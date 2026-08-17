@@ -54,6 +54,11 @@ Lokales Git-Repository fuer eine Analyse- und Monitoring-Infrastruktur rund um O
 - `R/run_duckdb_query.R` fuer einzelne SQL-Abfragen gegen die DuckDB-Datei
 - `R/run_duckdb_overview_report.R` fuer den kombinierten DuckDB-Analyse-Report
 
+## Betriebsmanual
+
+- `docs/06_betriebsmanual_workflow.md` fuer die Reihenfolge vor Ort und die
+  notwendigen Einstellungen
+
 ## Naechster Schritt
 
 Wenn du willst, baue ich als Naechstes ein kleines Grundgeruest mit:
