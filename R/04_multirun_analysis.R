@@ -65,13 +65,17 @@ benchmark_file_summary <- function(path) {
   if (!"probe" %in% names(df)) {
     df$probe <- "unknown"
   }
+  if (!"session_tag" %in% names(df)) {
+    parent_dir <- basename(dirname(path))
+    df$session_tag <- if (nzchar(parent_dir) && !identical(parent_dir, "raw")) parent_dir else "legacy"
+  }
   df$source_file <- path
   df
 }
 
 benchmark_run_summary <- function(df) {
   if (!is.data.frame(df) || !nrow(df)) return(data.frame())
-  key_cols <- intersect(c("target_label", "probe"), names(df))
+  key_cols <- intersect(c("session_tag", "target_label", "probe"), names(df))
   if (!length(key_cols)) return(data.frame())
 
   split_key <- interaction(df[, key_cols, drop = FALSE], drop = TRUE, lex.order = TRUE)
@@ -79,6 +83,7 @@ benchmark_run_summary <- function(df) {
 
   rows <- lapply(groups, function(g) {
     data.frame(
+      session_tag = if ("session_tag" %in% names(g)) normalize_empty(g$session_tag) else "legacy",
       target_label = normalize_empty(g$target_label),
       probe = normalize_empty(g$probe),
       rows = nrow(g),
@@ -118,6 +123,98 @@ build_multirun_bundle <- function(
     benchmark_rows = benchmark_rows,
     benchmark_summary = benchmark_summary
   )
+}
+
+benchmark_session_compare <- function(benchmark_rows) {
+  if (!is.data.frame(benchmark_rows) || !nrow(benchmark_rows)) return(data.frame())
+  if (!"session_tag" %in% names(benchmark_rows)) return(data.frame())
+  tags <- sort(unique(benchmark_rows$session_tag[!is.na(benchmark_rows$session_tag) & nzchar(benchmark_rows$session_tag)]))
+  if (length(tags) < 2) return(data.frame())
+
+  base_tag <- tags[1]
+  compare_tag <- tags[2]
+
+  subset_cols <- intersect(
+    c("session_tag", "target_label", "probe", "metric_ms", "connect_ms", "total_ms", "success"),
+    names(benchmark_rows)
+  )
+  df <- benchmark_rows[, subset_cols, drop = FALSE]
+  df <- df[df$session_tag %in% c(base_tag, compare_tag), , drop = FALSE]
+  if (!nrow(df)) return(data.frame())
+
+  group_key <- interaction(df$target_label, df$probe, drop = TRUE, lex.order = TRUE)
+  groups <- split(df, group_key)
+
+  rows <- lapply(groups, function(g) {
+    base <- g[g$session_tag == base_tag, , drop = FALSE]
+    compare <- g[g$session_tag == compare_tag, , drop = FALSE]
+    data.frame(
+      target_label = normalize_empty(g$target_label),
+      probe = normalize_empty(g$probe),
+      base_tag = base_tag,
+      compare_tag = compare_tag,
+      base_rows = nrow(base),
+      compare_rows = nrow(compare),
+      base_success_rate = if (nrow(base) && "success" %in% names(base)) mean(as.logical(base$success), na.rm = TRUE) else NA_real_,
+      compare_success_rate = if (nrow(compare) && "success" %in% names(compare)) mean(as.logical(compare$success), na.rm = TRUE) else NA_real_,
+      delta_success_rate = if (nrow(base) && nrow(compare)) {
+        (if ("success" %in% names(compare)) mean(as.logical(compare$success), na.rm = TRUE) else NA_real_) -
+          (if ("success" %in% names(base)) mean(as.logical(base$success), na.rm = TRUE) else NA_real_)
+      } else NA_real_,
+      base_metric_ms_mean = if (nrow(base) && "metric_ms" %in% names(base)) safe_mean(base$metric_ms) else NA_real_,
+      compare_metric_ms_mean = if (nrow(compare) && "metric_ms" %in% names(compare)) safe_mean(compare$metric_ms) else NA_real_,
+      delta_metric_ms_mean = if (nrow(base) && nrow(compare)) safe_mean(compare$metric_ms) - safe_mean(base$metric_ms) else NA_real_,
+      base_connect_ms_mean = if (nrow(base) && "connect_ms" %in% names(base)) safe_mean(base$connect_ms) else NA_real_,
+      compare_connect_ms_mean = if (nrow(compare) && "connect_ms" %in% names(compare)) safe_mean(compare$connect_ms) else NA_real_,
+      delta_connect_ms_mean = if (nrow(base) && nrow(compare)) safe_mean(compare$connect_ms) - safe_mean(base$connect_ms) else NA_real_,
+      base_total_ms_mean = if (nrow(base) && "total_ms" %in% names(base)) safe_mean(base$total_ms) else NA_real_,
+      compare_total_ms_mean = if (nrow(compare) && "total_ms" %in% names(compare)) safe_mean(compare$total_ms) else NA_real_,
+      delta_total_ms_mean = if (nrow(base) && nrow(compare)) safe_mean(compare$total_ms) - safe_mean(base$total_ms) else NA_real_,
+      stringsAsFactors = FALSE
+    )
+  })
+
+  do.call(rbind, rows)
+}
+
+write_benchmark_comparison_report <- function(
+  bundle = build_multirun_bundle(),
+  output_file = file.path(paths$reports, "network_direct_vs_switch.md")
+) {
+  compare_tbl <- benchmark_session_compare(bundle$benchmark_rows)
+  sum_tbl <- bundle$benchmark_summary
+  if (!nrow(compare_tbl)) {
+    md <- c(
+      "# Benchmark Vergleich",
+      "",
+      "Keine zwei beschrifteten Benchmark-Sessions gefunden.",
+      "",
+      "Tipp: setze `session_tag` in der Benchmark-Konfiguration, zum Beispiel `direct` und `switch`."
+    )
+    writeLines(md, output_file, useBytes = TRUE)
+    return(output_file)
+  }
+
+  md <- c(
+    "# Benchmark Vergleich",
+    "",
+    "## Zusammenfassung",
+    "",
+    fmt_md_table(sum_tbl, max_rows = 20),
+    "",
+    "## Direkt vs. Switch",
+    "",
+    fmt_md_table(compare_tbl, max_rows = 40),
+    "",
+    "## Hinweis",
+    "",
+    "- base_tag und compare_tag werden aus den ersten beiden Session-Tags gebildet.",
+    "- Fuer einen echten Direkt-vs-Switch-Vergleich sollten die Laufnamen `direct` und `switch` enthalten.",
+    "- Die Kennzahlen sind Mittelwerte ueber die jeweiligen CSV-Rows."
+  )
+
+  writeLines(md, output_file, useBytes = TRUE)
+  output_file
 }
 
 write_multirun_outputs <- function(bundle = build_multirun_bundle(), output_dir = file.path(paths$data_processed, "analysis")) {
@@ -236,7 +333,7 @@ write_multirun_plots <- function(
 
 write_multirun_report <- function(bundle = build_multirun_bundle(), output_file = file.path(paths$reports, "network_overview.md")) {
   inv_tbl <- if (nrow(bundle$inventory_sessions)) bundle$inventory_sessions[, intersect(c("computer_name", "collected_at", "adapter_count", "arp_count", "tcp_count", "listening_count", "primary_ipv4"), names(bundle$inventory_sessions)), drop = FALSE] else data.frame()
-  bench_tbl <- if (nrow(bundle$benchmark_summary)) bundle$benchmark_summary[, intersect(c("target_label", "probe", "rows", "success_rate", "metric_ms_mean", "metric_ms_median", "metric_ms_p95", "connect_ms_mean", "total_ms_mean"), names(bundle$benchmark_summary)), drop = FALSE] else data.frame()
+  bench_tbl <- if (nrow(bundle$benchmark_summary)) bundle$benchmark_summary[, intersect(c("session_tag", "target_label", "probe", "rows", "success_rate", "metric_ms_mean", "metric_ms_median", "metric_ms_p95", "connect_ms_mean", "total_ms_mean"), names(bundle$benchmark_summary)), drop = FALSE] else data.frame()
   figure_dir <- file.path(paths$reports, "figures")
   figure_links <- if (dir.exists(figure_dir)) {
     figs <- list.files(figure_dir, pattern = "\\.(png|svg)$", full.names = FALSE)

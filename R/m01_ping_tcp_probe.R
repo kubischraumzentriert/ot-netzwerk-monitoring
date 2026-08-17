@@ -128,8 +128,10 @@ run_benchmark <- function(targets = read_targets(), run_cfg = read_run_config())
   tcp_interval_sec <- as_num(run_cfg[["tcp_interval_sec"]], 1)
   tcp_timeout_sec <- as_num(run_cfg[["tcp_timeout_sec"]], 3)
   tcp_default_port <- as.integer(as_num(run_cfg[["tcp_port"]], 9000))
+  session_tag <- safe_component(run_cfg[["session_tag"]], fallback = "session")
   output_dir <- run_cfg[["output_dir"]]
   if (is.na(output_dir) || !nzchar(output_dir)) output_dir <- file.path(paths$root, "data", "raw")
+  output_dir <- file.path(output_dir, session_tag)
   dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 
   all_results <- list()
@@ -168,6 +170,12 @@ run_benchmark <- function(targets = read_targets(), run_cfg = read_run_config())
     )
     ping_df <- transform(do.call(rbind, ping_rows), target_label = target$label)
     tcp_df <- transform(do.call(rbind, tcp_rows), target_label = target$label)
+    ping_df$session_tag <- session_tag
+    tcp_df$session_tag <- session_tag
+    ping_df$target_host <- target$host
+    tcp_df$target_host <- target$host
+    ping_df$target_port <- port
+    tcp_df$target_port <- port
     combined <- bind_rows_union(ping_df, tcp_df)
     char_cols <- vapply(combined, is.character, logical(1))
     combined[char_cols] <- lapply(combined[char_cols], sanitize_text)

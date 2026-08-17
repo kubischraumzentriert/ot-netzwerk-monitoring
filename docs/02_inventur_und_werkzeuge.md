@@ -59,6 +59,14 @@ Wir bauen es so auf:
 Wenn du bereits das JDBC-JAR heruntergeladen hast, koennen wir den JDBC-Weg direkt nutzen.
 Der Standard-Flow fuer das Projekt bleibt trotzdem: CSV sammeln, Markdown erzeugen, dann optional in DuckDB laden.
 
+### Einfache Startskripte
+
+- `R/run_inventory_steckbrief.R` fuer den automatischen Inventur-Steckbrief
+- `powershell/run_inventory_steckbrief.ps1` fuer den Start aus PowerShell
+- `R/run_benchmark.R --run=configs/run.direct.example.csv --targets=configs/targets.csv`
+  fuer einen Direktlauf
+- `R/run_benchmark_comparison.R` fuer den Direkt-vs-Switch-Vergleich
+
 ## Wie du Wireshark, Nmap, ZAP und Suricata sinnvoll nutzt
 
 ### Nmap
@@ -119,7 +127,8 @@ Wenn dein Port 9000 kein Webdienst ist, ist ZAP eher zweitrangig.
 
 1. lokale Inventur
 2. Ping- und TCP-Benchmark
-3. Wireshark-Mitschnitt bei Auffaelligkeiten
-4. Nmap fuer strukturierte Port- und Host-Pruefung
-5. Suricata fuer passives Dauer-Monitoring
-6. ZAP nur, wenn eine Weboberflaeche beteiligt ist
+3. Direkt- und Switch-Benchmark getrennt laufen lassen
+4. Wireshark-Mitschnitt bei Auffaelligkeiten
+5. Nmap fuer strukturierte Port- und Host-Pruefung
+6. Suricata fuer passives Dauer-Monitoring
+7. ZAP nur, wenn eine Weboberflaeche beteiligt ist

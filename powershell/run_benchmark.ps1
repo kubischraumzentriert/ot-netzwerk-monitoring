@@ -1,5 +1,7 @@
 param(
-    [string]$ProjectRoot = (Split-Path -Parent $PSScriptRoot)
+    [string]$ProjectRoot = (Split-Path -Parent $PSScriptRoot),
+    [string]$TargetsConfig = (Join-Path $ProjectRoot 'configs\targets.csv'),
+    [string]$RunConfig = (Join-Path $ProjectRoot 'configs\run.csv')
 )
 
 $rscript = 'C:\Program Files\R\R-4.5.3\bin\Rscript.exe'
@@ -15,9 +17,8 @@ if (-not (Test-Path -LiteralPath $script)) {
 
 Push-Location $ProjectRoot
 try {
-    & $rscript $script
+    & $rscript $script "--targets=$TargetsConfig" "--run=$RunConfig"
 }
 finally {
     Pop-Location
 }
-

@@ -52,6 +52,11 @@ as_num <- function(x, default = NA_real_) {
   suppressWarnings(as.numeric(x))
 }
 
+safe_component <- function(x, fallback = "default") {
+  x <- ifelse(is.na(x) || !nzchar(x), fallback, x)
+  gsub("[^A-Za-z0-9_-]", "_", x)
+}
+
 read_csv_safe <- function(path) {
   if (!file.exists(path)) return(data.frame())
   read.csv(path, stringsAsFactors = FALSE, check.names = FALSE, fileEncoding = "UTF-8-BOM")

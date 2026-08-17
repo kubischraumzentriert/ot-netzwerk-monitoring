@@ -136,7 +136,10 @@ read_inventory_session <- function(session_dir) {
   )
 }
 
-inventory_steckbrief <- function(session_dir = latest_inventory_dir()) {
+inventory_steckbrief <- function(
+  session_dir = latest_inventory_dir(),
+  output_file = NULL
+) {
   if (is.na(session_dir) || !dir.exists(session_dir)) {
     stop("No inventory session found")
   }
@@ -210,7 +213,12 @@ inventory_steckbrief <- function(session_dir = latest_inventory_dir()) {
     "- Wenn DuckDB verfuegbar ist, koennen wir die Tabellen zusaetzlich in eine lokale Datenbank schreiben."
   )
 
-  out_file <- file.path(paths$reports, paste0("steckbrief_", basename(session_dir), ".md"))
+  if (is.null(output_file) || !nzchar(output_file)) {
+    out_file <- file.path(paths$reports, paste0("steckbrief_", basename(session_dir), ".md"))
+  } else {
+    out_file <- output_file
+  }
+  dir.create(dirname(out_file), recursive = TRUE, showWarnings = FALSE)
   writeLines(md, out_file, useBytes = TRUE)
   out_file
 }

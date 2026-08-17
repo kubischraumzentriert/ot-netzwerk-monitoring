@@ -47,7 +47,9 @@ Lokales Git-Repository fuer eine Analyse- und Monitoring-Infrastruktur rund um O
 - `powershell/list_capture_interfaces.ps1` fuer `tshark -D`
 - `powershell/start_wireshark_capture.ps1` fuer paketbasierten Mitschnitt
 - `powershell/start_suricata_capture.ps1` fuer passives Logging
+- `powershell/run_inventory_steckbrief.ps1` fuer den Inventur-Steckbrief
 - `R/run_multirun_analysis.R` fuer die gemeinsame Analyse mehrerer Sessions
+- `R/run_benchmark_comparison.R` fuer den Direkt-vs-Switch-Vergleich
 - `R/run_duckdb_analysis.R` fuer die lokale DuckDB-Datei und den DuckDB-Report
 - `R/run_duckdb_query.R` fuer einzelne SQL-Abfragen gegen die DuckDB-Datei
 - `R/run_duckdb_overview_report.R` fuer den kombinierten DuckDB-Analyse-Report
