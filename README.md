@@ -1,3 +1,8 @@
+---
+title: "README"
+output: "html"
+---
+
 # NetzwerkAnalyse
 
 Lokales Git-Repository fuer eine Analyse- und Monitoring-Infrastruktur rund um OT-Netze, Anlagen und Maschinen.

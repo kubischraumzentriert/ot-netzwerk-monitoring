@@ -1,3 +1,8 @@
+---
+title: "AGENTS"
+output: "html"
+---
+
 # AGENTS.md
 
 This repository uses this file as the primary instruction and context entry

@@ -1,3 +1,8 @@
+---
+title: "inventory steckbrief"
+output: "html"
+---
+
 # Netzwerk-Steckbrief Vorlage
 
 ## Kopf

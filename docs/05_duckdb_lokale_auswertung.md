@@ -1,3 +1,8 @@
+---
+title: "05 duckdb lokale auswertung"
+output: "html"
+---
+
 # Lokale DuckDB-Auswertung
 
 Diese Auswertung sammelt die vorhandenen Rohdaten in einer lokalen DuckDB-Datei

@@ -1,3 +1,8 @@
+---
+title: "SECURITY"
+output: "html"
+---
+
 # Security and Publication Notes
 
 This repository is intended to stay free of sensitive operational data.
