@@ -31,6 +31,18 @@ Das Skript versucht zunaechst den nativen DuckDB-Weg. Falls dieser in einer
 R-Umgebung nicht verfuegbar ist, kann die JDBC-Variante genutzt werden, sofern
 das JAR und die Java-Pakete vorhanden sind.
 
+Einzelne SQL-Abfragen laufen ueber:
+
+```powershell
+Rscript R/run_duckdb_query.R "SELECT * FROM inventory_sessions LIMIT 10"
+```
+
+Oder mit SQL-Datei:
+
+```powershell
+Rscript R/run_duckdb_query.R sql\inventory_overview.sql
+```
+
 ## Naechste Ausbaustufen
 
 - weitere Tabellen pro Anlage

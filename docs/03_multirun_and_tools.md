@@ -47,3 +47,6 @@ Als Alternative kann das JDBC-JAR verwendet werden.
 Der Einstieg ist `R/run_duckdb_analysis.R`. Das Skript schreibt die Datenbank
 `data/processed/network_analysis.duckdb` und erzeugt dazu den Report
 `reports/network_overview_duckdb.md`.
+
+Einzelne Abfragen laufen ueber `R/run_duckdb_query.R`, zum Beispiel mit
+`sql/inventory_overview.sql`.

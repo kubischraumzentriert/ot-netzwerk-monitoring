@@ -166,3 +166,43 @@ refresh_duckdb_analysis <- function(
   message("Wrote DuckDB analysis report: ", output_file)
   invisible(TRUE)
 }
+
+duckdb_query <- function(
+  sql,
+  db_path = file.path(paths$data_processed, "network_analysis.duckdb")
+) {
+  sql <- paste(sql, collapse = "\n")
+  if (!nzchar(trimws(sql))) {
+    stop("SQL statement is empty")
+  }
+
+  if (!dbi_available() || !file.exists(db_path)) {
+    stop("DuckDB database not available: ", db_path)
+  }
+
+  con <- open_duckdb(db_path)
+  on.exit(DBI::dbDisconnect(con, shutdown = TRUE), add = TRUE)
+
+  DBI::dbGetQuery(con, sql)
+}
+
+duckdb_write_query_result <- function(
+  sql,
+  output_file,
+  db_path = file.path(paths$data_processed, "network_analysis.duckdb")
+) {
+  result <- duckdb_query(sql = sql, db_path = db_path)
+  dir.create(dirname(output_file), recursive = TRUE, showWarnings = FALSE)
+
+  if (grepl("\\.csv$", output_file, ignore.case = TRUE)) {
+    write.csv(result, output_file, row.names = FALSE)
+  } else {
+    writeLines(c(
+      "# DuckDB Query Result",
+      "",
+      fmt_md_table(result, max_rows = 200)
+    ), output_file, useBytes = TRUE)
+  }
+
+  invisible(result)
+}
