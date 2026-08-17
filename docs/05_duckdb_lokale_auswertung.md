@@ -43,6 +43,12 @@ Oder mit SQL-Datei:
 Rscript R/run_duckdb_query.R sql\inventory_overview.sql
 ```
 
+Einen kombinierten Ueberblick fuer Inventur und Benchmarks erzeugt:
+
+```powershell
+Rscript R/run_duckdb_overview_report.R
+```
+
 ## Naechste Ausbaustufen
 
 - weitere Tabellen pro Anlage

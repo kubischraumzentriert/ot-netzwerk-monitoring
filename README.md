@@ -50,6 +50,7 @@ Lokales Git-Repository fuer eine Analyse- und Monitoring-Infrastruktur rund um O
 - `R/run_multirun_analysis.R` fuer die gemeinsame Analyse mehrerer Sessions
 - `R/run_duckdb_analysis.R` fuer die lokale DuckDB-Datei und den DuckDB-Report
 - `R/run_duckdb_query.R` fuer einzelne SQL-Abfragen gegen die DuckDB-Datei
+- `R/run_duckdb_overview_report.R` fuer den kombinierten DuckDB-Analyse-Report
 
 ## Naechster Schritt
 

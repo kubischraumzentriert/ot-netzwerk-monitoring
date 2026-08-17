@@ -50,3 +50,6 @@ Der Einstieg ist `R/run_duckdb_analysis.R`. Das Skript schreibt die Datenbank
 
 Einzelne Abfragen laufen ueber `R/run_duckdb_query.R`, zum Beispiel mit
 `sql/inventory_overview.sql`.
+
+Der kombinierte Ueberblick fuer Inventur und Benchmark heisst
+`R/run_duckdb_overview_report.R`.
