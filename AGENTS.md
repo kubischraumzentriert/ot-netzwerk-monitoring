@@ -11,6 +11,8 @@ Before starting substantive work in this repository:
 4. Read the relevant workflow docs, especially `docs/06_betriebsmanual_workflow.md`.
 5. Follow the repository rules for documentation, Git usage, verification, and
    reporting.
+6. Ensure every new `.md` document starts with a YAML header and set
+   `output: "html"` there unless a different output format is explicitly needed.
 
 ## Working rules
 
