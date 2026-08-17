@@ -48,7 +48,7 @@ Lokales Git-Repository fuer eine Analyse- und Monitoring-Infrastruktur rund um O
 - `powershell/start_wireshark_capture.ps1` fuer paketbasierten Mitschnitt
 - `powershell/start_suricata_capture.ps1` fuer passives Logging
 - `R/run_multirun_analysis.R` fuer die gemeinsame Analyse mehrerer Sessions
-- `R/run_duckdb_analysis.R` fuer die lokale DuckDB-Datei
+- `R/run_duckdb_analysis.R` fuer die lokale DuckDB-Datei und den DuckDB-Report
 
 ## Naechster Schritt
 

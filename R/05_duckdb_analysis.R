@@ -75,3 +75,94 @@ load_multirun_bundle_into_duckdb <- function(
   message("No DuckDB client available in this R session.")
   invisible(FALSE)
 }
+
+duckdb_table_counts <- function(
+  db_path = file.path(paths$data_processed, "network_analysis.duckdb")
+) {
+  if (!dbi_available()) {
+    return(data.frame())
+  }
+  if (!file.exists(db_path)) {
+    return(data.frame())
+  }
+
+  con <- open_duckdb(db_path)
+  on.exit(DBI::dbDisconnect(con, shutdown = TRUE), add = TRUE)
+
+  tables <- DBI::dbListTables(con)
+  if (!length(tables)) {
+    return(data.frame())
+  }
+
+  rows <- lapply(tables, function(tbl) {
+    count_sql <- paste0('SELECT COUNT(*) AS n_rows FROM "', tbl, '"')
+    n_rows <- tryCatch(
+      as.integer(DBI::dbGetQuery(con, count_sql)$n_rows[1]),
+      error = function(e) NA_integer_
+    )
+    data.frame(table_name = tbl, rows = n_rows, stringsAsFactors = FALSE)
+  })
+
+  do.call(rbind, rows)
+}
+
+write_duckdb_report <- function(
+  db_path = file.path(paths$data_processed, "network_analysis.duckdb"),
+  output_file = file.path(paths$reports, "network_overview_duckdb.md")
+) {
+  counts <- duckdb_table_counts(db_path)
+  if (!nrow(counts)) {
+    md <- c(
+      "# DuckDB Analyse Uebersicht",
+      "",
+      "Keine DuckDB-Datei oder keine Tabellen gefunden."
+    )
+    writeLines(md, output_file, useBytes = TRUE)
+    return(output_file)
+  }
+
+  counts <- counts[order(counts$table_name), , drop = FALSE]
+  total_rows <- sum(counts$rows, na.rm = TRUE)
+
+  md <- c(
+    "# DuckDB Analyse Uebersicht",
+    "",
+    paste0("- Datenbank: ", db_path),
+    paste0("- Tabellen: ", nrow(counts)),
+    paste0("- Zeilen gesamt: ", total_rows),
+    "",
+    "## Tabellen",
+    "",
+    fmt_md_table(counts, max_rows = 100),
+    "",
+    "## Naechste Schritte",
+    "",
+    "- bei Bedarf weitere Rohdaten als Tabellen aufnehmen",
+    "- SQL-Abfragen fuer Vergleichswerte anlegen",
+    "- DuckDB als lokales Archiv fuer mehrere Anlagen nutzen"
+  )
+
+  writeLines(md, output_file, useBytes = TRUE)
+  output_file
+}
+
+refresh_duckdb_analysis <- function(
+  bundle = build_multirun_bundle(),
+  db_path = file.path(paths$data_processed, "network_analysis.duckdb"),
+  output_file = file.path(paths$reports, "network_overview_duckdb.md"),
+  jar_path = duckdb_jdbc_default_jar(),
+  driver_class = "org.duckdb.DuckDBDriver"
+) {
+  loaded <- load_multirun_bundle_into_duckdb(
+    bundle = bundle,
+    db_path = db_path,
+    jar_path = jar_path,
+    driver_class = driver_class
+  )
+  if (!isTRUE(loaded)) {
+    return(invisible(FALSE))
+  }
+  write_duckdb_report(db_path = db_path, output_file = output_file)
+  message("Wrote DuckDB analysis report: ", output_file)
+  invisible(TRUE)
+}

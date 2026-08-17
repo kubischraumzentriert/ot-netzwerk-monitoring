@@ -44,3 +44,6 @@ DuckDB ist die gemeinsame lokale Analyse-Datei fuer:
 Der native Weg ist `duckdb` als R-Paket.
 Als Alternative kann das JDBC-JAR verwendet werden.
 
+Der Einstieg ist `R/run_duckdb_analysis.R`. Das Skript schreibt die Datenbank
+`data/processed/network_analysis.duckdb` und erzeugt dazu den Report
+`reports/network_overview_duckdb.md`.
