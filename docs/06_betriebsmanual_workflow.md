@@ -3,7 +3,7 @@ title: "Betriebsmanual NetzwerkAnalyse Workflow"
 version: "1.0"
 date: "2026-08-17"
 project: "NetzwerkAnalyse"
-purpose: "Vor-Ort-Workflow fuer Inventur, Port-9000-Tests, Direkt-vs-Switch-Vergleich und Auswertung"
+purpose: "Vor-Ort-Workflow fuer Inventur, konfigurierbare TCP-Port-Tests auf einem oder mehreren Ports pro Zielhost, Direkt-vs-Switch-Vergleich und Auswertung"
 ---
 
 # Betriebsmanual Workflow
@@ -14,7 +14,7 @@ Dieses Manual beschreibt den lokalen Ablauf fuer einen Laptop an einer Anlage
 oder an drei vernetzten Geraeten. Ziel ist:
 
 - den Ist-Zustand der Kommunikation zu erfassen
-- Port 9000 gegen die Geraete zu messen
+- einen konfigurierbaren TCP-Port gegen die Geraete zu messen, Standard ist 9000, wobei jeder Zielhost einen eigenen Port haben kann
 - einen Vergleich zwischen direkter Verbindung und Switch zu erzeugen
 - die Ergebnisse als Markdown und optional in DuckDB abzulegen
 
@@ -34,7 +34,7 @@ Wichtig ist dabei:
 - bei produktionsnahen Geraeten zuerst mit einer kurzen, vorsichtigen Laufzeit starten
 
 Wenn du den Test gegen die reale Anlage machst, wuerde ich ihn zuerst ohne Nmap
-und ohne Suricata starten und nur die Inventur plus Port-9000-Benchmark laufen
+und ohne Suricata starten und nur die Inventur plus TCP-Port-Benchmark auf mehreren Ports pro Zielhost laufen
 lassen. Die passiven Werkzeuge kannst du danach dazunehmen.
 
 ## Vorbereitung
@@ -117,7 +117,7 @@ Ergebnis:
 ### Phase D: Lauf mit Switch
 
 1. Switch zwischenschalten
-2. dieselben Zieladressen und Port 9000 verwenden
+2. dieselben Zieladressen und bei Bedarf pro Zielhost unterschiedliche TCP-Ports verwenden
 3. `configs/run.switch.csv` oder `configs/run.switch.example.csv` verwenden
 4. erneut `powershell/run_benchmark.ps1`
 
@@ -167,7 +167,7 @@ Empfehlung fuer den Start:
 
 - `ping_count = 20`
 - `tcp_count = 20`
-- `tcp_port = 9000`
+- `tcp_port = 9000` als Standardwert, aber jeder freigegebene Port pro Zielhost ist moeglich
 - `session_tag = direct` oder `switch`
 
 ### `configs/scan_targets.csv`
@@ -225,7 +225,7 @@ Wenn du nur wenig Zeit hast, dann wuerde ich so vorgehen:
 
 ## Optionaler Feinschliff
 
-Wenn das Programm auf Port 9000 besonders kritisch ist, kannst du den Test
+Wenn das Programm auf einem bestimmten Port besonders kritisch ist, kannst du den Test
 so weiter schärfen:
 
 - laengere Messreihe, aber niedrige Frequenz

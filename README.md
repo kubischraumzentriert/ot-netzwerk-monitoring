@@ -10,8 +10,8 @@ Lokales Git-Repository fuer eine Analyse- und Monitoring-Infrastruktur rund um O
 ## Oeffentliche Kurzfassung
 
 Dieses Repository sammelt Werkzeuge, Doku und Auswertungen fuer lokale
-Netzwerk-Inventuren, Port-9000-Messungen und Vergleiche zwischen direkter
-Verbindung und Switch.
+Netzwerk-Inventuren, konfigurierbare TCP-Port-Messungen auf einem oder mehreren Ports pro Zielhost und Vergleiche
+zwischen direkter Verbindung und Switch.
 
 Die Repo-Contents sind bewusst so aufgebaut, dass keine Rohdaten, Scans oder
 Ergebnisartefakte ins Repository gehoeren. Alles Laufzeitbezogene landet lokal
@@ -74,10 +74,10 @@ Bevor du am Projekt arbeitest, lies bitte:
 
 - `powershell/inventory_collect.ps1` fuer die lokale Inventur
 - `powershell/run_inventory_steckbrief.ps1` fuer den Inventur-Steckbrief
-- `powershell/run_benchmark.ps1` fuer Port-9000-Messungen
+- `powershell/run_benchmark.ps1` fuer TCP-Port-Messungen, Standard ist 9000, je Zielhost kann ein eigener Port gesetzt werden
 - `powershell/run_benchmark_comparison.ps1` fuer Direkt-vs-Switch-Vergleiche
 - `powershell/run_localhost_workflow.ps1` fuer den lokalen Trockenlauf
-- `powershell/run_nmap_scan.ps1` fuer konservative Nmap-Scans auf Port 9000
+- `powershell/run_nmap_scan.ps1` fuer konservative Nmap-Scans auf freigegebenen Ports
 - `powershell/list_capture_interfaces.ps1` fuer `tshark -D`
 - `powershell/start_wireshark_capture.ps1` fuer paketbasierten Mitschnitt
 - `powershell/start_suricata_capture.ps1` fuer passives Logging
@@ -101,6 +101,7 @@ Bevor du am Projekt arbeitest, lies bitte:
 - Beispiel-IPs in `configs/*.csv` sind absichtlich Platzhalter
 - echte Anlagenadressen gehoeren nicht ins Repo
 - Rohdaten, Scans und Reports bleiben lokal und werden nicht versioniert
+- TCP-Ports sind konfigurierbar; `9000` ist nur der Standardwert und pro Zielhost kann ein eigener Port gesetzt werden
 
 ## Public Repo Hinweis
 

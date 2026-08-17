@@ -11,7 +11,7 @@ purpose: "Kompakte Checkliste fuer Vor-Ort-Tests, Scans und Auswertung"
 Diese Checkliste ist fuer den Scan-Auswerte-Workflow gedacht:
 
 - Anlage oder Testnetz vor Ort
-- Inventur und Port-9000-Benchmark
+- Inventur und Benchmark auf einem konfigurierbaren TCP-Port, Standard ist 9000, je Zielhost ist ein eigener Port moeglich
 - optional Nmap, Wireshark, Suricata
 - anschliessende Auswertung in R oder DuckDB
 
@@ -31,9 +31,9 @@ Diese Checkliste ist fuer den Scan-Auswerte-Workflow gedacht:
 ## Beim Aufbau
 
 - [ ] Laptop mit dem Testnetz oder der Anlage verbinden
-- [ ] korrekte IP-/Port-Kombination pruefen
+- [ ] korrekte IP-/Port-Kombination je Zielhost pruefen
 - [ ] Gateway- und Routing-Situation kurz kontrollieren
-- [ ] wenn ein Switch getestet wird, gleiche Geraete und gleiche Ports behalten
+- [ ] wenn ein Switch getestet wird, gleiche Geraete und je Zielhost die gleichen Ports behalten
 - [ ] Laufzeitfenster festlegen
 - [ ] Notizen zur Verkabelung und Reihenfolge machen
 
@@ -45,7 +45,7 @@ Diese Checkliste ist fuer den Scan-Auswerte-Workflow gedacht:
 - [ ] Adapter, ARP, TCP und Route kurz ueberfliegen
 - [ ] auffaellige offene Verbindungen notieren
 
-## Port-9000-Benchmark
+## TCP-Port-Benchmark
 
 - [ ] `powershell/run_benchmark.ps1` mit Direktlauf ausfuehren
 - [ ] nach dem Direktlauf Switchlauf mit derselben Konfiguration ausfuehren
@@ -56,7 +56,7 @@ Diese Checkliste ist fuer den Scan-Auswerte-Workflow gedacht:
 ## Optionaler Netzwerkscan
 
 - [ ] `powershell/run_nmap_scan.ps1` nur gegen die freigegebenen Ziele ausfuehren
-- [ ] Port 9000 und nur die benoetigten Hosts scannen
+- [ ] den jeweils freigegebenen Port je Zielhost und nur die benoetigten Hosts scannen
 - [ ] Scan-Fenster kurz halten
 - [ ] keine aggressiven Defaults verwenden
 
@@ -66,7 +66,7 @@ Diese Checkliste ist fuer den Scan-Auswerte-Workflow gedacht:
   pruefen
 - [ ] `powershell/start_wireshark_capture.ps1` nur im Testfenster starten
 - [ ] `powershell/start_suricata_capture.ps1` nur passiv und freigegeben nutzen
-- [ ] Mitschnitt auf Port 9000 oder die drei Ziele begrenzen
+- [ ] Mitschnitt auf den jeweils freigegebenen Port je Zielhost oder die drei Ziele begrenzen
 
 ## Nach dem Lauf
 
@@ -88,4 +88,3 @@ Diese Checkliste ist fuer den Scan-Auswerte-Workflow gedacht:
 5. Vergleich
 6. optional Scans und Mitschnitt
 7. Auswertung und Ablage
-
