@@ -131,7 +131,9 @@ run_benchmark <- function(targets = read_targets(), run_cfg = read_run_config())
   session_tag <- safe_component(run_cfg[["session_tag"]], fallback = "session")
   output_dir <- run_cfg[["output_dir"]]
   if (is.na(output_dir) || !nzchar(output_dir)) output_dir <- file.path(paths$root, "data", "raw")
-  output_dir <- file.path(output_dir, session_tag)
+  if (tolower(basename(output_dir)) != tolower(session_tag)) {
+    output_dir <- file.path(output_dir, session_tag)
+  }
   dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 
   all_results <- list()
