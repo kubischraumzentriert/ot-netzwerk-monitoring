@@ -1,0 +1,169 @@
+source("R/00_setup.R", local = TRUE)
+source("R/01_inventory_report.R", local = TRUE)
+
+list_inventory_sessions <- function(root = paths$inventory) {
+  if (!dir.exists(root)) return(character())
+  dirs <- list.dirs(root, full.names = TRUE, recursive = FALSE)
+  dirs[dir.exists(dirs)]
+}
+
+list_benchmark_files <- function(root = paths$data_raw) {
+  if (!dir.exists(root)) return(character())
+  files <- list.files(root, pattern = "\\.csv$", full.names = TRUE, recursive = TRUE)
+  files[!grepl("[\\\\/]inventory[\\\\/]", files, ignore.case = TRUE)]
+}
+
+safe_mean <- function(x) {
+  x <- suppressWarnings(as.numeric(x))
+  if (!length(x) || all(is.na(x))) return(NA_real_)
+  mean(x, na.rm = TRUE)
+}
+
+safe_median <- function(x) {
+  x <- suppressWarnings(as.numeric(x))
+  if (!length(x) || all(is.na(x))) return(NA_real_)
+  stats::median(x, na.rm = TRUE)
+}
+
+safe_p95 <- function(x) {
+  x <- suppressWarnings(as.numeric(x))
+  x <- x[!is.na(x)]
+  if (!length(x)) return(NA_real_)
+  as.numeric(stats::quantile(x, 0.95, names = FALSE, type = 7))
+}
+
+inventory_session_summary <- function(session_dir) {
+  inv <- read_inventory_session(session_dir)
+  host_keys <- if (nrow(inv$host_info)) trimws(tolower(inv$host_info$key)) else character()
+  computer_name <- if (nrow(inv$host_info)) normalize_empty(inv$host_info$value[host_keys == "computer_name"]) else "n/a"
+  collected_at <- if (nrow(inv$host_info)) normalize_empty(inv$host_info$value[host_keys == "collected_at"]) else "n/a"
+  primary_ip <- if (nrow(inv$net_adapters)) normalize_empty(inv$net_adapters$ipv4[!is.na(inv$net_adapters$ipv4)][1], "n/a") else "n/a"
+  primary_mac <- if (nrow(inv$net_adapters)) normalize_empty(inv$net_adapters$mac[!is.na(inv$net_adapters$mac)][1], "n/a") else "n/a"
+
+  data.frame(
+    session_dir = session_dir,
+    computer_name = computer_name,
+    collected_at = collected_at,
+    adapter_count = nrow(inv$net_adapters),
+    arp_count = nrow(inv$arp_neighbors),
+    tcp_count = nrow(inv$tcp_connections),
+    listening_count = if (nrow(inv$tcp_connections)) sum(inv$tcp_connections$protocol == "TCP" & inv$tcp_connections$foreign_address %in% c("0.0.0.0:0", "[::]:0"), na.rm = TRUE) else 0,
+    primary_ipv4 = primary_ip,
+    primary_mac = primary_mac,
+    stringsAsFactors = FALSE
+  )
+}
+
+benchmark_file_summary <- function(path) {
+  if (!file.exists(path)) return(data.frame())
+  df <- read.csv(path, stringsAsFactors = FALSE, check.names = FALSE, fileEncoding = "UTF-8-BOM")
+  if (!nrow(df)) return(data.frame())
+
+  if (!"target_label" %in% names(df)) {
+    df$target_label <- sub("_[^_]+\\.csv$", "", basename(path))
+  }
+  if (!"probe" %in% names(df)) {
+    df$probe <- "unknown"
+  }
+  df$source_file <- path
+  df
+}
+
+benchmark_run_summary <- function(df) {
+  if (!is.data.frame(df) || !nrow(df)) return(data.frame())
+  key_cols <- intersect(c("target_label", "probe"), names(df))
+  if (!length(key_cols)) return(data.frame())
+
+  split_key <- interaction(df[, key_cols, drop = FALSE], drop = TRUE, lex.order = TRUE)
+  groups <- split(df, split_key)
+
+  rows <- lapply(groups, function(g) {
+    data.frame(
+      target_label = normalize_empty(g$target_label),
+      probe = normalize_empty(g$probe),
+      rows = nrow(g),
+      success_rate = if ("success" %in% names(g)) mean(as.logical(g$success), na.rm = TRUE) else NA_real_,
+      metric_ms_mean = if ("metric_ms" %in% names(g)) safe_mean(g$metric_ms) else NA_real_,
+      metric_ms_median = if ("metric_ms" %in% names(g)) safe_median(g$metric_ms) else NA_real_,
+      metric_ms_p95 = if ("metric_ms" %in% names(g)) safe_p95(g$metric_ms) else NA_real_,
+      connect_ms_mean = if ("connect_ms" %in% names(g)) safe_mean(g$connect_ms) else NA_real_,
+      total_ms_mean = if ("total_ms" %in% names(g)) safe_mean(g$total_ms) else NA_real_,
+      stringsAsFactors = FALSE
+    )
+  })
+
+  do.call(rbind, rows)
+}
+
+build_multirun_bundle <- function(
+  inventory_dirs = list_inventory_sessions(),
+  benchmark_files = list_benchmark_files()
+) {
+  inventory_sessions <- if (length(inventory_dirs)) {
+    do.call(rbind, lapply(inventory_dirs, inventory_session_summary))
+  } else {
+    data.frame()
+  }
+
+  benchmark_rows <- if (length(benchmark_files)) {
+    do.call(rbind, lapply(benchmark_files, benchmark_file_summary))
+  } else {
+    data.frame()
+  }
+
+  benchmark_summary <- benchmark_run_summary(benchmark_rows)
+
+  list(
+    inventory_sessions = inventory_sessions,
+    benchmark_rows = benchmark_rows,
+    benchmark_summary = benchmark_summary
+  )
+}
+
+write_multirun_outputs <- function(bundle = build_multirun_bundle(), output_dir = file.path(paths$data_processed, "analysis")) {
+  dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
+  if (nrow(bundle$inventory_sessions)) {
+    write.csv(bundle$inventory_sessions, file.path(output_dir, "inventory_sessions.csv"), row.names = FALSE)
+  }
+  if (nrow(bundle$benchmark_rows)) {
+    write.csv(bundle$benchmark_rows, file.path(output_dir, "benchmark_rows.csv"), row.names = FALSE)
+  }
+  if (nrow(bundle$benchmark_summary)) {
+    write.csv(bundle$benchmark_summary, file.path(output_dir, "benchmark_summary.csv"), row.names = FALSE)
+  }
+  invisible(output_dir)
+}
+
+write_multirun_report <- function(bundle = build_multirun_bundle(), output_file = file.path(paths$reports, "network_overview.md")) {
+  inv_tbl <- if (nrow(bundle$inventory_sessions)) bundle$inventory_sessions[, intersect(c("computer_name", "collected_at", "adapter_count", "arp_count", "tcp_count", "listening_count", "primary_ipv4"), names(bundle$inventory_sessions)), drop = FALSE] else data.frame()
+  bench_tbl <- if (nrow(bundle$benchmark_summary)) bundle$benchmark_summary[, intersect(c("target_label", "probe", "rows", "success_rate", "metric_ms_mean", "metric_ms_median", "metric_ms_p95", "connect_ms_mean", "total_ms_mean"), names(bundle$benchmark_summary)), drop = FALSE] else data.frame()
+
+  md <- c(
+    "# Netzwerk Analyse Uebersicht",
+    "",
+    "## Inventur Sessions",
+    "",
+    fmt_md_table(inv_tbl, max_rows = 20),
+    "",
+    "## Benchmark Summary",
+    "",
+    fmt_md_table(bench_tbl, max_rows = 20),
+    "",
+    "## Dateien",
+    "",
+    paste0("- Inventur-Sessions: ", if (nrow(bundle$inventory_sessions)) nrow(bundle$inventory_sessions) else 0),
+    paste0("- Benchmark-Rows: ", if (nrow(bundle$benchmark_rows)) nrow(bundle$benchmark_rows) else 0),
+    paste0("- Benchmark-Gruppen: ", if (nrow(bundle$benchmark_summary)) nrow(bundle$benchmark_summary) else 0),
+    "",
+    "## Naechste Auswertungsschritte",
+    "",
+    "- Direkt vs. Switch als getrennte Sessions markieren",
+    "- Port 9000 Messungen pro Geraet vergleichen",
+    "- auffaellige Hosts mit Wireshark oder Suricata nachverfolgen",
+    "- Ergebnisse bei Bedarf in DuckDB laden"
+  )
+
+  writeLines(md, output_file, useBytes = TRUE)
+  output_file
+}
+

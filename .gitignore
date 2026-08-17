@@ -1,0 +1,35 @@
+# Betriebssystem und Editor
+.DS_Store
+Thumbs.db
+*.swp
+*.tmp
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+
+# R
+.Rhistory
+.RData
+.Rproj.user/
+
+# PowerShell / Windows
+*.ps1~*
+
+# Daten und Exporte
+data/raw/*
+!data/raw/.gitkeep
+!data/raw/inventory/
+data/raw/inventory/*
+data/processed/*
+!data/processed/.gitkeep
+
+# Reports
+reports/*
+!reports/.gitkeep
