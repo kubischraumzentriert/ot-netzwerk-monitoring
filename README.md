@@ -2,6 +2,16 @@
 
 Lokales Git-Repository fuer eine Analyse- und Monitoring-Infrastruktur rund um OT-Netze, Anlagen und Maschinen.
 
+## Oeffentliche Kurzfassung
+
+Dieses Repository sammelt Werkzeuge, Doku und Auswertungen fuer lokale
+Netzwerk-Inventuren, Port-9000-Messungen und Vergleiche zwischen direkter
+Verbindung und Switch.
+
+Die Repo-Contents sind bewusst so aufgebaut, dass keine Rohdaten, Scans oder
+Ergebnisartefakte ins Repository gehoeren. Alles Laufzeitbezogene landet lokal
+unter `data/` oder `reports/` und ist in `.gitignore` ausgeschlossen.
+
 ## Zielbild
 
 - Netzwerke und Assets inventarisieren
@@ -58,6 +68,12 @@ Lokales Git-Repository fuer eine Analyse- und Monitoring-Infrastruktur rund um O
 
 - `docs/06_betriebsmanual_workflow.md` fuer die Reihenfolge vor Ort und die
   notwendigen Einstellungen
+
+## GitHub Hinweis
+
+- Beispiel-IPs in `configs/*.csv` sind absichtlich Platzhalter
+- echte Anlagenadressen gehoeren nicht ins Repo
+- Rohdaten, Scans und Reports bleiben lokal und werden nicht versioniert
 
 ## Naechster Schritt
 
