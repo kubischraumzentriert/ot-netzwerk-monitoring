@@ -40,8 +40,9 @@ Validierungen.
 1. [`README.md`](README.md) lesen
 2. [`AGENTS.md`](AGENTS.md) lesen
 3. [`SECURITY.md`](SECURITY.md) lesen
-4. [`docs/06_betriebsmanual_workflow.md`](docs/06_betriebsmanual_workflow.md) lesen
-5. je nach Ziel die passende Konfiguration in `configs/` anpassen
+4. [`docs/07_vor_ort_checkliste_scan_auswerte_workflow.md`](docs/07_vor_ort_checkliste_scan_auswerte_workflow.md) lesen
+5. [`docs/06_betriebsmanual_workflow.md`](docs/06_betriebsmanual_workflow.md) lesen
+6. je nach Ziel die passende Konfiguration in `configs/` anpassen
 
 ## Wichtige Regeln
 
@@ -54,4 +55,3 @@ Validierungen.
 - Vor-Ort-Checkliste weiter verdichten
 - echte `direct`- und `switch`-Testlaeufe ausfuehren
 - Vergleichsreport mit realen Messwerten fuellen
-

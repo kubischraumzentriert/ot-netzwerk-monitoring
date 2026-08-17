@@ -19,7 +19,8 @@ Bevor du am Projekt arbeitest, lies bitte:
 1. [AGENTS.md](AGENTS.md)
 2. [SECURITY.md](SECURITY.md)
 3. [Statusanker.md](Statusanker.md)
-4. das Betriebsmanual in [docs/06_betriebsmanual_workflow.md](docs/06_betriebsmanual_workflow.md)
+4. die Checkliste in [docs/07_vor_ort_checkliste_scan_auswerte_workflow.md](docs/07_vor_ort_checkliste_scan_auswerte_workflow.md)
+5. das Betriebsmanual in [docs/06_betriebsmanual_workflow.md](docs/06_betriebsmanual_workflow.md)
 
 ## Zielbild
 
@@ -87,6 +88,8 @@ Bevor du am Projekt arbeitest, lies bitte:
 
 - `docs/06_betriebsmanual_workflow.md` fuer die Reihenfolge vor Ort und die
   notwendigen Einstellungen
+- `docs/07_vor_ort_checkliste_scan_auswerte_workflow.md` fuer die kompakte
+  Vor-Ort-Checkliste
 
 ## GitHub Hinweis
 

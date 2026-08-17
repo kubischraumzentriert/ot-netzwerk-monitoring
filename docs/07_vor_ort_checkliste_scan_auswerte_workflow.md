@@ -1,0 +1,91 @@
+---
+title: "Vor-Ort-Checkliste Scan-Auswerte-Workflow"
+version: "1.0"
+date: "2026-08-17"
+project: "NetzwerkAnalyse"
+purpose: "Kompakte Checkliste fuer Vor-Ort-Tests, Scans und Auswertung"
+---
+
+# Vor-Ort-Checkliste
+
+Diese Checkliste ist fuer den Scan-Auswerte-Workflow gedacht:
+
+- Anlage oder Testnetz vor Ort
+- Inventur und Port-9000-Benchmark
+- optional Nmap, Wireshark, Suricata
+- anschliessende Auswertung in R oder DuckDB
+
+## Vor dem Anschluss
+
+- [ ] Freigabe fuer den Test liegt vor
+- [ ] Ziel ist klar: direkt, ueber Switch oder lokaler Trockenlauf
+- [ ] Relevante IPs und Hostnamen sind dokumentiert
+- [ ] `configs/targets.csv` ist vorbereitet
+- [ ] falls gebraucht: `configs/run.direct.csv` und `configs/run.switch.csv`
+  sind angepasst
+- [ ] unnoetige Netzwerkadapter sind identifiziert
+- [ ] VPN, Wi-Fi und sonstige Fremdverbindungen sind ausgeschaltet
+- [ ] nur der fuer den Test benoetigte Adapter ist aktiv
+- [ ] `SECURITY.md` und `AGENTS.md` sind im Kopf
+
+## Beim Aufbau
+
+- [ ] Laptop mit dem Testnetz oder der Anlage verbinden
+- [ ] korrekte IP-/Port-Kombination pruefen
+- [ ] Gateway- und Routing-Situation kurz kontrollieren
+- [ ] wenn ein Switch getestet wird, gleiche Geraete und gleiche Ports behalten
+- [ ] Laufzeitfenster festlegen
+- [ ] Notizen zur Verkabelung und Reihenfolge machen
+
+## Inventur
+
+- [ ] `powershell/inventory_collect.ps1` ausfuehren
+- [ ] `powershell/run_inventory_steckbrief.ps1` ausfuehren
+- [ ] Steckbrief auf Plausibilitaet pruefen
+- [ ] Adapter, ARP, TCP und Route kurz ueberfliegen
+- [ ] auffaellige offene Verbindungen notieren
+
+## Port-9000-Benchmark
+
+- [ ] `powershell/run_benchmark.ps1` mit Direktlauf ausfuehren
+- [ ] nach dem Direktlauf Switchlauf mit derselben Konfiguration ausfuehren
+- [ ] fuer jeden Zielhost auf Erfolg, Latenz und Ausreisser achten
+- [ ] die Session-Tags `direct` und `switch` sauber setzen
+- [ ] Ergebnisse unter `data/raw/direct/` und `data/raw/switch/` ablegen
+
+## Optionaler Netzwerkscan
+
+- [ ] `powershell/run_nmap_scan.ps1` nur gegen die freigegebenen Ziele ausfuehren
+- [ ] Port 9000 und nur die benoetigten Hosts scannen
+- [ ] Scan-Fenster kurz halten
+- [ ] keine aggressiven Defaults verwenden
+
+## Optionaler Mitschnitt
+
+- [ ] vor dem Mitschnitt Interface mit `powershell/list_capture_interfaces.ps1`
+  pruefen
+- [ ] `powershell/start_wireshark_capture.ps1` nur im Testfenster starten
+- [ ] `powershell/start_suricata_capture.ps1` nur passiv und freigegeben nutzen
+- [ ] Mitschnitt auf Port 9000 oder die drei Ziele begrenzen
+
+## Nach dem Lauf
+
+- [ ] Rohdaten liegen an den erwarteten Stellen
+- [ ] Reports wurden geschrieben
+- [ ] `R/run_benchmark_comparison.R` ausfuehren
+- [ ] optional `R/run_duckdb_analysis.R` ausfuehren
+- [ ] optional `R/run_duckdb_overview_report.R` ausfuehren
+- [ ] Ergebnisse kurz gegen die Fragestellung pruefen
+- [ ] wichtige Beobachtungen notieren
+- [ ] keine Rohdaten ins Repo kopieren
+
+## Kurzreihenfolge
+
+1. Freigabe und Vorbereitung
+2. Verbindung und Inventur
+3. Direktlauf
+4. Switchlauf
+5. Vergleich
+6. optional Scans und Mitschnitt
+7. Auswertung und Ablage
+

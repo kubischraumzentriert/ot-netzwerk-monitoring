@@ -18,6 +18,9 @@ oder an drei vernetzten Geraeten. Ziel ist:
 - einen Vergleich zwischen direkter Verbindung und Switch zu erzeugen
 - die Ergebnisse als Markdown und optional in DuckDB abzulegen
 
+Fuer die schnelle Abarbeitung vor Ort nutze zusaetzlich die
+[Vor-Ort-Checkliste](07_vor_ort_checkliste_scan_auswerte_workflow.md).
+
 ## Kann ich den Laptop an die Anlage haengen?
 
 Ja, das ist der vorgesehene Arbeitsmodus, wenn du es kontrolliert aufbaust.
@@ -254,4 +257,3 @@ Der empfohlene Start ist:
 3. Direktlauf
 4. Switchlauf
 5. Vergleich
-
