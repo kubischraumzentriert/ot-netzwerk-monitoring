@@ -134,9 +134,116 @@ write_multirun_outputs <- function(bundle = build_multirun_bundle(), output_dir 
   invisible(output_dir)
 }
 
+make_safe_name <- function(x) {
+  x <- ifelse(is.na(x), "unknown", x)
+  gsub("[^A-Za-z0-9_-]", "_", x)
+}
+
+plot_svg <- function(path, width = 10, height = 7, expr) {
+  svg(path, width = width, height = height)
+  old_par <- par(no.readonly = TRUE)
+  on.exit({
+    par(old_par)
+    dev.off()
+  }, add = FALSE)
+  force(expr)
+}
+
+write_multirun_plots <- function(
+  bundle = build_multirun_bundle(),
+  output_dir = file.path(paths$reports, "figures")
+) {
+  dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
+  old_figs <- list.files(output_dir, pattern = "^benchmark_.*\\.(png|svg)$", full.names = TRUE)
+  if (length(old_figs)) file.remove(old_figs)
+
+  bench <- bundle$benchmark_rows
+  sum_tbl <- bundle$benchmark_summary
+
+  if (!nrow(bench)) {
+    return(invisible(character()))
+  }
+
+  created <- character()
+
+  if (nrow(sum_tbl)) {
+    plot_file <- file.path(output_dir, "benchmark_success_rate.svg")
+    plot_svg(plot_file, expr = {
+      labels <- paste(sum_tbl$target_label, sum_tbl$probe, sep = " / ")
+      values <- suppressWarnings(as.numeric(sum_tbl$success_rate))
+      barplot(
+        height = values,
+        names.arg = labels,
+        las = 2,
+        col = "#2E86AB",
+        ylim = c(0, 1),
+        ylab = "Erfolgsrate",
+        main = "Benchmark Erfolgsrate"
+      )
+      abline(h = c(0.5, 1), lty = c(3, 2), col = c("grey70", "grey50"))
+    })
+    created <- c(created, plot_file)
+  }
+
+  numeric_cols <- intersect(c("metric_ms", "connect_ms", "total_ms"), names(bench))
+  for (col in numeric_cols) {
+    values <- suppressWarnings(as.numeric(bench[[col]]))
+    keep <- !is.na(values)
+    if (!any(keep)) next
+
+    plot_file <- file.path(output_dir, paste0("benchmark_", col, "_boxplot.png"))
+    plot_file <- file.path(output_dir, paste0("benchmark_", col, "_boxplot.svg"))
+    plot_svg(plot_file, expr = {
+      grp <- interaction(bench$target_label, bench$probe, drop = TRUE, lex.order = TRUE)
+      boxplot(
+        values[keep] ~ grp[keep],
+        las = 2,
+        col = "#F18F01",
+        ylab = paste(col, "ms"),
+        main = paste("Benchmark", col, "nach Ziel / Probe")
+      )
+    })
+    created <- c(created, plot_file)
+  }
+
+  if (nrow(sum_tbl) && "target_label" %in% names(sum_tbl)) {
+    plot_file <- file.path(output_dir, "benchmark_summary_scatter.svg")
+    plot_svg(plot_file, expr = {
+      x <- suppressWarnings(as.numeric(sum_tbl$metric_ms_mean))
+      y <- suppressWarnings(as.numeric(sum_tbl$connect_ms_mean))
+      keep <- is.finite(x) & is.finite(y)
+      if (any(keep)) {
+        plot(
+          x[keep], y[keep],
+          pch = 19,
+          col = "#6A4C93",
+          xlab = "metric_ms_mean",
+          ylab = "connect_ms_mean",
+          main = "Zusammenfassung der Benchmarks"
+        )
+        text(x[keep], y[keep], labels = paste(sum_tbl$target_label[keep], sum_tbl$probe[keep], sep = " / "), pos = 3, cex = 0.8)
+      } else {
+        plot.new()
+        title(main = "Zusammenfassung der Benchmarks")
+        text(0.5, 0.5, "Keine gemeinsamen numerischen Kennzahlen verfuegbar")
+      }
+    })
+    created <- c(created, plot_file)
+  }
+
+  invisible(created)
+}
+
 write_multirun_report <- function(bundle = build_multirun_bundle(), output_file = file.path(paths$reports, "network_overview.md")) {
   inv_tbl <- if (nrow(bundle$inventory_sessions)) bundle$inventory_sessions[, intersect(c("computer_name", "collected_at", "adapter_count", "arp_count", "tcp_count", "listening_count", "primary_ipv4"), names(bundle$inventory_sessions)), drop = FALSE] else data.frame()
   bench_tbl <- if (nrow(bundle$benchmark_summary)) bundle$benchmark_summary[, intersect(c("target_label", "probe", "rows", "success_rate", "metric_ms_mean", "metric_ms_median", "metric_ms_p95", "connect_ms_mean", "total_ms_mean"), names(bundle$benchmark_summary)), drop = FALSE] else data.frame()
+  figure_dir <- file.path(paths$reports, "figures")
+  figure_links <- if (dir.exists(figure_dir)) {
+    figs <- list.files(figure_dir, pattern = "\\.(png|svg)$", full.names = FALSE)
+    if (length(figs)) paste0("- [", figs, "](figures/", figs, ")", collapse = "\n") else ""
+  } else {
+    ""
+  }
 
   md <- c(
     "# Netzwerk Analyse Uebersicht",
@@ -155,6 +262,10 @@ write_multirun_report <- function(bundle = build_multirun_bundle(), output_file 
     paste0("- Benchmark-Rows: ", if (nrow(bundle$benchmark_rows)) nrow(bundle$benchmark_rows) else 0),
     paste0("- Benchmark-Gruppen: ", if (nrow(bundle$benchmark_summary)) nrow(bundle$benchmark_summary) else 0),
     "",
+    "## Figuren",
+    "",
+    if (length(figure_links) && nzchar(figure_links[1])) figure_links else "_keine Figuren erzeugt_",
+    "",
     "## Naechste Auswertungsschritte",
     "",
     "- Direkt vs. Switch als getrennte Sessions markieren",
@@ -166,4 +277,3 @@ write_multirun_report <- function(bundle = build_multirun_bundle(), output_file 
   writeLines(md, output_file, useBytes = TRUE)
   output_file
 }
-

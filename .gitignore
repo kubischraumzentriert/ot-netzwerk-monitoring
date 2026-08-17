@@ -18,6 +18,7 @@ env/
 .Rhistory
 .RData
 .Rproj.user/
+Rplots.pdf
 
 # PowerShell / Windows
 *.ps1~*
