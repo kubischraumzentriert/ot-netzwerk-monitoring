@@ -1,6 +1,6 @@
----
+﻿---
 title: "02 inventur und werkzeuge"
-output: "html"
+output: "html_document"
 ---
 
 # Inventur, Auswertung und Werkzeuge
@@ -178,3 +178,4 @@ Wenn dein Port 9000 kein Webdienst ist, ist ZAP eher zweitrangig.
 5. Nmap fuer strukturierte Port- und Host-Pruefung
 6. Suricata fuer passives Dauer-Monitoring
 7. ZAP nur, wenn eine Weboberflaeche beteiligt ist
+

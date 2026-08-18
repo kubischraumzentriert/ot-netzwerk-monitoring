@@ -40,7 +40,10 @@ read_run_config <- function(path = file.path(paths$configs, "run.csv")) {
     path <- file.path(paths$configs, "run.example.csv")
   }
   cfg <- read.csv(path, stringsAsFactors = FALSE)
-  stats::setNames(cfg$value, cfg$key)
+  keys <- trimws(as.character(cfg[[1]]))
+  values <- as.character(cfg[[2]])
+  names(values) <- keys
+  values
 }
 
 read_targets <- function(path = file.path(paths$configs, "targets.csv")) {
@@ -52,7 +55,13 @@ read_targets <- function(path = file.path(paths$configs, "targets.csv")) {
     path <- file.path(paths$configs, "targets.example.csv")
   }
   targets <- read.csv(path, stringsAsFactors = FALSE)
+  if (ncol(targets) >= 4) {
+    names(targets)[1:4] <- c("label", "host", "port", "request")
+  }
+  targets$label <- trimws(as.character(targets$label))
+  targets$host <- trimws(as.character(targets$host))
   targets$port <- as.integer(targets$port)
+  targets$request <- if ("request" %in% names(targets)) as.character(targets$request) else NA_character_
   targets
 }
 

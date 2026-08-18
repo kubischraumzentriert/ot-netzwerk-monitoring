@@ -1,6 +1,6 @@
----
+﻿---
 title: "03 multirun and tools"
-output: "html"
+output: "html_document"
 ---
 
 # Mehrlaeufige Auswertung und Tool-Workflow
@@ -70,3 +70,4 @@ und `configs/run.switch.example.csv`.
 Aktuell werden in DuckDB nur Inventur- und Benchmark-Daten geladen. Nmap-Scans,
 PCAP-Mitschnitte und Suricata-Logs bleiben als lokale Dateien unter `data/raw/`
 und koennen spaeter bei Bedarf separat in ein eigenes Schema aufgenommen werden.
+

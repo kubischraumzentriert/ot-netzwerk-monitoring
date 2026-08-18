@@ -1,6 +1,6 @@
----
+﻿---
 title: "09 konfigurations spickzettel"
-output: "html"
+output: "html_document"
 ---
 
 # Konfigurations-Spickzettel
@@ -86,3 +86,4 @@ Die kurze Referenz fuer den Vor-Ort-Einsatz.
 - `session_tag` ist nur ein Lauf-Label
 - der Port kann pro Zielhost gesetzt werden
 - `ports` in Nmap kann auch eine Liste sein, zum Beispiel `80,443,9000-9100`
+

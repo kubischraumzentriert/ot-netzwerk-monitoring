@@ -1,6 +1,6 @@
----
+﻿---
 title: "README"
-output: "html"
+output: "html_document"
 ---
 
 # R-Skripte
@@ -34,3 +34,4 @@ Die TCP-Messung ist generisch. Wenn dein Dienst auf Port 9000 ein bestimmtes Pro
 - `R/02_duckdb.R` ist der native Weg ueber das `duckdb`-Paket
 - `R/03_duckdb_jdbc.R` ist der JDBC-Weg ueber `RJDBC`, `rJava` und das JAR
 - Standardpfad fuer das JAR: `C:/Users/Andre/Downloads/duckdb_jdbc-1.5.5.0.jar`
+

@@ -61,6 +61,33 @@ sanitize_text <- function(x) {
   x
 }
 
+extract_ping_rtt_ms <- function(lines) {
+  if (!length(lines)) return(NA_real_)
+
+  patterns <- c(
+    "Zeit\\s*[=<]\\s*([0-9]+(?:[.,][0-9]+)?)\\s*ms",
+    "time\\s*[=<]\\s*([0-9]+(?:[.,][0-9]+)?)\\s*ms"
+  )
+
+  candidates <- numeric()
+  for (line in lines) {
+    if (is.na(line) || !nzchar(line)) next
+    for (pattern in patterns) {
+      match <- regexec(pattern, line, perl = TRUE, ignore.case = TRUE)
+      parts <- regmatches(line, match)[[1]]
+      if (length(parts) >= 2 && nzchar(parts[2])) {
+        candidate <- suppressWarnings(as.numeric(gsub(",", ".", parts[2], fixed = TRUE)))
+        if (!is.na(candidate)) {
+          candidates <- c(candidates, candidate)
+        }
+      }
+    }
+  }
+
+  if (!length(candidates)) return(NA_real_)
+  min(candidates, na.rm = TRUE)
+}
+
 ping_once <- function(host, timeout_sec = 1) {
   if (.Platform$OS.type != "windows") {
     cmd <- "ping"
@@ -76,17 +103,7 @@ ping_once <- function(host, timeout_sec = 1) {
 
   text <- paste(res, collapse = "\n")
   success <- any(grepl("TTL=", res, ignore.case = TRUE)) || any(grepl("ttl=", res, ignore.case = TRUE))
-  rtt_ms <- NA_real_
-
-  if (success && .Platform$OS.type == "windows") {
-    hit <- regmatches(text, regexpr("Zeit[=< ]+([0-9]+)ms", text, perl = TRUE, ignore.case = TRUE))
-    if (length(hit) == 0 || !nzchar(hit)) {
-      hit <- regmatches(text, regexpr("time[=< ]+([0-9.]+) ?ms", text, perl = TRUE, ignore.case = TRUE))
-    }
-    if (length(hit) > 0 && nzchar(hit)) {
-      rtt_ms <- as.numeric(gsub("[^0-9.]", "", hit))
-    }
-  }
+  rtt_ms <- extract_ping_rtt_ms(res)
 
   data.frame(
     ts = Sys.time(),
@@ -132,8 +149,9 @@ tcp_probe <- function(host, port = 9000, request = "HELLO", timeout_sec = 3) {
     err <<- conditionMessage(e)
   }, finally = {
     if (!is.null(con)) close(con)
-    total_ms <<- as.numeric(difftime(Sys.time(), start, units = "secs")) * 1000
   })
+
+  total_ms <- as.numeric(difftime(Sys.time(), start, units = "secs")) * 1000
 
   data.frame(
     ts = Sys.time(),

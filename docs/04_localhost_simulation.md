@@ -1,6 +1,6 @@
----
+﻿---
 title: "04 localhost simulation"
-output: "html"
+output: "html_document"
 ---
 
 # Localhost Simulation
@@ -51,3 +51,4 @@ flowchart TD
 - `powershell/start_local_tcp_echo_server.ps1`
 - `powershell/run_localhost_workflow.ps1`
 - `R/run_localhost_simulation.R`
+

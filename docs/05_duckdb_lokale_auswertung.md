@@ -1,6 +1,6 @@
----
+﻿---
 title: "05 duckdb lokale auswertung"
-output: "html"
+output: "html_document"
 ---
 
 # Lokale DuckDB-Auswertung
@@ -11,7 +11,7 @@ und macht sie als SQL-basierten Analyse-Store nutzbar.
 ## Zweck
 
 - Inventur-Sessions vergleichbar machen
-- Benchmark-Läufe zentral auswerten
+- Benchmark-LÃ¤ufe zentral auswerten
 - spaetere Anlagen und Messreihen in derselben Struktur aufnehmen
 - lokale, offline nutzbare Analysen ohne GitHub oder Cloud
 
@@ -26,6 +26,11 @@ und macht sie als SQL-basierten Analyse-Store nutzbar.
 - `inventory_sessions`
 - `benchmark_rows`
 - `benchmark_summary`
+- Views fuer Basisabfragen:
+  - `inventory_overview`
+  - `benchmark_overview`
+  - `benchmark_rows_ping`
+  - `benchmark_rows_tcp`
 
 Die Tabellen haben interne technische Schluessel wie `session_id` oder
 `row_id`. Diese IDs entstehen erst beim Laden in DuckDB und muessen in den
@@ -49,6 +54,11 @@ powershell\run_init_database.ps1
 Das Skript versucht zunaechst den nativen DuckDB-Weg. Falls dieser in einer
 R-Umgebung nicht verfuegbar ist, kann die JDBC-Variante genutzt werden, sofern
 das JAR und die Java-Pakete vorhanden sind.
+
+`R/run_duckdb_analysis.R` ueberfuehrt die aktuellen Inventur- und
+Benchmark-Rohdaten in die DuckDB und schreibt den Uebersichtsreport.
+`R/run_duckdb_overview_report.R` erzeugt nur den lesenden
+Uebersichtsreport aus der bereits gefuellten DuckDB.
 
 Wenn du einen getrennten Testlauf fahren willst, kannst du die lokale DuckDB
 ueber `NETWORK_ANALYSIS_DUCKDB_PATH` oder die Wrapper-Parameter `-DbPath`
@@ -78,3 +88,4 @@ Rscript R/run_duckdb_overview_report.R
 - SQL-Queries fuer Latenz- und Fehlervergleiche
 - Archivierung mehrerer Testlaeufe
 - Auswertung direkt aus DuckDB nach Markdown oder CSV
+

@@ -55,6 +55,9 @@ flowchart TD
 
 Der lokale Trockenlauf ruft also zuerst die Datenbank-Initialisierung auf und
 laedt danach die Mess- und Inventurdaten in dieselbe lokale DuckDB-Datei.
+Die eigentliche Datenueberfuehrung in DuckDB passiert dabei ueber
+`R/run_duckdb_analysis.R`; `R/run_duckdb_overview_report.R` erzeugt aus der
+bereits gefuellten DuckDB nur noch den einfachen Uebersichtsreport.
 Fuer einen kompakten reinen Trockenlauf sieh auch
 [docs/04_localhost_simulation.md](04_localhost_simulation.md).
 
@@ -268,6 +271,18 @@ Rscript R/run_duckdb_analysis.R
 Rscript R/run_duckdb_query.R sql\inventory_overview.sql
 Rscript R/run_duckdb_overview_report.R
 ```
+
+`R/run_init_database.R` legt das Schema an, inklusive der DuckDB-Views fuer die
+wichtigsten Basisabfragen:
+
+- `inventory_overview`
+- `benchmark_overview`
+- `benchmark_rows_ping`
+- `benchmark_rows_tcp`
+
+`R/run_duckdb_analysis.R` importiert die aktuellen Inventur- und Benchmarkdaten
+in die DuckDB, `R/run_duckdb_overview_report.R` liest nur noch aus der
+vorhandenen Datenbank und schreibt den Uebersichtsreport.
 
 ### Archivieren und Zuruecksetzen
 

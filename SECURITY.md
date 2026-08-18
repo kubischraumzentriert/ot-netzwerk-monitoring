@@ -1,6 +1,6 @@
----
+﻿---
 title: "SECURITY"
-output: "html"
+output: "html_document"
 ---
 
 # Security and Publication Notes
@@ -25,3 +25,4 @@ This repository is intended to stay free of sensitive operational data.
 
 Assume the artifact is local-only unless it is clearly a reusable script,
 template, or document.
+

@@ -1,6 +1,6 @@
----
+﻿---
 title: "README"
-output: "html"
+output: "html_document"
 ---
 
 # NetzwerkAnalyse
@@ -100,7 +100,7 @@ Der genaue Vor-Ort-Ablauf steht im [Betriebsmanual](docs/06_betriebsmanual_workf
 | `configs/run.localhost.csv` | Trockenlauf | `ping_count`, `tcp_count`, `tcp_port`, `session_tag`, `output_dir` |
 | `configs/scan_targets.csv` | Nmap-Ziele | `label`, `host`, `ports` |
 | `configs/duckdb_jdbc.example.csv` | optionale JDBC-Anbindung | `jar_path`, `db_path`, `driver_class` |
-| `sql/ddl/network_analysis_schema.sql` | DuckDB-DDL fuer die Basisstruktur mit internen Schluesseln | `schema_metadata`, `inventory_sessions`, `benchmark_rows`, `benchmark_summary` |
+| `sql/ddl/network_analysis_schema.sql` | DuckDB-DDL fuer die Basisstruktur mit internen Schluesseln und Views | `schema_metadata`, `inventory_sessions`, `benchmark_rows`, `benchmark_summary`, `inventory_overview`, `benchmark_overview`, `benchmark_rows_ping`, `benchmark_rows_tcp` |
 
 ## Workflow Werkzeuge
 
@@ -123,9 +123,9 @@ Der genaue Vor-Ort-Ablauf steht im [Betriebsmanual](docs/06_betriebsmanual_workf
 | `R/run_benchmark.R` | Messlaeufe aus R | Roh-CSV-Dateien pro Lauf | ja |
 | `R/run_benchmark_comparison.R` | Direkt-vs-Switch-Vergleich | `reports/network_direct_vs_switch.md` | nein |
 | `R/run_multirun_analysis.R` | gemeinsame Analyse mehrerer Sessions | `reports/network_overview.md` und CSV-Aggregate | ja |
-| `R/run_duckdb_analysis.R` | lokale DuckDB-Datei und Report | `reports/network_overview_duckdb.md` | ja |
+| `R/run_duckdb_analysis.R` | laedt die lokalen Daten in DuckDB, erstellt Views und Report | `reports/network_overview_duckdb.md` | ja |
 | `R/run_duckdb_query.R` | einzelne SQL-Abfragen | Report oder CSV je nach Ausgabe | ja |
-| `R/run_duckdb_overview_report.R` | kombinierter DuckDB-Analyse-Report | `reports/duckdb_analysis_overview.md` | ja |
+| `R/run_duckdb_overview_report.R` | lesender DuckDB-Analyse-Report aus bestehender DB | `reports/duckdb_analysis_overview.md` | ja |
 
 ## Betriebsmanual
 
@@ -169,3 +169,4 @@ Wenn du das Repo oeffentlich lassen willst, halte die Beispielkonfigurationen
 generisch und pruefe vor jedem Push `SECURITY.md` und `.gitignore`. Laufzeit-
 Artefakte sollten lokal bleiben; versioniert werden nur bewusst gepflegte
 Dokumente und Vorlagen.
+

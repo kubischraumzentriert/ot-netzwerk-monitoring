@@ -8,5 +8,5 @@ SELECT
   metric_ms_p95,
   connect_ms_mean,
   total_ms_mean
-FROM benchmark_summary
+FROM benchmark_overview
 ORDER BY target_label, probe;

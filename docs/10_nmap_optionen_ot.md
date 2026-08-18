@@ -1,6 +1,6 @@
----
+﻿---
 title: "10 nmap optionen ot"
-output: "html"
+output: "html_document"
 ---
 
 # Nmap-Optionen fuer OT-Netze
@@ -154,3 +154,4 @@ zu beurteilen, bleibt der TCP-Test die wichtigste Basismessung.
 - [Nmap OS detection](https://nmap.org/book/man-os-detection.html)
 - [Nmap version detection](https://nmap.org/book/man-version-detection.html)
 - [Nmap miscellaneous options](https://nmap.org/book/man-misc-options.html)
+

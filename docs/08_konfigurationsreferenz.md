@@ -1,6 +1,6 @@
----
+﻿---
 title: "08 konfigurationsreferenz"
-output: "html"
+output: "html_document"
 ---
 
 # Konfigurationsreferenz
@@ -206,3 +206,4 @@ Hinweise:
 - `run.*.csv` beschreibt Lauflaenge, Timeout, Default-Port und Session-Namen.
 - `scan_targets.csv` beschreibt Nmap-Ziele und Ports.
 - `duckdb_jdbc.example.csv` dokumentiert die optionale JDBC-Anbindung.
+

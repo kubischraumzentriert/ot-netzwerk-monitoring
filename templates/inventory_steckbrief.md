@@ -1,6 +1,6 @@
----
+﻿---
 title: "inventory steckbrief"
-output: "html"
+output: "html_document"
 ---
 
 # Netzwerk-Steckbrief Vorlage
@@ -37,3 +37,4 @@ output: "html"
 
 Diese Vorlage wird durch `R/run_inventory_steckbrief.R` automatisch aus der
 zuletzt erfassten Session oder aus einer angegebenen Session erzeugt.
+

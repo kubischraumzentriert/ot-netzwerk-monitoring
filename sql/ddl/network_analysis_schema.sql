@@ -56,3 +56,42 @@ CREATE TABLE IF NOT EXISTS benchmark_summary (
   connect_ms_mean DOUBLE,
   total_ms_mean DOUBLE
 );
+
+CREATE OR REPLACE VIEW inventory_overview AS
+SELECT
+  session_id,
+  session_dir,
+  computer_name,
+  collected_at,
+  adapter_count,
+  arp_count,
+  tcp_count,
+  listening_count,
+  primary_ipv4,
+  primary_mac
+FROM inventory_sessions;
+
+CREATE OR REPLACE VIEW benchmark_overview AS
+SELECT
+  summary_id,
+  session_tag,
+  target_label,
+  probe,
+  rows,
+  success_rate,
+  metric_ms_mean,
+  metric_ms_median,
+  metric_ms_p95,
+  connect_ms_mean,
+  total_ms_mean
+FROM benchmark_summary;
+
+CREATE OR REPLACE VIEW benchmark_rows_ping AS
+SELECT *
+FROM benchmark_rows
+WHERE probe = 'ping';
+
+CREATE OR REPLACE VIEW benchmark_rows_tcp AS
+SELECT *
+FROM benchmark_rows
+WHERE probe = 'tcp';

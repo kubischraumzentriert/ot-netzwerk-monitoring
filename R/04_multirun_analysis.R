@@ -47,6 +47,19 @@ safe_p95 <- function(x) {
   as.numeric(stats::quantile(x, 0.95, names = FALSE, type = 7))
 }
 
+read_benchmark_csv <- function(path) {
+  if (requireNamespace("readr", quietly = TRUE)) {
+    return(readr::read_csv(
+      path,
+      show_col_types = FALSE,
+      progress = FALSE,
+      locale = readr::locale(encoding = "UTF-8")
+    ))
+  }
+
+  read.csv(path, stringsAsFactors = FALSE, check.names = FALSE, fileEncoding = "")
+}
+
 inventory_session_summary <- function(session_dir) {
   inv <- read_inventory_session(session_dir)
   host_keys <- if (nrow(inv$host_info)) trimws(tolower(inv$host_info$key)) else character()
@@ -71,7 +84,10 @@ inventory_session_summary <- function(session_dir) {
 
 benchmark_file_summary <- function(path) {
   if (!file.exists(path)) return(data.frame())
-  df <- read.csv(path, stringsAsFactors = FALSE, check.names = FALSE, fileEncoding = "UTF-8-BOM")
+  df <- tryCatch(
+    as.data.frame(read_benchmark_csv(path), stringsAsFactors = FALSE),
+    error = function(e) data.frame()
+  )
   if (!nrow(df)) return(data.frame())
 
   if (!"target_label" %in% names(df)) {
@@ -86,6 +102,95 @@ benchmark_file_summary <- function(path) {
   }
   df$source_file <- path
   df
+}
+
+benchmark_file_overview <- function(benchmark_files = list_benchmark_files()) {
+  if (!length(benchmark_files)) {
+    return(data.frame())
+  }
+
+  rows <- lapply(benchmark_files, function(path) {
+    df <- benchmark_file_summary(path)
+    if (!nrow(df)) {
+      return(data.frame())
+    }
+
+    sessions <- sort(unique(df$session_tag[!is.na(df$session_tag) & nzchar(df$session_tag)]))
+    targets <- sort(unique(df$target_label[!is.na(df$target_label) & nzchar(df$target_label)]))
+    probes <- sort(unique(df$probe[!is.na(df$probe) & nzchar(df$probe)]))
+
+    data.frame(
+      file_name = basename(path),
+      rows = nrow(df),
+      session_tags = if (length(sessions)) paste(sessions, collapse = ", ") else "n/a",
+      target_labels = if (length(targets)) paste(targets, collapse = ", ") else "n/a",
+      probes = if (length(probes)) paste(probes, collapse = ", ") else "n/a",
+      ping_rows = if ("probe" %in% names(df)) sum(df$probe == "ping", na.rm = TRUE) else NA_integer_,
+      tcp_rows = if ("probe" %in% names(df)) sum(df$probe == "tcp", na.rm = TRUE) else NA_integer_,
+      success_rate = if ("success" %in% names(df)) mean(as.logical(df$success), na.rm = TRUE) else NA_real_,
+      file_mtime = if (file.exists(path)) format(file.info(path)$mtime[1], "%Y-%m-%d %H:%M:%S") else "n/a",
+      stringsAsFactors = FALSE
+    )
+  })
+
+  rows <- Filter(function(x) is.data.frame(x) && nrow(x) >= 0, rows)
+  if (!length(rows)) {
+    return(data.frame())
+  }
+
+  out <- do.call(rbind, rows)
+  out[order(out$file_name), , drop = FALSE]
+}
+
+benchmark_probe_overview <- function(benchmark_rows) {
+  if (!is.data.frame(benchmark_rows) || !nrow(benchmark_rows) || !"probe" %in% names(benchmark_rows)) {
+    return(data.frame())
+  }
+
+  probes <- sort(unique(benchmark_rows$probe[!is.na(benchmark_rows$probe) & nzchar(benchmark_rows$probe)]))
+  rows <- lapply(probes, function(probe_name) {
+    subset_tbl <- benchmark_rows[benchmark_rows$probe == probe_name, , drop = FALSE]
+    data.frame(
+      probe = probe_name,
+      rows = nrow(subset_tbl),
+      session_tags = if ("session_tag" %in% names(subset_tbl)) length(unique(subset_tbl$session_tag[!is.na(subset_tbl$session_tag) & nzchar(subset_tbl$session_tag)])) else NA_integer_,
+      target_labels = if ("target_label" %in% names(subset_tbl)) length(unique(subset_tbl$target_label[!is.na(subset_tbl$target_label) & nzchar(subset_tbl$target_label)])) else NA_integer_,
+      success_rate = if ("success" %in% names(subset_tbl)) mean(as.logical(subset_tbl$success), na.rm = TRUE) else NA_real_,
+      metric_ms_mean = if ("metric_ms" %in% names(subset_tbl)) safe_mean(subset_tbl$metric_ms) else NA_real_,
+      metric_ms_median = if ("metric_ms" %in% names(subset_tbl)) safe_median(subset_tbl$metric_ms) else NA_real_,
+      metric_ms_p95 = if ("metric_ms" %in% names(subset_tbl)) safe_p95(subset_tbl$metric_ms) else NA_real_,
+      connect_ms_mean = if ("connect_ms" %in% names(subset_tbl)) safe_mean(subset_tbl$connect_ms) else NA_real_,
+      total_ms_mean = if ("total_ms" %in% names(subset_tbl)) safe_mean(subset_tbl$total_ms) else NA_real_,
+      stringsAsFactors = FALSE
+    )
+  })
+
+  do.call(rbind, rows)
+}
+
+benchmark_target_overview <- function(summary_tbl) {
+  if (!is.data.frame(summary_tbl) || !nrow(summary_tbl) || !"target_label" %in% names(summary_tbl)) {
+    return(data.frame())
+  }
+
+  targets <- sort(unique(summary_tbl$target_label[!is.na(summary_tbl$target_label) & nzchar(summary_tbl$target_label)]))
+  rows <- lapply(targets, function(target_name) {
+    subset_tbl <- summary_tbl[summary_tbl$target_label == target_name, , drop = FALSE]
+    data.frame(
+      target_label = target_name,
+      rows = sum(as.integer(subset_tbl$rows), na.rm = TRUE),
+      session_tags = if ("session_tag" %in% names(subset_tbl)) length(unique(subset_tbl$session_tag[!is.na(subset_tbl$session_tag) & nzchar(subset_tbl$session_tag)])) else NA_integer_,
+      probes = if ("probe" %in% names(subset_tbl)) paste(sort(unique(subset_tbl$probe[!is.na(subset_tbl$probe) & nzchar(subset_tbl$probe)])), collapse = ", ") else "n/a",
+      success_rate = if ("success_rate" %in% names(subset_tbl)) weighted.mean(subset_tbl$success_rate, w = as.integer(subset_tbl$rows), na.rm = TRUE) else NA_real_,
+      metric_ms_mean = if ("metric_ms_mean" %in% names(subset_tbl)) weighted.mean(subset_tbl$metric_ms_mean, w = as.integer(subset_tbl$rows), na.rm = TRUE) else NA_real_,
+      metric_ms_median = if ("metric_ms_median" %in% names(subset_tbl)) weighted.mean(subset_tbl$metric_ms_median, w = as.integer(subset_tbl$rows), na.rm = TRUE) else NA_real_,
+      metric_ms_p95 = if ("metric_ms_p95" %in% names(subset_tbl)) weighted.mean(subset_tbl$metric_ms_p95, w = as.integer(subset_tbl$rows), na.rm = TRUE) else NA_real_,
+      stringsAsFactors = FALSE
+    )
+  })
+
+  out <- do.call(rbind, rows)
+  out[order(-out$rows, out$target_label), , drop = FALSE]
 }
 
 benchmark_run_summary <- function(df) {
@@ -156,7 +261,7 @@ markdown_yaml_header <- function(title) {
   c(
     "---",
     paste0("title: \"", gsub("\"", "\\\\\"", title, fixed = TRUE), "\""),
-    "output: \"html\"",
+    "output: \"html_document\"",
     "---",
     ""
   )
