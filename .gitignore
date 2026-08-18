@@ -24,6 +24,9 @@ Rplots.pdf
 # PowerShell / Windows
 *.ps1~*
 
+# Lokale Zielkonfigurationen
+configs/targets.private.csv
+
 # Daten und Exporte
 data/raw/*
 !data/raw/.gitkeep

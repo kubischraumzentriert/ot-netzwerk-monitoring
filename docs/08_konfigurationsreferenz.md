@@ -11,6 +11,7 @@ aller verwendeten Spalten und Schluessel.
 ## Uebersicht
 
 - `configs/targets.csv` oder `configs/targets.example.csv`
+- `configs/targets.private.csv`
 - `configs/targets.production.example.csv`
 - `configs/targets.localhost.csv`
 - `configs/run.csv` oder `configs/run.example.csv`
@@ -23,7 +24,7 @@ aller verwendeten Spalten und Schluessel.
 
 ## `configs/targets.csv`
 
-Diese Datei beschreibt die Zielsysteme fuer Ping- und TCP-Tests.
+Diese Datei ist die generische Zielvorlage fuer Ping- und TCP-Tests.
 
 | Spalte | Bedeutung | Beispiel | Pflicht |
 | --- | --- | --- | --- |
@@ -38,7 +39,24 @@ Hinweise:
 - Wenn `request` fehlt, wird `HELLO` gesendet.
 - `target_port` wird fuer die TCP-Messung gesetzt; bei Ping-Zeilen bleibt
   dieser Wert `NA`.
-- Diese Datei ist die normale Arbeitsdatei fuer reale Geraete.
+- Diese Datei ist die normale Arbeitsdatei fuer generische Vorlagen.
+
+## `configs/targets.private.csv`
+
+Diese Datei ist die lokale, ignorierte Arbeitsdatei fuer reale Zieladressen.
+Wenn sie existiert, verwenden die Run-Skripte und R-Defaults sie bevorzugt.
+
+| Spalte | Bedeutung | Beispiel | Pflicht |
+| --- | --- | --- | --- |
+| `label` | Anzeigename fuer Reports, CSVs und Dateinamen | `Geraet#1` | ja |
+| `host` | IP-Adresse oder DNS-Name des Ziels | `172.18.181.140` | ja |
+| `port` | TCP-Port pro Zielhost | `9000` | nein |
+| `request` | Text, der beim TCP-Test an den Dienst gesendet wird | `HELLO` | nein |
+
+Hinweise:
+
+- Diese Datei gehoert in `.gitignore`.
+- Sie ist fuer reale Zielsysteme gedacht, die nicht ins Repo sollen.
 
 ## `configs/targets.production.example.csv`
 
@@ -182,7 +200,8 @@ Hinweise:
 
 ## Typische Zuordnung
 
-- `targets.csv` beschreibt die Kommunikationsziele.
+- `targets.csv` beschreibt die generische Zielvorlage.
+- `targets.private.csv` beschreibt lokale reale Zielsysteme.
 - `targets.production.example.csv` ist die Vorlage fuer reale Zielsysteme.
 - `run.*.csv` beschreibt Lauflaenge, Timeout, Default-Port und Session-Namen.
 - `scan_targets.csv` beschreibt Nmap-Ziele und Ports.

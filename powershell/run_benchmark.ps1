@@ -1,6 +1,6 @@
 param(
     [string]$ProjectRoot = (Split-Path -Parent $PSScriptRoot),
-    [string]$TargetsConfig = (Join-Path $ProjectRoot 'configs\targets.csv'),
+    [string]$TargetsConfig = $(if (Test-Path -LiteralPath (Join-Path $ProjectRoot 'configs\targets.private.csv')) { Join-Path $ProjectRoot 'configs\targets.private.csv' } else { Join-Path $ProjectRoot 'configs\targets.csv' }),
     [string]$RunConfig = (Join-Path $ProjectRoot 'configs\run.csv')
 )
 

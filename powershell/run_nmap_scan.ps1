@@ -1,6 +1,6 @@
 param(
     [string]$ProjectRoot = (Split-Path -Parent $PSScriptRoot),
-    [string]$TargetsCsv = (Join-Path $ProjectRoot 'configs\targets.csv'),
+    [string]$TargetsCsv = $(if (Test-Path -LiteralPath (Join-Path $ProjectRoot 'configs\targets.private.csv')) { Join-Path $ProjectRoot 'configs\targets.private.csv' } else { Join-Path $ProjectRoot 'configs\targets.csv' }),
     [string]$OutputDir = (Join-Path $ProjectRoot 'data\raw\scans\nmap'),
     [string]$NmapPath,
     [string]$DefaultPorts = '9000'
@@ -54,4 +54,3 @@ foreach ($target in $targets) {
     Write-Host "Scanning $label ($host) ports $ports"
     & $NmapPath @args
 }
-

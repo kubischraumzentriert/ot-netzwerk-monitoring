@@ -104,6 +104,7 @@ write_duckdb_report <- function(
   counts <- duckdb_table_counts(db_path)
   if (!nrow(counts)) {
     md <- c(
+      markdown_yaml_header("DuckDB Analyse Uebersicht"),
       "# DuckDB Analyse Uebersicht",
       "",
       "Keine DuckDB-Datei oder keine Tabellen gefunden."
@@ -116,6 +117,7 @@ write_duckdb_report <- function(
   total_rows <- sum(counts$rows, na.rm = TRUE)
 
   md <- c(
+    markdown_yaml_header("DuckDB Analyse Uebersicht"),
     "# DuckDB Analyse Uebersicht",
     "",
     paste0("- Datenbank: ", db_path),

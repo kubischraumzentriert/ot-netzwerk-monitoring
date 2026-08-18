@@ -9,7 +9,8 @@ Die kurze Referenz fuer den Vor-Ort-Einsatz.
 
 ## Welche Datei wofuer?
 
-- `configs/targets.csv`: echte Ziele fuer Ping und TCP
+- `configs/targets.csv`: generische Zielvorlage fuer Ping und TCP
+- `configs/targets.private.csv`: lokale, ignorierte Zieladressen
 - `configs/targets.production.example.csv`: Vorlage fuer reale Zielgeraete
 - `configs/targets.localhost.csv`: lokaler Trockenlauf auf `127.0.0.1`
 - `configs/run.direct.csv`: Direktlauf
@@ -23,10 +24,14 @@ Die kurze Referenz fuer den Vor-Ort-Einsatz.
 
 ### `targets.csv`
 
-- `label`: Name des Geraets
-- `host`: IP oder Hostname
-- `port`: Port pro Zielhost, optional
-- `request`: TCP-Payload, optional
+- generische Zielvorlage
+- gleiche Spalten wie unten
+
+### `targets.private.csv`
+
+- lokale Arbeitsdatei fuer reale Zielgeraete
+- gleiche Spalten wie `targets.csv`
+- wird bevorzugt genutzt, wenn vorhanden
 
 ### `targets.production.example.csv`
 
@@ -41,7 +46,7 @@ Die kurze Referenz fuer den Vor-Ort-Einsatz.
 - `tcp_count`: Anzahl TCP-Proben
 - `tcp_interval_sec`: Pause zwischen TCP-Proben
 - `tcp_timeout_sec`: TCP-Timeout
-- `tcp_port`: Default-Port, wenn `targets.csv` keinen gueltigen Port hat
+- `tcp_port`: Default-Port, wenn `targets.csv` oder `targets.private.csv` keinen gueltigen Port hat
 - `session_tag`: Laufname wie `direct`, `switch` oder `localhost`
 - `output_dir`: Zielordner fuer Rohdaten
 

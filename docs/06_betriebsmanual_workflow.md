@@ -88,6 +88,7 @@ Der Wrapper schreibt automatisch:
 Die relevanten Dateien sind:
 
 - `configs/targets.csv`
+- `configs/targets.private.csv` fuer lokale reale Zieladressen, falls vorhanden
 - `configs/run.localhost.csv` fuer den Trockenlauf
 - `configs/run.direct.example.csv`
 - `configs/run.switch.example.csv`
@@ -180,12 +181,21 @@ Ergebnis:
 
 ### `configs/targets.csv`
 
-Hier trägst du die drei Geraete ein:
+Hier liegt die generische Zielvorlage fuer Ping- und TCP-Tests:
 
 - `label`
 - `host`
 - `port`
 - optional `request`
+
+### `configs/targets.private.csv`
+
+Diese Datei wird lokal bevorzugt verwendet, wenn sie existiert. Sie gehoert
+nicht ins Repository und ist fuer reale Zieladressen gedacht.
+
+- gleiche Spalten wie `targets.csv`
+- fuer deinen Testfall die drei realen Geraete
+- bleibt lokal und wird ueber `.gitignore` ausgeschlossen
 
 ### `configs/targets.production.example.csv`
 

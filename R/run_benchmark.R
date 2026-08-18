@@ -3,7 +3,7 @@ source("R/m01_ping_tcp_probe.R", local = TRUE)
 
 parse_benchmark_args <- function(args) {
   opts <- list(
-    targets = file.path(paths$configs, "targets.csv"),
+    targets = default_targets_path(),
     run = file.path(paths$configs, "run.csv")
   )
 

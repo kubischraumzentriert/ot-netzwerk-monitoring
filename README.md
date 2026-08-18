@@ -10,12 +10,14 @@ Lokales Git-Repository fuer eine Analyse- und Monitoring-Infrastruktur rund um O
 ## Oeffentliche Kurzfassung
 
 Dieses Repository sammelt Werkzeuge, Doku und Auswertungen fuer lokale
-Netzwerk-Inventuren, konfigurierbare TCP-Port-Messungen auf einem oder mehreren Ports pro Zielhost und Vergleiche
-zwischen direkter Verbindung und Switch.
+Netzwerk-Inventuren, konfigurierbare TCP-Port-Messungen auf einem oder
+mehreren Ports pro Zielhost und Vergleiche zwischen direkter Verbindung und
+Switch.
 
-Die Repo-Contents sind bewusst so aufgebaut, dass keine Rohdaten, Scans oder
-Ergebnisartefakte ins Repository gehoeren. Alles Laufzeitbezogene landet lokal
-unter `data/` oder `reports/` und ist in `.gitignore` ausgeschlossen.
+Die Repo-Contents sind bewusst so aufgebaut, dass Rohdaten, Scans und andere
+laufende Messartefakte lokal unter `data/` oder `reports/` landen. Die
+kuratierten Markdown-Dokumente im Repo bleiben versioniert, damit die Doku
+nachvollziehbar bleibt.
 
 ## Einstieg
 
@@ -90,7 +92,8 @@ Der genaue Vor-Ort-Ablauf steht im [Betriebsmanual](docs/06_betriebsmanual_workf
 
 | Datei | Zweck | Typische Schluessel |
 | --- | --- | --- |
-| `configs/targets.csv` | Ziele fuer echte Geraete | `label`, `host`, `port`, `request` |
+| `configs/targets.csv` | generische Zielvorlage | `label`, `host`, `port`, `request` |
+| `configs/targets.private.csv` | lokale, ignorierte Zielkonfiguration | `label`, `host`, `port`, `request` |
 | `configs/targets.production.example.csv` | Vorlage fuer reale Anlagenziele | `label`, `host`, `port`, `request` |
 | `configs/run.direct.csv` | Direktlauf | `ping_count`, `tcp_count`, `tcp_port`, `session_tag`, `output_dir` |
 | `configs/run.switch.csv` | Switchlauf | `ping_count`, `tcp_count`, `tcp_port`, `session_tag`, `output_dir` |
@@ -146,6 +149,7 @@ Der genaue Vor-Ort-Ablauf steht im [Betriebsmanual](docs/06_betriebsmanual_workf
 ## GitHub Hinweis
 
 - Beispiel-IPs in `configs/*.csv` sind absichtlich Platzhalter
+- reale Zieladressen gehoeren in die lokale, ignorierte `configs/targets.private.csv`
 - echte Anlagenadressen gehoeren nicht ins Repo
 - Rohdaten, Scans und Reports bleiben lokal und werden nicht versioniert
 - TCP-Ports sind konfigurierbar; `9000` ist nur der Standardwert und pro Zielhost kann ein eigener Port gesetzt werden
@@ -162,4 +166,6 @@ beschreibbar.
 - ohne Schreibrechte kann niemand direkt auf dieses Repo pushen
 
 Wenn du das Repo oeffentlich lassen willst, halte die Beispielkonfigurationen
-generisch und pruefe vor jedem Push `SECURITY.md` und `.gitignore`.
+generisch und pruefe vor jedem Push `SECURITY.md` und `.gitignore`. Laufzeit-
+Artefakte sollten lokal bleiben; versioniert werden nur bewusst gepflegte
+Dokumente und Vorlagen.

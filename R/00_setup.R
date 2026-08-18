@@ -44,12 +44,25 @@ read_run_config <- function(path = file.path(paths$configs, "run.csv")) {
 }
 
 read_targets <- function(path = file.path(paths$configs, "targets.csv")) {
+  private_path <- file.path(paths$configs, "targets.private.csv")
+  if (identical(path, file.path(paths$configs, "targets.csv")) && file.exists(private_path)) {
+    path <- private_path
+  }
   if (!file.exists(path)) {
     path <- file.path(paths$configs, "targets.example.csv")
   }
   targets <- read.csv(path, stringsAsFactors = FALSE)
   targets$port <- as.integer(targets$port)
   targets
+}
+
+default_targets_path <- function() {
+  private_path <- file.path(paths$configs, "targets.private.csv")
+  if (file.exists(private_path)) {
+    private_path
+  } else {
+    file.path(paths$configs, "targets.csv")
+  }
 }
 
 as_num <- function(x, default = NA_real_) {
