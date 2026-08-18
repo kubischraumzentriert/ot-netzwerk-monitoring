@@ -74,6 +74,22 @@ Der Standard-Flow fuer das Projekt bleibt trotzdem: CSV sammeln, Markdown erzeug
 
 ## Wie du Wireshark, Nmap, ZAP und Suricata sinnvoll nutzt
 
+| Werkzeug | Worum geht es? | Wann ist es am sinnvollsten? | Wofuer eher nicht? |
+| --- | --- | --- | --- |
+| TCP-Test | gezielte Erreichbarkeits- und Laufzeitpruefung auf einem bekannten Port | wenn du wissen willst, ob Port 9000 oder ein anderer freigegebener Port wirklich erreicht wird | fuer Portsuche oder Protokoll-Fingerprinting |
+| Nmap | strukturierte Host-, Port- und Dienstsicht | wenn du vor oder nach dem TCP-Test sehen willst, welche Dienste offen sind und ob es Zusatzhinweise gibt | fuer exakte Latenz- oder Belastungsmessung |
+| Wireshark / tshark | Paket- und Protokollanalyse auf Frame-Ebene | wenn du Retransmits, ACK-Muster, Verzoegerungen oder Abbrueche verstehen willst | fuer schnelle, rein konfigurationsbasierte Checks |
+| Suricata | passives Monitoring und Ereignis-Logging | wenn du laenger beobachten willst, ob auffaellige Muster auftreten | fuer aktive Tests oder schnelle Einzelmessungen |
+| ZAP | Web- und API-Analyse | wenn die Anlage eine HTTP- oder HTTPS-Schnittstelle hat | fuer reine TCP-Dienste ohne Weboberflaeche |
+
+Merksatz:
+
+- TCP-Test beantwortet zuerst die Frage "komme ich zum Dienst?"
+- Nmap beantwortet zusaetzlich "was hoert da noch alles?"
+- Wireshark beantwortet "was passiert auf dem Draht?"
+- Suricata beantwortet "gibt es sichtbare Ereignisse oder Muster?"
+- ZAP beantwortet "ist die Webschnittstelle sauber?"
+
 ### Nmap
 
 Sehr sinnvoll fuer:
