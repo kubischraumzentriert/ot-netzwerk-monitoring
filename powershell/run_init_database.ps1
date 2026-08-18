@@ -1,6 +1,7 @@
 param(
     [string]$ProjectRoot = (Split-Path -Parent $PSScriptRoot),
-    [string]$RScriptPath = 'C:\Program Files\R\R-4.5.3\bin\Rscript.exe'
+    [string]$RScriptPath = 'C:\Program Files\R\R-4.5.3\bin\Rscript.exe',
+    [string]$DbPath = ''
 )
 
 $ErrorActionPreference = 'Stop'
@@ -19,9 +20,17 @@ if (-not $env:R_LIBS_USER -or -not (Test-Path -LiteralPath $env:R_LIBS_USER)) {
     $env:R_LIBS_USER = Join-Path $env:USERPROFILE 'AppData\Local\R\win-library\4.5'
 }
 
+if ($DbPath) {
+    $env:NETWORK_ANALYSIS_DUCKDB_PATH = $DbPath
+}
+
 Push-Location $ProjectRoot
 try {
-    & $RScriptPath $script
+    $args = @()
+    if ($DbPath) {
+        $args += "--db=$DbPath"
+    }
+    & $RScriptPath $script @args
 }
 finally {
     Pop-Location

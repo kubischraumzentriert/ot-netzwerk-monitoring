@@ -37,6 +37,27 @@ Wenn du den Test gegen die reale Anlage machst, wuerde ich ihn zuerst ohne Nmap
 und ohne Suricata starten und nur die Inventur plus TCP-Port-Benchmark auf mehreren Ports pro Zielhost laufen
 lassen. Die passiven Werkzeuge kannst du danach dazunehmen.
 
+## Ablaufdiagramm
+
+```mermaid
+flowchart TD
+  A["powershell/run_localhost_workflow.ps1"] --> B["powershell/run_init_database.ps1"]
+  B --> C["R/run_init_database.R"]
+  C --> D["sql/ddl/network_analysis_schema.sql"]
+  D --> E["data/processed/network_analysis.duckdb"]
+  A --> F["inventory_collect.ps1"]
+  F --> G["R/run_localhost_simulation.R"]
+  G --> H["R/run_benchmark.R"]
+  H --> I["R/run_multirun_analysis.R"]
+  I --> J["R/run_duckdb_analysis.R"]
+  J --> K["reports/network_overview_duckdb.md"]
+```
+
+Der lokale Trockenlauf ruft also zuerst die Datenbank-Initialisierung auf und
+laedt danach die Mess- und Inventurdaten in dieselbe lokale DuckDB-Datei.
+Fuer einen kompakten reinen Trockenlauf sieh auch
+[docs/04_localhost_simulation.md](04_localhost_simulation.md).
+
 ## Vorbereitung
 
 ### 1. Projektpfad
@@ -101,7 +122,9 @@ verwenden.
 2. `R/run_duckdb_overview_report.R`
 3. `R/run_benchmark_comparison.R`
 
-Damit pruefst du, ob der komplette Werkzeugpfad lokal funktioniert.
+Damit pruefst du, ob der komplette Werkzeugpfad lokal funktioniert. Der
+Workflow-Wrapper ruft dabei zuerst `powershell/run_init_database.ps1` auf, das
+seinerseits `R/run_init_database.R` startet.
 
 ### Phase B: Vor-Ort-Inventur
 
@@ -224,6 +247,19 @@ Rscript R/run_duckdb_analysis.R
 Rscript R/run_duckdb_query.R sql\inventory_overview.sql
 Rscript R/run_duckdb_overview_report.R
 ```
+
+### Archivieren und Zuruecksetzen
+
+```powershell
+powershell\archive_data_backup.ps1
+powershell\restore_data_backup.ps1
+```
+
+Das legt einen Zeitstempel-Ordner unter `data/backups/` an, sichert `data/raw/`,
+`data/processed/` und `reports/` und leert danach den Arbeitsbestand.
+`powershell\archive_data_backup.ps1 -WhatIf` zeigt die geplanten Aktionen,
+ohne etwas zu veraendern. Mit `powershell\restore_data_backup.ps1` kannst du
+das letzte oder ein explizites Backup wiederherstellen.
 
 ## Praktischer Ablauf vor Ort
 

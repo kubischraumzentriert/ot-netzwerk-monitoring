@@ -2,7 +2,7 @@ source("R/06_duckdb_schema.R", local = TRUE)
 
 parse_init_database_args <- function(args) {
   opts <- list(
-    db_path = file.path(paths$data_processed, "network_analysis.duckdb"),
+    db_path = duckdb_default_db_path(),
     schema_sql = duckdb_schema_sql_path()
   )
 

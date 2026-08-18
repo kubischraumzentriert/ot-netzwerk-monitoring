@@ -150,9 +150,9 @@ Diese Datei beschreibt die DuckDB-Basisstruktur.
 | Objekt | Bedeutung |
 | --- | --- |
 | `schema_metadata` | Metadaten zum Schema und zur Initialisierung |
-| `inventory_sessions` | Verdichtete Inventur-Sessions |
-| `benchmark_rows` | Rohdaten der Ping- und TCP-Messungen |
-| `benchmark_summary` | Zusammenfassungen pro Session, Ziel und Probe |
+| `inventory_sessions` | Verdichtete Inventur-Sessions mit interner `session_id` |
+| `benchmark_rows` | Rohdaten der Ping- und TCP-Messungen mit interner `row_id` |
+| `benchmark_summary` | Zusammenfassungen pro Session, Ziel und Probe mit interner `summary_id` |
 
 Hinweise:
 

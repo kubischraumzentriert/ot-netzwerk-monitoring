@@ -27,6 +27,10 @@ und macht sie als SQL-basierten Analyse-Store nutzbar.
 - `benchmark_rows`
 - `benchmark_summary`
 
+Die Tabellen haben interne technische Schluessel wie `session_id` oder
+`row_id`. Diese IDs entstehen erst beim Laden in DuckDB und muessen in den
+CSV-Dateien nicht vorhanden sein.
+
 ## Start
 
 Die empfohlene Reihenfolge ist:
@@ -45,6 +49,10 @@ powershell\run_init_database.ps1
 Das Skript versucht zunaechst den nativen DuckDB-Weg. Falls dieser in einer
 R-Umgebung nicht verfuegbar ist, kann die JDBC-Variante genutzt werden, sofern
 das JAR und die Java-Pakete vorhanden sind.
+
+Wenn du einen getrennten Testlauf fahren willst, kannst du die lokale DuckDB
+ueber `NETWORK_ANALYSIS_DUCKDB_PATH` oder die Wrapper-Parameter `-DbPath`
+gezielt auf eine andere Datei umbiegen.
 
 Einzelne SQL-Abfragen laufen ueber:
 

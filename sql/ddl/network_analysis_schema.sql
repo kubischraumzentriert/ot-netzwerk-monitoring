@@ -5,7 +5,9 @@ CREATE TABLE IF NOT EXISTS schema_metadata (
   note VARCHAR
 );
 
+CREATE SEQUENCE IF NOT EXISTS inventory_sessions_seq START 1;
 CREATE TABLE IF NOT EXISTS inventory_sessions (
+  session_id BIGINT PRIMARY KEY DEFAULT nextval('inventory_sessions_seq'),
   session_dir VARCHAR,
   computer_name VARCHAR,
   collected_at VARCHAR,
@@ -17,7 +19,9 @@ CREATE TABLE IF NOT EXISTS inventory_sessions (
   primary_mac VARCHAR
 );
 
+CREATE SEQUENCE IF NOT EXISTS benchmark_rows_seq START 1;
 CREATE TABLE IF NOT EXISTS benchmark_rows (
+  row_id BIGINT PRIMARY KEY DEFAULT nextval('benchmark_rows_seq'),
   ts TIMESTAMP,
   host VARCHAR,
   probe VARCHAR,
@@ -38,7 +42,9 @@ CREATE TABLE IF NOT EXISTS benchmark_rows (
   source_file VARCHAR
 );
 
+CREATE SEQUENCE IF NOT EXISTS benchmark_summary_seq START 1;
 CREATE TABLE IF NOT EXISTS benchmark_summary (
+  summary_id BIGINT PRIMARY KEY DEFAULT nextval('benchmark_summary_seq'),
   session_tag VARCHAR,
   target_label VARCHAR,
   probe VARCHAR,

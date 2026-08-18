@@ -72,6 +72,20 @@ Bevor du am Projekt arbeitest, lies bitte:
 - optional DuckDB als lokale Auswertungsbasis
 - spaeterer Vergleich mehrerer Anlagen und Messlaeufe
 
+## Ablauf auf einen Blick
+
+```mermaid
+flowchart TD
+  A["Vorbereitung: Configs, Ports, Targets"] --> B["powershell/run_init_database.ps1"]
+  B --> C["R/run_init_database.R"]
+  C --> D["DuckDB-Datei / Schema"]
+  D --> E["powershell/run_localhost_workflow.ps1 oder Vor-Ort-Lauf"]
+  E --> F["Inventur, Ping, TCP-Test, Auswertung"]
+  F --> G["Reports / DuckDB / Steckbrief"]
+```
+
+Der genaue Vor-Ort-Ablauf steht im [Betriebsmanual](docs/06_betriebsmanual_workflow.md).
+
 ## Konfigurations-Spickzettel
 
 | Datei | Zweck | Typische Schluessel |
@@ -82,7 +96,7 @@ Bevor du am Projekt arbeitest, lies bitte:
 | `configs/run.localhost.csv` | Trockenlauf | `ping_count`, `tcp_count`, `tcp_port`, `session_tag`, `output_dir` |
 | `configs/scan_targets.csv` | Nmap-Ziele | `label`, `host`, `ports` |
 | `configs/duckdb_jdbc.example.csv` | optionale JDBC-Anbindung | `jar_path`, `db_path`, `driver_class` |
-| `sql/ddl/network_analysis_schema.sql` | DuckDB-DDL fuer die Basisstruktur | `schema_metadata`, `inventory_sessions`, `benchmark_rows`, `benchmark_summary` |
+| `sql/ddl/network_analysis_schema.sql` | DuckDB-DDL fuer die Basisstruktur mit internen Schluesseln | `schema_metadata`, `inventory_sessions`, `benchmark_rows`, `benchmark_summary` |
 
 ## Workflow Werkzeuge
 
@@ -91,6 +105,8 @@ Bevor du am Projekt arbeitest, lies bitte:
 - `powershell/run_inventory_steckbrief.ps1` fuer den Inventur-Steckbrief
 - `powershell/run_benchmark.ps1` fuer TCP-Port-Messungen, Standard ist 9000, je Zielhost kann ein eigener Port gesetzt werden
 - `powershell/run_benchmark_comparison.ps1` fuer Direkt-vs-Switch-Vergleiche
+- `powershell/archive_data_backup.ps1` fuer Datensicherung und anschliessenden Reset von `data/` und `reports/`
+- `powershell/restore_data_backup.ps1` fuer das Zurueckspielen des letzten oder eines expliziten Backups
 - `powershell/run_localhost_workflow.ps1` fuer den lokalen Trockenlauf
 - `powershell/run_nmap_scan.ps1` fuer konservative Nmap-Scans auf freigegebenen Ports
 - `powershell/list_capture_interfaces.ps1` fuer `tshark -D`

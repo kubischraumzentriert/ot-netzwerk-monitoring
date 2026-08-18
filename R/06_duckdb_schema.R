@@ -5,6 +5,14 @@ duckdb_schema_sql_path <- function() {
   file.path(paths$root, "sql", "ddl", "network_analysis_schema.sql")
 }
 
+duckdb_default_db_path <- function() {
+  env_db_path <- Sys.getenv("NETWORK_ANALYSIS_DUCKDB_PATH")
+  if (nzchar(env_db_path)) {
+    return(env_db_path)
+  }
+  file.path(paths$data_processed, "network_analysis.duckdb")
+}
+
 read_sql_file <- function(path) {
   if (!file.exists(path)) {
     stop("SQL file not found: ", path)
@@ -28,7 +36,7 @@ duckdb_write_or_replace_table <- function(con, name, df) {
 }
 
 duckdb_init_database <- function(
-  db_path = file.path(paths$data_processed, "network_analysis.duckdb"),
+  db_path = duckdb_default_db_path(),
   schema_sql_path = duckdb_schema_sql_path(),
   schema_name = "network_analysis",
   schema_version = "1.0"

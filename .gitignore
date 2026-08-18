@@ -19,6 +19,7 @@ env/
 .RData
 .Rproj.user/
 Rplots.pdf
+.local_r_lib/
 
 # PowerShell / Windows
 *.ps1~*
@@ -30,6 +31,8 @@ data/raw/*
 data/raw/inventory/*
 data/processed/*
 !data/processed/.gitkeep
+data/backups/*
+!data/backups/.gitkeep
 
 # Reports
 reports/*

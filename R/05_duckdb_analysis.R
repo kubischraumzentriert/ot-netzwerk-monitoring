@@ -9,7 +9,7 @@ duckdb_native_available <- function() {
 
 load_multirun_bundle_into_duckdb_native <- function(
   bundle = build_multirun_bundle(),
-  db_path = file.path(paths$data_processed, "network_analysis.duckdb")
+  db_path = duckdb_default_db_path()
 ) {
   if (!duckdb_native_available()) {
     message("duckdb/DBI not available; skipping native DuckDB load.")
@@ -30,7 +30,7 @@ load_multirun_bundle_into_duckdb_native <- function(
 
 load_multirun_bundle_into_duckdb_jdbc <- function(
   bundle = build_multirun_bundle(),
-  db_path = file.path(paths$data_processed, "network_analysis.duckdb"),
+  db_path = duckdb_default_db_path(),
   jar_path = duckdb_jdbc_default_jar(),
   driver_class = "org.duckdb.DuckDBDriver"
 ) {
@@ -53,7 +53,7 @@ load_multirun_bundle_into_duckdb_jdbc <- function(
 
 load_multirun_bundle_into_duckdb <- function(
   bundle = build_multirun_bundle(),
-  db_path = file.path(paths$data_processed, "network_analysis.duckdb"),
+  db_path = duckdb_default_db_path(),
   jar_path = duckdb_jdbc_default_jar(),
   driver_class = "org.duckdb.DuckDBDriver"
 ) {
@@ -68,7 +68,7 @@ load_multirun_bundle_into_duckdb <- function(
 }
 
 duckdb_table_counts <- function(
-  db_path = file.path(paths$data_processed, "network_analysis.duckdb")
+  db_path = duckdb_default_db_path()
 ) {
   if (!dbi_available()) {
     return(data.frame())
@@ -98,7 +98,7 @@ duckdb_table_counts <- function(
 }
 
 write_duckdb_report <- function(
-  db_path = file.path(paths$data_processed, "network_analysis.duckdb"),
+  db_path = duckdb_default_db_path(),
   output_file = file.path(paths$reports, "network_overview_duckdb.md")
 ) {
   counts <- duckdb_table_counts(db_path)
@@ -139,7 +139,7 @@ write_duckdb_report <- function(
 
 refresh_duckdb_analysis <- function(
   bundle = build_multirun_bundle(),
-  db_path = file.path(paths$data_processed, "network_analysis.duckdb"),
+  db_path = duckdb_default_db_path(),
   output_file = file.path(paths$reports, "network_overview_duckdb.md"),
   jar_path = duckdb_jdbc_default_jar(),
   driver_class = "org.duckdb.DuckDBDriver"
@@ -160,7 +160,7 @@ refresh_duckdb_analysis <- function(
 
 duckdb_query <- function(
   sql,
-  db_path = file.path(paths$data_processed, "network_analysis.duckdb")
+  db_path = duckdb_default_db_path()
 ) {
   sql <- paste(sql, collapse = "\n")
   if (!nzchar(trimws(sql))) {
@@ -180,7 +180,7 @@ duckdb_query <- function(
 duckdb_write_query_result <- function(
   sql,
   output_file,
-  db_path = file.path(paths$data_processed, "network_analysis.duckdb")
+  db_path = duckdb_default_db_path()
 ) {
   result <- duckdb_query(sql = sql, db_path = db_path)
   dir.create(dirname(output_file), recursive = TRUE, showWarnings = FALSE)

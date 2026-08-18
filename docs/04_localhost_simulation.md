@@ -18,6 +18,22 @@ Die komplette Kette soll lokal gegen `127.0.0.1` durchgespielt werden:
 ## Warum das sinnvoll ist
 
 Damit kannst du den Ablauf testen, ohne schon echte Geraete anzugreifen.
+Der spaetere Vor-Ort-Ablauf ist im [Betriebsmanual](06_betriebsmanual_workflow.md)
+beschrieben.
+
+## Ablaufdiagramm
+
+```mermaid
+flowchart TD
+  A["powershell/run_init_database.ps1"] --> B["R/run_init_database.R"]
+  B --> C["DuckDB-Datei / Schema"]
+  C --> D["powershell/run_localhost_workflow.ps1"]
+  D --> E["Lokaler TCP-Echo-Server auf 127.0.0.1:9000"]
+  E --> F["Inventory Collect"]
+  F --> G["R/run_localhost_simulation.R"]
+  G --> H["R/run_multirun_analysis.R"]
+  H --> I["DuckDB-Ladung und Reports"]
+```
 
 ## Aufbau
 
