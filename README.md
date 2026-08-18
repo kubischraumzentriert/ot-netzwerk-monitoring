@@ -114,6 +114,15 @@ Bevor du am Projekt arbeitest, lies bitte:
 - `docs/08_konfigurationsreferenz.md` fuer die komplette Config-Referenz
 - `docs/09_konfigurations_spickzettel.md` fuer den schnellen Vor-Ort-Ueberblick
 
+## Start In 3 Schritten
+
+1. `powershell/run_init_database.ps1` ausfuehren
+2. `powershell/run_localhost_workflow.ps1` fuer den Trockenlauf oder
+   `powershell/inventory_collect.ps1` plus `powershell/run_benchmark.ps1` fuer
+   den echten Lauf starten
+3. die Reports in `reports/` und die DuckDB-Datei in
+   `data/processed/network_analysis.duckdb` pruefen
+
 ## GitHub Hinweis
 
 - Beispiel-IPs in `configs/*.csv` sind absichtlich Platzhalter
