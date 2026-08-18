@@ -91,6 +91,7 @@ ping_once <- function(host, timeout_sec = 1) {
   data.frame(
     ts = Sys.time(),
     host = host,
+    port = NA_integer_,
     probe = "ping",
     success = success,
     metric_ms = ifelse(is.na(rtt_ms), elapsed_ms, rtt_ms),
@@ -204,7 +205,7 @@ run_benchmark <- function(targets = read_targets(), run_cfg = read_run_config())
     tcp_df$session_tag <- session_tag
     ping_df$target_host <- target$host
     tcp_df$target_host <- target$host
-    ping_df$target_port <- port
+    ping_df$target_port <- NA_integer_
     tcp_df$target_port <- port
     combined <- bind_rows_union(ping_df, tcp_df)
     char_cols <- vapply(combined, is.character, logical(1))

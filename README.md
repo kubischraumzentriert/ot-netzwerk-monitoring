@@ -100,26 +100,28 @@ Der genaue Vor-Ort-Ablauf steht im [Betriebsmanual](docs/06_betriebsmanual_workf
 
 ## Workflow Werkzeuge
 
-- `powershell/run_init_database.ps1` fuer den ersten Datenbank-Initialisierungsschritt
-- `powershell/inventory_collect.ps1` fuer die lokale Inventur
-- `powershell/run_inventory_steckbrief.ps1` fuer den Inventur-Steckbrief
-- `powershell/run_benchmark.ps1` fuer TCP-Port-Messungen, Standard ist 9000, je Zielhost kann ein eigener Port gesetzt werden
-- `powershell/run_benchmark_comparison.ps1` fuer Direkt-vs-Switch-Vergleiche
-- `powershell/archive_data_backup.ps1` fuer Datensicherung und anschliessenden Reset von `data/` und `reports/`
-- `powershell/restore_data_backup.ps1` fuer das Zurueckspielen des letzten oder eines expliziten Backups
-- `powershell/run_localhost_workflow.ps1` fuer den lokalen Trockenlauf
-- `powershell/run_nmap_scan.ps1` fuer konservative Nmap-Scans auf freigegebenen Ports
-- `powershell/list_capture_interfaces.ps1` fuer `tshark -D`
-- `powershell/start_wireshark_capture.ps1` fuer paketbasierten Mitschnitt
-- `powershell/start_suricata_capture.ps1` fuer passives Logging
-- `R/run_init_database.R` fuer die lokale DuckDB-Initialisierung
-- `R/run_inventory_steckbrief.R` fuer den Markdown-Steckbrief
-- `R/run_benchmark.R` fuer die Messlaeufe
-- `R/run_benchmark_comparison.R` fuer den Direkt-vs-Switch-Vergleich
-- `R/run_multirun_analysis.R` fuer die gemeinsame Analyse mehrerer Sessions
-- `R/run_duckdb_analysis.R` fuer die lokale DuckDB-Datei und den DuckDB-Report
-- `R/run_duckdb_query.R` fuer einzelne SQL-Abfragen gegen die DuckDB-Datei
-- `R/run_duckdb_overview_report.R` fuer den kombinierten DuckDB-Analyse-Report
+| Script | Zweck | Output | DuckDB |
+| --- | --- | --- | --- |
+| `powershell/run_init_database.ps1` | Datenbank initialisieren | `data/processed/network_analysis.duckdb` | ja |
+| `powershell/inventory_collect.ps1` | lokale Inventur | `data/raw/inventory/<timestamp>/` | optional |
+| `powershell/run_inventory_steckbrief.ps1` | Inventur-Steckbrief erzeugen | `reports/steckbrief_*.md` | nein |
+| `powershell/run_benchmark.ps1` | TCP-Port-Messungen, Standard ist 9000 | `data/raw/direct/` oder `data/raw/switch/` oder `data/raw/sim/` | ja |
+| `powershell/run_benchmark_comparison.ps1` | Direkt-vs-Switch-Vergleich | `reports/network_direct_vs_switch.md` | nein |
+| `powershell/archive_data_backup.ps1` | Daten sichern und Arbeitsbestand resetten | `data/backups/YYYYMMdd_HHmmss_Databackup/` | nein |
+| `powershell/restore_data_backup.ps1` | Backup wiederherstellen | Rueckspielung von `data/raw/`, `data/processed/`, `reports/` | nein |
+| `powershell/run_localhost_workflow.ps1` | lokaler Trockenlauf | `reports/network_overview_localhost.md` und lokale Rohdaten | ja |
+| `powershell/run_nmap_scan.ps1` | konservative Nmap-Scans | `data/raw/scans/nmap/` | nein |
+| `powershell/list_capture_interfaces.ps1` | `tshark -D` anzeigen | nur Konsole | nein |
+| `powershell/start_wireshark_capture.ps1` | paketbasierter Mitschnitt | `data/raw/pcap/*.pcapng` | nein |
+| `powershell/start_suricata_capture.ps1` | passives Logging | `data/raw/suricata/` | nein |
+| `R/run_init_database.R` | DuckDB-Initialisierung aus R | `data/processed/network_analysis.duckdb` | ja |
+| `R/run_inventory_steckbrief.R` | Markdown-Steckbrief | `reports/steckbrief_*.md` | nein |
+| `R/run_benchmark.R` | Messlaeufe aus R | Roh-CSV-Dateien pro Lauf | ja |
+| `R/run_benchmark_comparison.R` | Direkt-vs-Switch-Vergleich | `reports/network_direct_vs_switch.md` | nein |
+| `R/run_multirun_analysis.R` | gemeinsame Analyse mehrerer Sessions | `reports/network_overview.md` und CSV-Aggregate | ja |
+| `R/run_duckdb_analysis.R` | lokale DuckDB-Datei und Report | `reports/network_overview_duckdb.md` | ja |
+| `R/run_duckdb_query.R` | einzelne SQL-Abfragen | Report oder CSV je nach Ausgabe | ja |
+| `R/run_duckdb_overview_report.R` | kombinierter DuckDB-Analyse-Report | `reports/duckdb_analysis_overview.md` | ja |
 
 ## Betriebsmanual
 

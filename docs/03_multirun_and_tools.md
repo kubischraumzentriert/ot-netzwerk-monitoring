@@ -63,3 +63,7 @@ Der kombinierte Ueberblick fuer Inventur und Benchmark heisst
 Der Direkt-vs-Switch-Vergleich laeuft ueber `R/run_benchmark_comparison.R`.
 Die passenden Beispielkonfigurationen sind `configs/run.direct.example.csv`
 und `configs/run.switch.example.csv`.
+
+Aktuell werden in DuckDB nur Inventur- und Benchmark-Daten geladen. Nmap-Scans,
+PCAP-Mitschnitte und Suricata-Logs bleiben als lokale Dateien unter `data/raw/`
+und koennen spaeter bei Bedarf separat in ein eigenes Schema aufgenommen werden.

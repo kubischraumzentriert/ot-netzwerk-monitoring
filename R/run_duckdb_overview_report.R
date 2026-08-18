@@ -15,6 +15,7 @@ write_duckdb_overview_report <- function(
 ) {
   if (!dbi_available() || !file.exists(db_path)) {
     md <- c(
+      markdown_yaml_header("DuckDB Analyse-Overview"),
       "# DuckDB Analyse-Overview",
       "",
       "Keine DuckDB-Datenbank oder keine DuckDB-Pakete in dieser R-Sitzung verfuegbar."
@@ -30,6 +31,7 @@ write_duckdb_overview_report <- function(
   counts <- duckdb_table_counts(db_path)
 
   md <- c(
+    markdown_yaml_header("DuckDB Analyse-Overview"),
     "# DuckDB Analyse-Overview",
     "",
     paste0("- Datenbank: ", db_path),

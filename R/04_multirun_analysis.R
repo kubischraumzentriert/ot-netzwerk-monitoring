@@ -115,6 +115,53 @@ benchmark_run_summary <- function(df) {
   do.call(rbind, rows)
 }
 
+split_benchmark_summary_by_probe <- function(summary_tbl) {
+  if (!is.data.frame(summary_tbl) || !nrow(summary_tbl) || !"probe" %in% names(summary_tbl)) {
+    return(list())
+  }
+
+  probes <- unique(summary_tbl$probe[!is.na(summary_tbl$probe) & nzchar(summary_tbl$probe)])
+  probes <- sort(probes)
+
+  out <- setNames(vector("list", length(probes)), probes)
+  for (probe_name in probes) {
+    out[[probe_name]] <- summary_tbl[summary_tbl$probe == probe_name, , drop = FALSE]
+  }
+  out
+}
+
+benchmark_session_overview <- function(summary_tbl) {
+  if (!is.data.frame(summary_tbl) || !nrow(summary_tbl) || !"session_tag" %in% names(summary_tbl)) {
+    return(data.frame())
+  }
+
+  tags <- sort(unique(summary_tbl$session_tag[!is.na(summary_tbl$session_tag) & nzchar(summary_tbl$session_tag)]))
+  if (!length(tags)) return(data.frame())
+
+  rows <- lapply(tags, function(tag) {
+    subset_tbl <- summary_tbl[summary_tbl$session_tag == tag, , drop = FALSE]
+    data.frame(
+      session_tag = tag,
+      benchmark_rows = if ("rows" %in% names(subset_tbl)) sum(as.integer(subset_tbl$rows), na.rm = TRUE) else nrow(subset_tbl),
+      target_labels = if ("target_label" %in% names(subset_tbl)) length(unique(subset_tbl$target_label[!is.na(subset_tbl$target_label) & nzchar(subset_tbl$target_label)])) else NA_integer_,
+      probes = if ("probe" %in% names(subset_tbl)) length(unique(subset_tbl$probe[!is.na(subset_tbl$probe) & nzchar(subset_tbl$probe)])) else NA_integer_,
+      stringsAsFactors = FALSE
+    )
+  })
+
+  do.call(rbind, rows)
+}
+
+markdown_yaml_header <- function(title) {
+  c(
+    "---",
+    paste0("title: \"", gsub("\"", "\\\\\"", title, fixed = TRUE), "\""),
+    "output: \"html\"",
+    "---",
+    ""
+  )
+}
+
 build_multirun_bundle <- function(
   inventory_dirs = list_inventory_sessions(),
   benchmark_files = list_benchmark_files()
@@ -198,35 +245,55 @@ write_benchmark_comparison_report <- function(
 ) {
   compare_tbl <- benchmark_session_compare(bundle$benchmark_rows)
   sum_tbl <- bundle$benchmark_summary
-  if (!nrow(compare_tbl)) {
-    md <- c(
-      "# Benchmark Vergleich",
-      "",
-      "Keine zwei beschrifteten Benchmark-Sessions gefunden.",
-      "",
-      "Tipp: setze `session_tag` in der Benchmark-Konfiguration, zum Beispiel `direct` und `switch`."
-    )
-    writeLines(md, output_file, useBytes = TRUE)
-    return(output_file)
+  session_overview <- benchmark_session_overview(sum_tbl)
+  available_tags <- character()
+  if (is.data.frame(bundle$benchmark_rows) && nrow(bundle$benchmark_rows) && "session_tag" %in% names(bundle$benchmark_rows)) {
+    available_tags <- sort(unique(bundle$benchmark_rows$session_tag[!is.na(bundle$benchmark_rows$session_tag) & nzchar(bundle$benchmark_rows$session_tag)]))
+  }
+  tag_hint <- if (length(available_tags)) {
+    paste0("Vorhandene Session-Tags: ", paste(available_tags, collapse = ", "), ".")
+  } else {
+    "Es wurden keine beschrifteten Benchmark-Daten gefunden."
   }
 
   md <- c(
+    markdown_yaml_header("Benchmark Vergleich"),
     "# Benchmark Vergleich",
+    "",
+    "## Session-Uebersicht",
+    "",
+    if (nrow(session_overview)) fmt_md_table(session_overview, max_rows = 20) else "Keine Session-Tags gefunden.",
     "",
     "## Zusammenfassung",
     "",
     fmt_md_table(sum_tbl, max_rows = 20),
     "",
     "## Direkt vs. Switch",
-    "",
-    fmt_md_table(compare_tbl, max_rows = 40),
-    "",
-    "## Hinweis",
-    "",
-    "- base_tag und compare_tag werden aus den ersten beiden Session-Tags gebildet.",
-    "- Fuer einen echten Direkt-vs-Switch-Vergleich sollten die Laufnamen `direct` und `switch` enthalten.",
-    "- Die Kennzahlen sind Mittelwerte ueber die jeweiligen CSV-Rows."
+    ""
   )
+
+  if (nrow(compare_tbl)) {
+    md <- c(
+      md,
+      fmt_md_table(compare_tbl, max_rows = 40),
+      "",
+      "## Hinweis",
+      "",
+      "- base_tag und compare_tag werden aus den ersten beiden Session-Tags gebildet.",
+      "- Fuer einen echten Direkt-vs-Switch-Vergleich sollten die Laufnamen `direct` und `switch` enthalten.",
+      "- Die Kennzahlen sind Mittelwerte ueber die jeweiligen CSV-Rows."
+    )
+  } else {
+    md <- c(
+      md,
+      "Keine zwei unterschiedlichen Benchmark-Sessions gefunden.",
+      "",
+      tag_hint,
+      "",
+      "Tipp: setze `session_tag` in der Benchmark-Konfiguration, zum Beispiel `direct` und `switch`.",
+      "Der Vergleich braucht mindestens zwei unterschiedliche, nicht-leere Session-Tags."
+    )
+  }
 
   writeLines(md, output_file, useBytes = TRUE)
   output_file
@@ -349,6 +416,7 @@ write_multirun_plots <- function(
 write_multirun_report <- function(bundle = build_multirun_bundle(), output_file = file.path(paths$reports, "network_overview.md")) {
   inv_tbl <- if (nrow(bundle$inventory_sessions)) bundle$inventory_sessions[, intersect(c("computer_name", "collected_at", "adapter_count", "arp_count", "tcp_count", "listening_count", "primary_ipv4"), names(bundle$inventory_sessions)), drop = FALSE] else data.frame()
   bench_tbl <- if (nrow(bundle$benchmark_summary)) bundle$benchmark_summary[, intersect(c("session_tag", "target_label", "probe", "rows", "success_rate", "metric_ms_mean", "metric_ms_median", "metric_ms_p95", "connect_ms_mean", "total_ms_mean"), names(bundle$benchmark_summary)), drop = FALSE] else data.frame()
+  bench_tables <- split_benchmark_summary_by_probe(bench_tbl)
   figure_dir <- file.path(paths$reports, "figures")
   figure_links <- if (dir.exists(figure_dir)) {
     figs <- list.files(figure_dir, pattern = "\\.(png|svg)$", full.names = FALSE)
@@ -358,6 +426,7 @@ write_multirun_report <- function(bundle = build_multirun_bundle(), output_file 
   }
 
   md <- c(
+    markdown_yaml_header("Netzwerk Analyse Uebersicht"),
     "# Netzwerk Analyse Uebersicht",
     "",
     "## Inventur Sessions",
@@ -365,9 +434,25 @@ write_multirun_report <- function(bundle = build_multirun_bundle(), output_file 
     fmt_md_table(inv_tbl, max_rows = 20),
     "",
     "## Benchmark Summary",
-    "",
-    fmt_md_table(bench_tbl, max_rows = 20),
-    "",
+    ""
+  )
+
+  if (length(bench_tables)) {
+    for (probe_name in names(bench_tables)) {
+      md <- c(
+        md,
+        paste0("### ", toupper(probe_name)),
+        "",
+        fmt_md_table(bench_tables[[probe_name]], max_rows = 20),
+        ""
+      )
+    }
+  } else {
+    md <- c(md, "Keine Benchmark-Daten vorhanden.", "")
+  }
+
+  md <- c(
+    md,
     "## Dateien",
     "",
     paste0("- Inventur-Sessions: ", if (nrow(bundle$inventory_sessions)) nrow(bundle$inventory_sessions) else 0),

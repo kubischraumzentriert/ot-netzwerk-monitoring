@@ -35,6 +35,8 @@ Hinweise:
 
 - Wenn `port` fehlt, verwendet der Benchmark den Default aus der Run-Config.
 - Wenn `request` fehlt, wird `HELLO` gesendet.
+- `target_port` wird fuer die TCP-Messung gesetzt; bei Ping-Zeilen bleibt
+  dieser Wert `NA`.
 - Diese Datei ist die normale Arbeitsdatei fuer reale Geraete.
 
 ## `configs/targets.localhost.csv`
