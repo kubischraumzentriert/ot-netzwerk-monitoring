@@ -11,6 +11,24 @@ resolve_port <- function(target_port, default_port = 9000) {
   port
 }
 
+resolve_session_tag <- function(run_cfg, output_dir, fallback = "session") {
+  tag <- if (!is.null(run_cfg) && "session_tag" %in% names(run_cfg)) {
+    run_cfg[["session_tag"]]
+  } else {
+    NULL
+  }
+
+  if (is.null(tag) || is.na(tag) || !nzchar(tag)) {
+    if (!is.null(output_dir) && nzchar(output_dir)) {
+      tag <- basename(output_dir)
+    } else {
+      tag <- fallback
+    }
+  }
+
+  safe_component(tag, fallback = fallback)
+}
+
 bind_rows_union <- function(...) {
   dfs <- list(...)
   dfs <- Filter(function(x) is.data.frame(x) && nrow(x) >= 0, dfs)
@@ -128,9 +146,9 @@ run_benchmark <- function(targets = read_targets(), run_cfg = read_run_config())
   tcp_interval_sec <- as_num(run_cfg[["tcp_interval_sec"]], 1)
   tcp_timeout_sec <- as_num(run_cfg[["tcp_timeout_sec"]], 3)
   tcp_default_port <- as.integer(as_num(run_cfg[["tcp_port"]], 9000))
-  session_tag <- safe_component(run_cfg[["session_tag"]], fallback = "session")
   output_dir <- run_cfg[["output_dir"]]
   if (is.na(output_dir) || !nzchar(output_dir)) output_dir <- file.path(paths$root, "data", "raw")
+  session_tag <- resolve_session_tag(run_cfg, output_dir, fallback = "session")
   if (tolower(basename(output_dir)) != tolower(session_tag)) {
     output_dir <- file.path(output_dir, session_tag)
   }

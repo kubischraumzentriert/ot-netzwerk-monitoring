@@ -5,5 +5,5 @@ tcp_count,10
 tcp_interval_sec,1
 tcp_timeout_sec,3
 tcp_port,9000
+session_tag,localhost
 output_dir,data/raw/sim
-

@@ -1,6 +1,21 @@
 source("R/00_setup.R", local = TRUE)
 source("R/01_inventory_report.R", local = TRUE)
 
+bind_rows_union <- function(...) {
+  dfs <- list(...)
+  dfs <- Filter(function(x) is.data.frame(x) && nrow(x) >= 0, dfs)
+  if (!length(dfs)) return(data.frame())
+  all_names <- unique(unlist(lapply(dfs, names), use.names = FALSE))
+  aligned <- lapply(dfs, function(df) {
+    missing <- setdiff(all_names, names(df))
+    for (nm in missing) df[[nm]] <- NA
+    df <- df[, all_names, drop = FALSE]
+    rownames(df) <- NULL
+    df
+  })
+  do.call(rbind, aligned)
+}
+
 list_inventory_sessions <- function(root = paths$inventory) {
   if (!dir.exists(root)) return(character())
   dirs <- list.dirs(root, full.names = TRUE, recursive = FALSE)
@@ -105,13 +120,13 @@ build_multirun_bundle <- function(
   benchmark_files = list_benchmark_files()
 ) {
   inventory_sessions <- if (length(inventory_dirs)) {
-    do.call(rbind, lapply(inventory_dirs, inventory_session_summary))
+    bind_rows_union(lapply(inventory_dirs, inventory_session_summary))
   } else {
     data.frame()
   }
 
   benchmark_rows <- if (length(benchmark_files)) {
-    do.call(rbind, lapply(benchmark_files, benchmark_file_summary))
+    bind_rows_union(lapply(benchmark_files, benchmark_file_summary))
   } else {
     data.frame()
   }
