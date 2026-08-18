@@ -31,6 +31,7 @@ Bevor du am Projekt arbeitest, lies bitte:
 6. die Konfigurationsreferenz in [docs/08_konfigurationsreferenz.md](docs/08_konfigurationsreferenz.md)
 7. den Konfigurations-Spickzettel in [docs/09_konfigurations_spickzettel.md](docs/09_konfigurations_spickzettel.md)
 8. das DuckDB-Datenmodell in [docs/11_duckdb_datenmodell.md](docs/11_duckdb_datenmodell.md)
+9. die Einordnung zu `netstat` und `Test-NetConnection` in [docs/12_netstat_vs_testnetconnection.md](docs/12_netstat_vs_testnetconnection.md)
 
 ## Zielbild
 

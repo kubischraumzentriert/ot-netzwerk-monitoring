@@ -90,6 +90,32 @@ Merksatz:
 - Suricata beantwortet "gibt es sichtbare Ereignisse oder Muster?"
 - ZAP beantwortet "ist die Webschnittstelle sauber?"
 
+## Abgrenzung zu `Test-NetConnection`
+
+`Test-NetConnection -ComputerName <host> -Port <port>` ist fuer einen schnellen
+Windows-Check sehr gut geeignet. Unser R-Test geht fachlich einen Schritt
+weiter:
+
+- er misst nicht nur die Verbindbarkeit, sondern auch `connect_ms` und
+  `total_ms`
+- er sendet optional einen definierten Request, zum Beispiel `HELLO`
+- er liest die Antwort des Dienstes aus und speichert sie mit in der CSV
+- er schreibt die Rohdaten in ein Schema, das sich spaeter direkt in DuckDB
+  auswerten laesst
+
+Kurz gesagt:
+
+- `Test-NetConnection` ist ein schneller manueller Diagnosetest
+- unser R-Test ist die reproduzierbare Messung mit Protokollierung, Verlauf und
+  Auswertbarkeit
+
+Fuer die Ursachenanalyse im OT-Umfeld ist der R-Test deshalb meist die
+bessere Primaermessung.
+
+Wenn du den genauen Unterschied zwischen `netstat`-Zustaenden wie
+`Established` und `Test-NetConnection` suchst, lies
+[docs/12_netstat_vs_testnetconnection.md](12_netstat_vs_testnetconnection.md).
+
 ## Entscheidungsweg
 
 ```mermaid
