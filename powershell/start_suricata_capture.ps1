@@ -1,8 +1,8 @@
 param(
-    [string]$ProjectRoot = (Split-Path -Parent $PSScriptRoot),
+    [string]$ProjectRoot = '',
     [string]$InterfaceName,
     [string]$ConfigPath,
-    [string]$LogDir = (Join-Path $ProjectRoot 'data\raw\suricata'),
+    [string]$LogDir = '',
     [int]$DurationSeconds = 300,
     [string]$SuricataPath,
     [string]$RulesPath
@@ -10,29 +10,24 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-if (-not $SuricataPath -or -not $SuricataPath.Trim()) {
-    $cmd = Get-Command suricata -ErrorAction SilentlyContinue
-    if ($cmd) {
-        $SuricataPath = $cmd.Source
-    }
+$ScriptRootPath = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Path }
+if (-not $ProjectRoot -or -not $ProjectRoot.Trim()) {
+    $ProjectRoot = Split-Path -Parent $ScriptRootPath
+}
+if (-not $LogDir -or -not $LogDir.Trim()) {
+    $LogDir = Join-Path $ProjectRoot 'data\raw\suricata'
 }
 
-if (-not $SuricataPath -or -not $SuricataPath.Trim()) {
-    $candidatePaths = @(
+. (Join-Path $ScriptRootPath 'resolve_tool_path.ps1')
+$SuricataPath = Resolve-ProjectTool `
+    -ProjectRoot $ProjectRoot `
+    -ToolName 'suricata' `
+    -ConfigKey 'suricata' `
+    -ExplicitPath $SuricataPath `
+    -CandidatePaths @(
         'C:\Program Files\Suricata\suricata.exe',
         'C:\Program Files (x86)\Suricata\suricata.exe'
     )
-    foreach ($candidate in $candidatePaths) {
-        if (Test-Path -LiteralPath $candidate) {
-            $SuricataPath = $candidate
-            break
-        }
-    }
-}
-
-if (-not $SuricataPath -or -not (Test-Path -LiteralPath $SuricataPath)) {
-    throw "suricata.exe not found. Set -SuricataPath or install Suricata."
-}
 
 if (-not $InterfaceName -or -not $InterfaceName.Trim()) {
     throw "Please provide -InterfaceName."

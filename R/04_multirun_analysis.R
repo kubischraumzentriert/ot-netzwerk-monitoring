@@ -292,14 +292,17 @@ build_multirun_bundle <- function(
   )
 }
 
-benchmark_session_compare <- function(benchmark_rows) {
+benchmark_session_compare <- function(benchmark_rows, base_tag = NULL, compare_tag = NULL) {
   if (!is.data.frame(benchmark_rows) || !nrow(benchmark_rows)) return(data.frame())
   if (!"session_tag" %in% names(benchmark_rows)) return(data.frame())
   tags <- sort(unique(benchmark_rows$session_tag[!is.na(benchmark_rows$session_tag) & nzchar(benchmark_rows$session_tag)]))
-  if (length(tags) < 2) return(data.frame())
-
-  base_tag <- tags[1]
-  compare_tag <- tags[2]
+  if (is.null(base_tag) || !nzchar(base_tag)) {
+    base_tag <- tags[1]
+  }
+  if (is.null(compare_tag) || !nzchar(compare_tag)) {
+    compare_tag <- tags[2]
+  }
+  if (length(tags) < 2 || !(base_tag %in% tags) || !(compare_tag %in% tags)) return(data.frame())
 
   subset_cols <- intersect(
     c("session_tag", "target_label", "probe", "metric_ms", "connect_ms", "total_ms", "success"),
@@ -346,9 +349,11 @@ benchmark_session_compare <- function(benchmark_rows) {
 
 write_benchmark_comparison_report <- function(
   bundle = build_multirun_bundle(),
-  output_file = file.path(paths$reports, "network_direct_vs_switch.md")
+  output_file = file.path(paths$reports, "network_direct_vs_switch.md"),
+  base_tag = NULL,
+  compare_tag = NULL
 ) {
-  compare_tbl <- benchmark_session_compare(bundle$benchmark_rows)
+  compare_tbl <- benchmark_session_compare(bundle$benchmark_rows, base_tag = base_tag, compare_tag = compare_tag)
   sum_tbl <- bundle$benchmark_summary
   session_overview <- benchmark_session_overview(sum_tbl)
   available_tags <- character()
@@ -384,7 +389,11 @@ write_benchmark_comparison_report <- function(
       "",
       "## Hinweis",
       "",
-      "- base_tag und compare_tag werden aus den ersten beiden Session-Tags gebildet.",
+      if (is.null(base_tag) || is.null(compare_tag)) {
+        "- base_tag und compare_tag werden ohne explizite Auswahl aus den ersten beiden Session-Tags gebildet."
+      } else {
+        paste0("- Expliziter Vergleich: `", base_tag, "` gegen `", compare_tag, "`.")
+      },
       "- Fuer einen echten Direkt-vs-Switch-Vergleich sollten die Laufnamen `direct` und `switch` enthalten.",
       "- Die Kennzahlen sind Mittelwerte ueber die jeweiligen CSV-Rows."
     )
@@ -395,7 +404,7 @@ write_benchmark_comparison_report <- function(
       "",
       tag_hint,
       "",
-      "Tipp: setze `session_tag` in der Benchmark-Konfiguration, zum Beispiel `direct` und `switch`.",
+      "Tipp: setze `session_tag` in der Benchmark-Konfiguration, zum Beispiel `direct` und `switch`, oder gib `--base=` und `--compare=` an.",
       "Der Vergleich braucht mindestens zwei unterschiedliche, nicht-leere Session-Tags."
     )
   }

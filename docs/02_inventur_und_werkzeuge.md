@@ -12,6 +12,8 @@ Am Anfang soll der PC lokal eine erste Netzwerkinventur machen. Die Ergebnisse w
 ## Was erfasst wird
 
 - `arp` bzw. Neighbor-Tabelle
+- optional ein vorsichtiger `/24`-Ping-Sweep, um den lokalen ARP-Cache vor der
+  Inventur zu aktualisieren
 - `netstat` bzw. TCP-Verbindungen und Listeners
 - Netzwerkschnittstellen
 - IP-Konfiguration
@@ -23,8 +25,13 @@ Damit bekommst du einen schnellen Ist-Zustand:
 
 - Welche Adapter sind aktiv?
 - Welche Nachbarn sind sichtbar?
+- Welche MAC-Adressen sind im gleichen Layer-2-Netz sichtbar?
 - Welche Prozesse halten welche Verbindungen?
 - Gibt es unerwartete offene Ports?
+
+Wichtig: Die ARP-/MAC-Sicht gilt nur fuer Teilnehmer im gleichen
+Layer-2-Netz. Hinter einem Router siehst du normalerweise die MAC-Adresse des
+Gateways, nicht die MAC-Adresse des entfernten Zielgeraets.
 
 ## DuckDB als Auswertungsschicht
 

@@ -1,5 +1,5 @@
 key,value
-jar_path,C:/Users/Andre/Downloads/duckdb_jdbc-1.5.5.0.jar
+jar_path,C:/Pfad/zu/duckdb_jdbc-1.5.5.0.jar
 db_path,data/processed/network_analysis.duckdb
 driver_class,org.duckdb.DuckDBDriver
 

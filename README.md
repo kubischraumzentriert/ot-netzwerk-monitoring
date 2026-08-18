@@ -72,6 +72,7 @@ Bevor du am Projekt arbeitest, lies bitte:
 ## Inventur und Auswertung
 
 - lokale Inventur mit `arp`, `netstat` und Schnittstellen-Informationen
+- optionaler vorsichtiger `/24`-Ping-Sweep zum Aktualisieren des ARP-Caches
 - Steckbrief als Markdown aus R
 - optional DuckDB als lokale Auswertungsbasis
 - spaeterer Vergleich mehrerer Anlagen und Messlaeufe
@@ -104,6 +105,7 @@ genaue Vor-Ort-Ablauf steht im [Betriebsmanual](docs/06_betriebsmanual_workflow.
 | `configs/run.switch.example.csv` | Vorlage fuer Switchlauf | `ping_count`, `tcp_count`, `tcp_port`, `session_tag`, `output_dir` |
 | `configs/run.localhost.csv` | Trockenlauf | `ping_count`, `tcp_count`, `tcp_port`, `session_tag`, `output_dir` |
 | `configs/scan_targets.csv` | Nmap-Ziele | `label`, `host`, `ports` |
+| `configs/tools.example.csv` | Vorlage fuer lokale Tool-Pfade | `tool`, `path`, `note` |
 | `configs/duckdb_jdbc.example.csv` | optionale JDBC-Anbindung | `jar_path`, `db_path`, `driver_class` |
 | `sql/ddl/network_analysis_schema.sql` | DuckDB-DDL fuer die Basisstruktur mit internen Schluesseln und Views | `schema_metadata`, `inventory_sessions`, `benchmark_rows`, `benchmark_summary`, `inventory_overview`, `benchmark_overview`, `benchmark_rows_ping`, `benchmark_rows_tcp` |
 
@@ -113,9 +115,11 @@ genaue Vor-Ort-Ablauf steht im [Betriebsmanual](docs/06_betriebsmanual_workflow.
 | --- | --- | --- | --- |
 | `powershell/run_init_database.ps1` | Datenbank initialisieren | `data/processed/network_analysis.duckdb` | ja |
 | `powershell/inventory_collect.ps1` | lokale Inventur | `data/raw/inventory/<timestamp>/` | optional |
+| `powershell/refresh_arp_cache.ps1` | ARP-Cache ueber vorsichtigen `/24`-Ping-Sweep aktualisieren | `data/raw/inventory/arp_refresh/` oder Inventur-Unterordner | nein |
 | `powershell/run_inventory_steckbrief.ps1` | Inventur-Steckbrief erzeugen | `reports/steckbrief_*.md` | nein |
 | `powershell/run_benchmark.ps1` | TCP-Port-Messungen, Standard ist 9000 | `data/raw/direct/` oder `data/raw/switch/` oder `data/raw/sim/` | ja |
 | `powershell/run_benchmark_comparison.ps1` | Direkt-vs-Switch-Vergleich | `reports/network_direct_vs_switch.md` | nein |
+| `powershell/run_r_script.ps1` | generischer R-Skript-Start mit zentraler Rscript-Suche | je nach R-Skript | je nach R-Skript |
 | `powershell/archive_data_backup.ps1` | Daten sichern und Arbeitsbestand resetten | `data/backups/YYYYMMdd_HHmmss_Databackup/` | nein |
 | `powershell/restore_data_backup.ps1` | Backup wiederherstellen | Rueckspielung von `data/raw/`, `data/processed/`, `reports/` | nein |
 | `powershell/run_localhost_workflow.ps1` | lokaler Trockenlauf | `reports/network_overview_localhost.md` und lokale Rohdaten | ja |
@@ -123,11 +127,12 @@ genaue Vor-Ort-Ablauf steht im [Betriebsmanual](docs/06_betriebsmanual_workflow.
 | `powershell/list_capture_interfaces.ps1` | `tshark -D` anzeigen | nur Konsole | nein |
 | `powershell/start_wireshark_capture.ps1` | paketbasierter Mitschnitt | `data/raw/pcap/*.pcapng` | nein |
 | `powershell/start_suricata_capture.ps1` | passives Logging | `data/raw/suricata/` | nein |
+| `powershell/resolve_tool_path.ps1` | gemeinsame Suche fuer Rscript, Nmap, tshark und Suricata | nur Konsole | nein |
 | `R/run_init_database.R` | DuckDB-Initialisierung aus R | `data/processed/network_analysis.duckdb` | ja |
 | `R/run_inventory_steckbrief.R` | Markdown-Steckbrief | `reports/steckbrief_*.md` | nein |
 | `R/run_localhost_simulation.R` | lokaler Simulationslauf mit Benchmark, Multirun-Auswertung und DuckDB-Import | `reports/network_overview_localhost.md` | ja |
 | `R/run_benchmark.R` | Messlaeufe aus R | Roh-CSV-Dateien pro Lauf | ja |
-| `R/run_benchmark_comparison.R` | Direkt-vs-Switch-Vergleich | `reports/network_direct_vs_switch.md` | nein |
+| `R/run_benchmark_comparison.R` | Direkt-vs-Switch-Vergleich, optional mit `--base=` und `--compare=` | `reports/network_direct_vs_switch.md` | nein |
 | `R/run_multirun_analysis.R` | gemeinsame Analyse mehrerer Sessions | `reports/network_overview.md` und CSV-Aggregate | ja |
 | `R/run_duckdb_analysis.R` | laedt die lokalen Daten in DuckDB, erstellt Views und Report | `reports/network_overview_duckdb.md` | ja |
 | `R/run_duckdb_query.R` | einzelne SQL-Abfragen | Report oder CSV je nach Ausgabe | ja |
@@ -156,7 +161,10 @@ genaue Vor-Ort-Ablauf steht im [Betriebsmanual](docs/06_betriebsmanual_workflow.
 
 - Beispiel-IPs in `configs/*.csv` sind absichtlich Platzhalter
 - reale Zieladressen gehoeren in die lokale, ignorierte `configs/targets.private.csv`
+- reale Scanbereiche werden nur als Laufzeitparameter verwendet und nicht versioniert
+- lokale Tool-Pfade gehoeren in `configs/tools.csv` oder `configs/tools.private.csv`, beide werden ignoriert
 - echte Anlagenadressen gehoeren nicht ins Repo
+- ARP-MACs sind nur im gleichen Layer-2-Netz aussagekraeftig; bei Routing siehst du in der Regel die Gateway-MAC
 - Rohdaten, Scans und Reports bleiben lokal und werden nicht versioniert
 - TCP-Ports sind konfigurierbar; `9000` ist nur der Standardwert und pro Zielhost kann ein eigener Port gesetzt werden
 

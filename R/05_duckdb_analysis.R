@@ -117,6 +117,12 @@ write_duckdb_report <- function(
   inventory_overview <- if (is.list(bundle) && "inventory_sessions" %in% names(bundle)) bundle$inventory_sessions else data.frame()
   benchmark_rows <- if (is.list(bundle) && "benchmark_rows" %in% names(bundle)) bundle$benchmark_rows else data.frame()
   benchmark_summary <- if (is.list(bundle) && "benchmark_summary" %in% names(bundle)) bundle$benchmark_summary else data.frame()
+  benchmark_overview_sql <- file.path(paths$root, "sql", "benchmark_overview.sql")
+  benchmark_overview <- if (file.exists(benchmark_overview_sql)) {
+    duckdb_query(readLines(benchmark_overview_sql, warn = FALSE, encoding = "UTF-8"), db_path = db_path)
+  } else {
+    data.frame()
+  }
   benchmark_files <- benchmark_file_overview()
   probe_overview <- benchmark_probe_overview(benchmark_rows)
   session_overview <- benchmark_session_overview(benchmark_summary)
@@ -179,6 +185,10 @@ write_duckdb_report <- function(
     "## Benchmark-Dateien",
     "",
     if (nrow(benchmark_files)) fmt_md_table(benchmark_files, max_rows = 20) else "Keine Benchmark-Dateien gefunden.",
+    "",
+    "## Benchmark-Overview",
+    "",
+    if (nrow(benchmark_overview)) fmt_md_table(benchmark_overview, max_rows = 30) else "Keine Benchmark-Overview-Daten verfuegbar.",
     "",
     "## Probe-Uebersicht",
     "",

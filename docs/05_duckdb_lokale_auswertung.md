@@ -44,14 +44,17 @@ CSV-Dateien nicht vorhanden sein.
 Die empfohlene Reihenfolge ist:
 
 ```powershell
-Rscript R/run_init_database.R
-Rscript R/run_duckdb_analysis.R
+powershell\run_init_database.ps1
+powershell\run_r_script.ps1 -ScriptPath R\run_duckdb_analysis.R
 ```
 
-Oder aus PowerShell:
+Der PowerShell-Weg nutzt die zentrale Tool-Aufloesung fuer `Rscript`.
+Direkte `Rscript`-Aufrufe sind weiterhin moeglich, wenn R bereits im `PATH`
+liegt.
 
 ```powershell
-powershell\run_init_database.ps1
+Rscript R/run_init_database.R
+Rscript R/run_duckdb_analysis.R
 ```
 
 Das Skript versucht zunaechst den nativen DuckDB-Weg. Falls dieser in einer
@@ -70,19 +73,19 @@ gezielt auf eine andere Datei umbiegen.
 Einzelne SQL-Abfragen laufen ueber:
 
 ```powershell
-Rscript R/run_duckdb_query.R "SELECT * FROM inventory_sessions LIMIT 10"
+powershell\run_r_script.ps1 -ScriptPath R\run_duckdb_query.R "SELECT * FROM inventory_sessions LIMIT 10"
 ```
 
 Oder mit SQL-Datei:
 
 ```powershell
-Rscript R/run_duckdb_query.R sql\inventory_overview.sql
+powershell\run_r_script.ps1 -ScriptPath R\run_duckdb_query.R sql\inventory_overview.sql
 ```
 
 Einen kombinierten Ueberblick fuer Inventur und Benchmarks erzeugt:
 
 ```powershell
-Rscript R/run_duckdb_overview_report.R
+powershell\run_r_script.ps1 -ScriptPath R\run_duckdb_overview_report.R
 ```
 
 ## Naechste Ausbaustufen

@@ -1,28 +1,34 @@
 param(
-    [string]$ProjectRoot = (Split-Path -Parent $PSScriptRoot),
-    [string]$TargetsCsv = $(if (Test-Path -LiteralPath (Join-Path $ProjectRoot 'configs\targets.private.csv')) { Join-Path $ProjectRoot 'configs\targets.private.csv' } else { Join-Path $ProjectRoot 'configs\targets.csv' }),
-    [string]$OutputDir = (Join-Path $ProjectRoot 'data\raw\scans\nmap'),
+    [string]$ProjectRoot = '',
+    [string]$TargetsCsv = '',
+    [string]$OutputDir = '',
     [string]$NmapPath,
     [string]$DefaultPorts = '9000'
 )
 
 $ErrorActionPreference = 'Stop'
 
-if (-not $NmapPath -or -not $NmapPath.Trim()) {
-    $cmd = Get-Command nmap -ErrorAction SilentlyContinue
-    if ($cmd) {
-        $NmapPath = $cmd.Source
-    } else {
-        $candidate = 'C:\Program Files (x86)\Nmap\nmap.exe'
-        if (Test-Path -LiteralPath $candidate) {
-            $NmapPath = $candidate
-        }
-    }
+$ScriptRootPath = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Path }
+if (-not $ProjectRoot -or -not $ProjectRoot.Trim()) {
+    $ProjectRoot = Split-Path -Parent $ScriptRootPath
+}
+if (-not $TargetsCsv -or -not $TargetsCsv.Trim()) {
+    $TargetsCsv = if (Test-Path -LiteralPath (Join-Path $ProjectRoot 'configs\targets.private.csv')) { Join-Path $ProjectRoot 'configs\targets.private.csv' } else { Join-Path $ProjectRoot 'configs\targets.csv' }
+}
+if (-not $OutputDir -or -not $OutputDir.Trim()) {
+    $OutputDir = Join-Path $ProjectRoot 'data\raw\scans\nmap'
 }
 
-if (-not $NmapPath -or -not (Test-Path -LiteralPath $NmapPath)) {
-    throw "nmap.exe not found. Set -NmapPath or install Nmap."
-}
+. (Join-Path $ScriptRootPath 'resolve_tool_path.ps1')
+$NmapPath = Resolve-ProjectTool `
+    -ProjectRoot $ProjectRoot `
+    -ToolName 'nmap' `
+    -ConfigKey 'nmap' `
+    -ExplicitPath $NmapPath `
+    -CandidatePaths @(
+        'C:\Program Files\Nmap\nmap.exe',
+        'C:\Program Files (x86)\Nmap\nmap.exe'
+    )
 
 if (-not (Test-Path -LiteralPath $TargetsCsv)) {
     throw "Targets CSV not found: $TargetsCsv"

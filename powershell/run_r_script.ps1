@@ -1,9 +1,10 @@
 param(
     [string]$ProjectRoot = '',
     [string]$RScriptPath = '',
-    [string]$BaseTag = '',
-    [string]$CompareTag = '',
-    [string]$OutputFile = ''
+    [Parameter(Mandatory = $true)]
+    [string]$ScriptPath,
+    [Parameter(ValueFromRemainingArguments = $true)]
+    [string[]]$ScriptArgs = @()
 )
 
 $ErrorActionPreference = 'Stop'
@@ -12,8 +13,9 @@ $ScriptRootPath = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent
 if (-not $ProjectRoot -or -not $ProjectRoot.Trim()) {
     $ProjectRoot = Split-Path -Parent $ScriptRootPath
 }
+
 . (Join-Path $ScriptRootPath 'resolve_tool_path.ps1')
-$rscript = Resolve-ProjectTool `
+$RScriptPath = Resolve-ProjectTool `
     -ProjectRoot $ProjectRoot `
     -ToolName 'Rscript' `
     -ConfigKey 'rscript' `
@@ -24,20 +26,20 @@ $rscript = Resolve-ProjectTool `
         'C:\Program Files\R\R-*\bin\Rscript.exe',
         'C:\Program Files\R\R-*\bin\x64\Rscript.exe'
     )
-$script = Join-Path $ProjectRoot 'R\run_benchmark_comparison.R'
 
-if (-not (Test-Path -LiteralPath $script)) {
-    throw "Benchmark comparison runner not found: $script"
+$ResolvedScriptPath = if ([System.IO.Path]::IsPathRooted($ScriptPath)) {
+    $ScriptPath
+} else {
+    Join-Path $ProjectRoot $ScriptPath
 }
 
-$args = @($script)
-if ($BaseTag) { $args += "--base=$BaseTag" }
-if ($CompareTag) { $args += "--compare=$CompareTag" }
-if ($OutputFile) { $args += "--out=$OutputFile" }
+if (-not (Test-Path -LiteralPath $ResolvedScriptPath -PathType Leaf)) {
+    throw "R script not found: $ResolvedScriptPath"
+}
 
 Push-Location $ProjectRoot
 try {
-    & $rscript @args
+    & $RScriptPath $ResolvedScriptPath @ScriptArgs
 }
 finally {
     Pop-Location

@@ -39,7 +39,10 @@ Diese Checkliste ist fuer den Scan-Auswerte-Workflow gedacht:
 
 ## Inventur
 
+- [ ] optional: ARP-Cache fuer den freigegebenen lokalen `/24`-Bereich aktualisieren
 - [ ] `powershell/inventory_collect.ps1` ausfuehren
+- [ ] bei Bedarf `powershell/inventory_collect.ps1 -RefreshArpCidr 192.0.2.0/24`
+  verwenden
 - [ ] `powershell/run_inventory_steckbrief.ps1` ausfuehren
 - [ ] Steckbrief auf Plausibilitaet pruefen
 - [ ] Adapter, ARP, TCP und Route kurz ueberfliegen

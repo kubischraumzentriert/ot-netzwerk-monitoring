@@ -72,11 +72,18 @@ Arbeite aus dem Projektordner:
 
 `C:\Pfad\zum\ot-netzwerk-monitoring`
 
-### 2. R-Pfad
+### 2. Tool-Pfade
 
-In diesem Projekt wird R direkt aus
-`C:\Program Files\R\R-4.5.3\bin\Rscript.exe`
-aufgerufen.
+Die PowerShell-Wrapper suchen externe Programme in dieser Reihenfolge:
+
+1. expliziter Script-Parameter, zum Beispiel `-RScriptPath`
+2. lokale Tool-Konfiguration `configs/tools.private.csv` oder `configs/tools.csv`
+3. `PATH` ueber `Get-Command`
+4. bekannte Windows-Installationspfade
+
+Als Vorlage dient `configs/tools.example.csv`. Reale lokale Pfade gehoeren in
+`configs/tools.csv` oder `configs/tools.private.csv`; beide Dateien bleiben
+lokal und werden nicht versioniert.
 
 ### 3. Inventur
 
@@ -85,9 +92,14 @@ Der Wrapper schreibt automatisch:
 
 - `ipconfig /all`
 - `netsh interface show interface`
+- optional einen vorsichtigen `/24`-Ping-Sweep zur Aktualisierung des ARP-Caches
 - `arp -a`
 - `netstat -ano`
 - `route print`
+
+Die ARP-Liste zeigt MAC-Adressen nur fuer Teilnehmer im gleichen Layer-2-Netz.
+Wenn ein Ziel ueber ein Gateway geroutet wird, ist normalerweise die
+Gateway-MAC sichtbar.
 
 ### 4. Benchmark-Konfiguration
 
@@ -139,8 +151,11 @@ seinerseits `R/run_init_database.R` startet.
 
 1. Laptop an das Testnetz oder an die Anlage anschliessen
 2. nicht benoetigte Netzwerkadapter deaktivieren
-3. `powershell/inventory_collect.ps1`
-4. `powershell/run_inventory_steckbrief.ps1`
+3. optional ARP-Cache fuer das freigegebene lokale `/24` aktualisieren
+4. `powershell/inventory_collect.ps1`
+   oder `powershell/inventory_collect.ps1 -RefreshArpCidr 192.0.2.0/24`
+   mit deinem lokalen, nicht versionierten Testnetz
+5. `powershell/run_inventory_steckbrief.ps1`
 
 Ergebnis:
 
@@ -242,6 +257,8 @@ Hier bestimmst du, ob und welche Hosts mit Nmap gescannt werden.
 
 ```powershell
 powershell\inventory_collect.ps1
+powershell\inventory_collect.ps1 -RefreshArpCidr 192.0.2.0/24
+powershell\refresh_arp_cache.ps1 -NetworkCidr 192.0.2.0/24
 powershell\run_inventory_steckbrief.ps1
 ```
 
@@ -269,10 +286,10 @@ powershell\start_suricata_capture.ps1
 ### DuckDB
 
 ```powershell
-Rscript R/run_init_database.R
-Rscript R/run_duckdb_analysis.R
-Rscript R/run_duckdb_query.R sql\inventory_overview.sql
-Rscript R/run_duckdb_overview_report.R
+powershell\run_init_database.ps1
+powershell\run_r_script.ps1 -ScriptPath R\run_duckdb_analysis.R
+powershell\run_r_script.ps1 -ScriptPath R\run_duckdb_query.R sql\inventory_overview.sql
+powershell\run_r_script.ps1 -ScriptPath R\run_duckdb_overview_report.R
 ```
 
 `R/run_init_database.R` legt das Schema an, inklusive der DuckDB-Views fuer die
@@ -286,6 +303,13 @@ wichtigsten Basisabfragen:
 `R/run_duckdb_analysis.R` importiert die aktuellen Inventur- und Benchmarkdaten
 in die DuckDB, `R/run_duckdb_overview_report.R` liest nur noch aus der
 vorhandenen Datenbank und schreibt den Uebersichtsreport.
+
+Bei mehreren Messpaaren kannst du den Direkt-vs-Switch-Vergleich explizit
+auswaehlen:
+
+```powershell
+powershell\run_benchmark_comparison.ps1 -BaseTag direct -CompareTag switch
+```
 
 ### Archivieren und Zuruecksetzen
 

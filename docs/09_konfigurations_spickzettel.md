@@ -17,6 +17,7 @@ Die kurze Referenz fuer den Vor-Ort-Einsatz.
 - `configs/run.switch.csv`: Switchlauf
 - `configs/run.localhost.csv`: Trockenlauf
 - `configs/scan_targets.csv`: Nmap-Ziele
+- `configs/tools.example.csv`: Vorlage fuer lokale Tool-Pfade
 - `configs/duckdb_jdbc.example.csv`: optionale JDBC-Anbindung
 - `sql/ddl/network_analysis_schema.sql`: DuckDB-Basisstruktur
 - `docs/11_duckdb_datenmodell.md`: Tabellen, Views und Spalten im Detail
@@ -61,6 +62,12 @@ Die kurze Referenz fuer den Vor-Ort-Einsatz.
 
 - wichtigste Nmap-Optionen fuer OT-Netze: [docs/10_nmap_optionen_ot.md](10_nmap_optionen_ot.md)
 
+### `tools.csv` / `tools.private.csv`
+
+- optionale lokale Pfade fuer `rscript`, `nmap`, `tshark`, `suricata`
+- wird vor `PATH` und bekannten Windows-Installationspfaden ausgewertet
+- echte lokale Pfade bleiben ignoriert und werden nicht versioniert
+
 ### `duckdb_jdbc.example.csv`
 
 - `jar_path`: Pfad zum DuckDB-JDBC-JAR
@@ -90,7 +97,7 @@ Die kurze Referenz fuer den Vor-Ort-Einsatz.
 - Switchlauf: `session_tag=switch`, `output_dir=data/raw/switch`
 - Trockenlauf: `session_tag=localhost`, `output_dir=data/raw/sim`
 - Standardport: `tcp_port=9000`
-- Schema-Start: `Rscript R/run_init_database.R`
+- Schema-Start: `powershell\run_init_database.ps1`
 
 ## Wichtig
 

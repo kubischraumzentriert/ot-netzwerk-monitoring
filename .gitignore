@@ -26,6 +26,9 @@ Rplots.pdf
 
 # Lokale Zielkonfigurationen
 configs/targets.private.csv
+configs/*.private.csv
+configs/tools.csv
+configs/duckdb_jdbc.csv
 
 # Daten und Exporte
 data/raw/*

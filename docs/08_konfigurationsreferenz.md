@@ -19,6 +19,8 @@ aller verwendeten Spalten und Schluessel.
 - `configs/run.switch.csv` oder `configs/run.switch.example.csv`
 - `configs/run.localhost.csv`
 - `configs/scan_targets.csv` oder `configs/scan_targets.example.csv`
+- `configs/tools.example.csv`, optional lokal `configs/tools.csv` oder
+  `configs/tools.private.csv`
 - `configs/duckdb_jdbc.example.csv`
 - `sql/ddl/network_analysis_schema.sql`
 
@@ -170,6 +172,25 @@ Hinweise:
 - Wenn `ports` leer ist, verwendet der Wrapper die Standardports aus dem Skript.
 - Portlisten und Bereiche sind moeglich, weil der Wert direkt an Nmap uebergeben wird.
 
+## `configs/tools.example.csv`
+
+Diese Datei dokumentiert die lokale Tool-Aufloesung fuer die PowerShell-Wrapper.
+Versioniert wird nur die Beispiel-Datei; echte lokale Pfade gehoeren in
+`configs/tools.csv` oder `configs/tools.private.csv` und bleiben ignoriert.
+
+| Spalte | Bedeutung | Beispiel | Pflicht |
+| --- | --- | --- | --- |
+| `tool` | Tool-Schluessel fuer den Wrapper | `rscript`, `nmap`, `tshark`, `suricata` | ja |
+| `path` | optionaler lokaler Pfad zur EXE | `%USERPROFILE%\Programme\R\R-4.5.2\bin\Rscript.exe` | nein |
+| `note` | kurzer Hinweis fuer Menschen | `lokale R-Installation` | nein |
+
+Suchreihenfolge:
+
+1. expliziter Script-Parameter
+2. `configs/tools.private.csv`, dann `configs/tools.csv`, dann `configs/tools.example.csv`
+3. `PATH` ueber `Get-Command`
+4. bekannte Windows-Installationspfade
+
 ## `configs/duckdb_jdbc.example.csv`
 
 Diese Datei dokumentiert die JDBC-Variante fuer DuckDB.
@@ -178,7 +199,7 @@ die JDBC-Route mit `RJDBC` und `rJava` gehen willst.
 
 | Schluessel | Bedeutung | Beispiel | Pflicht |
 | --- | --- | --- | --- |
-| `jar_path` | Pfad zum DuckDB-JDBC-JAR | `C:/Users/Andre/Downloads/duckdb_jdbc-1.5.5.0.jar` | ja |
+| `jar_path` | Pfad zum DuckDB-JDBC-JAR | `C:/Pfad/zu/duckdb_jdbc-1.5.5.0.jar` | ja |
 | `db_path` | Lokale DuckDB-Datei | `data/processed/network_analysis.duckdb` | ja |
 | `driver_class` | JDBC-Treiberklasse | `org.duckdb.DuckDBDriver` | ja |
 
@@ -205,5 +226,6 @@ Hinweise:
 - `targets.production.example.csv` ist die Vorlage fuer reale Zielsysteme.
 - `run.*.csv` beschreibt Lauflaenge, Timeout, Default-Port und Session-Namen.
 - `scan_targets.csv` beschreibt Nmap-Ziele und Ports.
+- `tools.example.csv` beschreibt die optionale lokale Tool-Pfad-Konfiguration.
 - `duckdb_jdbc.example.csv` dokumentiert die optionale JDBC-Anbindung.
 

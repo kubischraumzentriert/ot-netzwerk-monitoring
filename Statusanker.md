@@ -19,6 +19,10 @@ Validierungen.
 - AGENTS- und Security-Regeln sind im Repo verankert
 - Workflow fuer Inventur, Port-9000-Benchmark, Vergleich und DuckDB ist
   dokumentiert
+- Optionaler ARP-Cache-Refresh fuer lokale `/24`-Inventuren ist als
+  PowerShell-Wrapper ergaenzt
+- Tool-Pfade fuer Rscript, Nmap, tshark und Suricata werden zentral ueber
+  Parameter, lokale Config und automatische Suche aufgeloest
 - Beispielkonfigurationen sind auf Platzhalter umgestellt
 
 ## Letzte verifizierte Bausteine
@@ -56,5 +60,6 @@ Validierungen.
 ## Naechster sinnvoller Fokus
 
 - Vor-Ort-Checkliste weiter verdichten
+- ARP-Refresh im freigegebenen Testnetz pruefen und MAC-Liste plausibilisieren
 - echte `direct`- und `switch`-Testlaeufe ausfuehren
 - Vergleichsreport mit realen Messwerten fuellen

@@ -1,38 +1,33 @@
 param(
-    [string]$ProjectRoot = (Split-Path -Parent $PSScriptRoot),
+    [string]$ProjectRoot = '',
     [string]$InterfaceId,
     [string]$CaptureFilter = 'port 9000',
     [int]$DurationSeconds = 300,
-    [string]$OutputDir = (Join-Path $ProjectRoot 'data\raw\pcap'),
+    [string]$OutputDir = '',
     [string]$TsharkPath
 )
 
 $ErrorActionPreference = 'Stop'
 
-if (-not $TsharkPath -or -not $TsharkPath.Trim()) {
-    $cmd = Get-Command tshark -ErrorAction SilentlyContinue
-    if ($cmd) {
-        $TsharkPath = $cmd.Source
-    }
+$ScriptRootPath = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Path }
+if (-not $ProjectRoot -or -not $ProjectRoot.Trim()) {
+    $ProjectRoot = Split-Path -Parent $ScriptRootPath
+}
+if (-not $OutputDir -or -not $OutputDir.Trim()) {
+    $OutputDir = Join-Path $ProjectRoot 'data\raw\pcap'
 }
 
-if (-not $TsharkPath -or -not $TsharkPath.Trim()) {
-    $candidatePaths = @(
-        'C:\Users\Andre\Programme\WiresharkPortable64\App\Wireshark\tshark.exe',
+. (Join-Path $ScriptRootPath 'resolve_tool_path.ps1')
+$TsharkPath = Resolve-ProjectTool `
+    -ProjectRoot $ProjectRoot `
+    -ToolName 'tshark' `
+    -ConfigKey 'tshark' `
+    -ExplicitPath $TsharkPath `
+    -CandidatePaths @(
+        "$env:USERPROFILE\Programme\WiresharkPortable64\App\Wireshark\tshark.exe",
         'C:\Program Files\Wireshark\tshark.exe',
         'C:\Program Files (x86)\Wireshark\tshark.exe'
     )
-    foreach ($candidate in $candidatePaths) {
-        if (Test-Path -LiteralPath $candidate) {
-            $TsharkPath = $candidate
-            break
-        }
-    }
-}
-
-if (-not $TsharkPath -or -not (Test-Path -LiteralPath $TsharkPath)) {
-    throw "tshark.exe not found. Set -TsharkPath or install Wireshark/tshark."
-}
 
 if (-not $InterfaceId -or -not $InterfaceId.Trim()) {
     throw "Please provide -InterfaceId. Use list_capture_interfaces.ps1 first."

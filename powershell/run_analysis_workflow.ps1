@@ -1,6 +1,14 @@
 param(
-    [string]$ProjectRoot = (Split-Path -Parent $PSScriptRoot)
+    [string]$ProjectRoot = '',
+    [string]$NmapPath = ''
 )
 
-& (Join-Path $PSScriptRoot 'run_nmap_scan.ps1') -ProjectRoot $ProjectRoot
+$ErrorActionPreference = 'Stop'
+
+$ScriptRootPath = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Path }
+if (-not $ProjectRoot -or -not $ProjectRoot.Trim()) {
+    $ProjectRoot = Split-Path -Parent $ScriptRootPath
+}
+
+& (Join-Path $ScriptRootPath 'run_nmap_scan.ps1') -ProjectRoot $ProjectRoot -NmapPath $NmapPath
 

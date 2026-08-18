@@ -1,0 +1,5 @@
+tool,path,note
+rscript,,Optional path to Rscript.exe. If empty, wrappers search PATH and common Windows locations.
+nmap,,Optional path to nmap.exe. If empty, wrappers search PATH and common Windows locations.
+tshark,,Optional path to tshark.exe. If empty, wrappers search PATH and common Windows locations.
+suricata,,Optional path to suricata.exe. If empty, wrappers search PATH and common Windows locations.

@@ -33,6 +33,7 @@ run_duckdb_query_main <- function() {
       message("No DuckDB database or tables found yet.")
     }
     message("Usage: Rscript R/run_duckdb_query.R --db=path/to/network_analysis.duckdb --out=reports/result.md <sql or sql-file>")
+    message("PowerShell wrapper: powershell/run_r_script.ps1 -ScriptPath R/run_duckdb_query.R <sql or sql-file>")
     message("Examples:")
     message("  Rscript R/run_duckdb_query.R \"SELECT * FROM inventory_sessions LIMIT 10\"")
     message("  Rscript R/run_duckdb_query.R sql\\inventory_overview.sql")

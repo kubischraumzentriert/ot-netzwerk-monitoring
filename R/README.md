@@ -17,7 +17,7 @@ output: "html_document"
 
 1. `configs/targets.csv` aus `configs/targets.example.csv` ableiten
 2. `configs/run.csv` aus `configs/run.example.csv` ableiten
-3. `Rscript R/m01_ping_tcp_probe.R` ausfuehren
+3. `powershell/run_benchmark.ps1` ausfuehren
 
 ## Hinweis
 
@@ -33,5 +33,6 @@ Die TCP-Messung ist generisch. Wenn dein Dienst auf Port 9000 ein bestimmtes Pro
 
 - `R/02_duckdb.R` ist der native Weg ueber das `duckdb`-Paket
 - `R/03_duckdb_jdbc.R` ist der JDBC-Weg ueber `RJDBC`, `rJava` und das JAR
-- Standardpfad fuer das JAR: `C:/Users/Andre/Downloads/duckdb_jdbc-1.5.5.0.jar`
+- Lokale JAR-Pfade gehoeren in `configs/duckdb_jdbc.csv` oder eine lokale
+  Arbeitskopie der Beispielkonfiguration und werden nicht versioniert.
 
