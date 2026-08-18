@@ -45,10 +45,20 @@ bind_rows_union <- function(...) {
 }
 
 sanitize_text <- function(x) {
-  x <- enc2utf8(as.character(x))
-  x <- gsub("\r\n|\r|\n", " \\n ", x)
-  x <- gsub("[[:cntrl:]]", " ", x)
-  trimws(x)
+  x <- as.character(x)
+  x <- vapply(x, function(value) {
+    value <- tryCatch(
+      iconv(value, from = "", to = "UTF-8", sub = "byte"),
+      error = function(e) NA_character_
+    )
+    if (is.na(value) || !nzchar(value)) {
+      value <- ""
+    }
+    value <- gsub("\r\n|\r|\n", " \\n ", value, perl = TRUE)
+    value <- gsub("[[:cntrl:]]", " ", value, perl = TRUE)
+    trimws(value)
+  }, character(1), USE.NAMES = FALSE)
+  x
 }
 
 ping_once <- function(host, timeout_sec = 1) {
