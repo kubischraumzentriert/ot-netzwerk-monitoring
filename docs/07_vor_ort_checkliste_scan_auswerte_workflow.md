@@ -50,7 +50,8 @@ Diese Checkliste ist fuer den Scan-Auswerte-Workflow gedacht:
 - [ ] `powershell/run_benchmark.ps1` mit Direktlauf ausfuehren
 - [ ] nach dem Direktlauf Switchlauf mit derselben Konfiguration ausfuehren
 - [ ] fuer jeden Zielhost auf Erfolg, Latenz und Ausreisser achten
-- [ ] die Session-Tags `direct` und `switch` sauber setzen
+- [ ] die Session-Tags in `configs/run.localhost.csv`, `configs/run.direct.csv`
+  und `configs/run.switch.csv` sauber setzen
 - [ ] Ergebnisse unter `data/raw/direct/` und `data/raw/switch/` ablegen
 
 ## Optionaler Netzwerkscan

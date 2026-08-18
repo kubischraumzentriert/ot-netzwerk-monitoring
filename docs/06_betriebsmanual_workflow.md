@@ -67,12 +67,19 @@ Der Wrapper schreibt automatisch:
 Die relevanten Dateien sind:
 
 - `configs/targets.csv`
+- `configs/run.localhost.csv` fuer den Trockenlauf
 - `configs/run.direct.example.csv`
 - `configs/run.switch.example.csv`
 
 Fuer echte Tests kannst du die Beispieldateien nach
 `configs/run.direct.csv` und `configs/run.switch.csv`
 kopieren oder direkt die Beispiel-Dateien uebergeben.
+
+`session_tag` traegst du in der jeweiligen Run-Config ein:
+
+- `configs/run.localhost.csv` fuer den Trockenlauf, zum Beispiel `localhost`
+- `configs/run.direct.csv` oder `configs/run.direct.example.csv`, zum Beispiel `direct`
+- `configs/run.switch.csv` oder `configs/run.switch.example.csv`, zum Beispiel `switch`
 
 ### 5. Nmap-Konfiguration
 
@@ -168,7 +175,7 @@ Empfehlung fuer den Start:
 - `ping_count = 20`
 - `tcp_count = 20`
 - `tcp_port = 9000` als Standardwert, aber jeder freigegebene Port pro Zielhost ist moeglich
-- `session_tag = direct` oder `switch`
+- `session_tag = direct`, `switch` oder `localhost`
 
 ### `configs/scan_targets.csv`
 
