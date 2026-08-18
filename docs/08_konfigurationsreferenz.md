@@ -11,6 +11,7 @@ aller verwendeten Spalten und Schluessel.
 ## Uebersicht
 
 - `configs/targets.csv` oder `configs/targets.example.csv`
+- `configs/targets.production.example.csv`
 - `configs/targets.localhost.csv`
 - `configs/run.csv` oder `configs/run.example.csv`
 - `configs/run.direct.csv` oder `configs/run.direct.example.csv`
@@ -38,6 +39,24 @@ Hinweise:
 - `target_port` wird fuer die TCP-Messung gesetzt; bei Ping-Zeilen bleibt
   dieser Wert `NA`.
 - Diese Datei ist die normale Arbeitsdatei fuer reale Geraete.
+
+## `configs/targets.production.example.csv`
+
+Diese Datei ist die generische Vorlage fuer reale Anlagenziele.
+
+| Spalte | Bedeutung | Beispiel | Pflicht |
+| --- | --- | --- | --- |
+| `label` | Anzeigename fuer Reports, CSVs und Dateinamen | `PLC_1` | ja |
+| `host` | IP-Adresse oder DNS-Name des Ziels | `192.0.2.21` | ja |
+| `port` | TCP-Port pro Zielhost | `9000` | nein |
+| `request` | Text, der beim TCP-Test an den Dienst gesendet wird | `HELLO` | nein |
+
+Hinweise:
+
+- Die Datei ist nur eine Vorlage und sollte fuer echte Anlagen vor dem Einsatz
+  nach `configs/targets.csv` oder in eine projektspezifische Arbeitsdatei
+  uebertragen werden.
+- Platzhalter-Adressen aus dem Dokumentationsnetz bleiben bewusst generisch.
 
 ## `configs/targets.localhost.csv`
 
@@ -164,6 +183,7 @@ Hinweise:
 ## Typische Zuordnung
 
 - `targets.csv` beschreibt die Kommunikationsziele.
+- `targets.production.example.csv` ist die Vorlage fuer reale Zielsysteme.
 - `run.*.csv` beschreibt Lauflaenge, Timeout, Default-Port und Session-Namen.
 - `scan_targets.csv` beschreibt Nmap-Ziele und Ports.
 - `duckdb_jdbc.example.csv` dokumentiert die optionale JDBC-Anbindung.

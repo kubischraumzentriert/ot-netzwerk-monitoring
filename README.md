@@ -91,6 +91,7 @@ Der genaue Vor-Ort-Ablauf steht im [Betriebsmanual](docs/06_betriebsmanual_workf
 | Datei | Zweck | Typische Schluessel |
 | --- | --- | --- |
 | `configs/targets.csv` | Ziele fuer echte Geraete | `label`, `host`, `port`, `request` |
+| `configs/targets.production.example.csv` | Vorlage fuer reale Anlagenziele | `label`, `host`, `port`, `request` |
 | `configs/run.direct.csv` | Direktlauf | `ping_count`, `tcp_count`, `tcp_port`, `session_tag`, `output_dir` |
 | `configs/run.switch.csv` | Switchlauf | `ping_count`, `tcp_count`, `tcp_port`, `session_tag`, `output_dir` |
 | `configs/run.localhost.csv` | Trockenlauf | `ping_count`, `tcp_count`, `tcp_port`, `session_tag`, `output_dir` |
@@ -131,6 +132,7 @@ Der genaue Vor-Ort-Ablauf steht im [Betriebsmanual](docs/06_betriebsmanual_workf
   Vor-Ort-Checkliste
 - `docs/08_konfigurationsreferenz.md` fuer die komplette Config-Referenz
 - `docs/09_konfigurations_spickzettel.md` fuer den schnellen Vor-Ort-Ueberblick
+- `docs/10_nmap_optionen_ot.md` fuer die Nmap-Einordnung in OT-Netzen
 
 ## Start In 3 Schritten
 

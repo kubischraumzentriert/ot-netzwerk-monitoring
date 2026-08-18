@@ -10,6 +10,7 @@ Die kurze Referenz fuer den Vor-Ort-Einsatz.
 ## Welche Datei wofuer?
 
 - `configs/targets.csv`: echte Ziele fuer Ping und TCP
+- `configs/targets.production.example.csv`: Vorlage fuer reale Zielgeraete
 - `configs/targets.localhost.csv`: lokaler Trockenlauf auf `127.0.0.1`
 - `configs/run.direct.csv`: Direktlauf
 - `configs/run.switch.csv`: Switchlauf
@@ -27,6 +28,12 @@ Die kurze Referenz fuer den Vor-Ort-Einsatz.
 - `port`: Port pro Zielhost, optional
 - `request`: TCP-Payload, optional
 
+### `targets.production.example.csv`
+
+- Vorlage fuer reale Zielgeraete
+- gleiche Spalten wie `targets.csv`
+- nur Platzhalter-Adressen
+
 ### `run.*.csv`
 
 - `ping_count`: Anzahl Ping-Proben
@@ -43,6 +50,10 @@ Die kurze Referenz fuer den Vor-Ort-Einsatz.
 - `label`: Anzeigename
 - `host`: Zielhost
 - `ports`: Port oder Portliste fuer `nmap -p`
+
+### Nmap-Katalog
+
+- wichtigste Nmap-Optionen fuer OT-Netze: [docs/10_nmap_optionen_ot.md](10_nmap_optionen_ot.md)
 
 ### `duckdb_jdbc.example.csv`
 

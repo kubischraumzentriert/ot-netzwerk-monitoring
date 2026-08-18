@@ -1,0 +1,4 @@
+label,host,port,request
+PLC_1,192.0.2.21,9000,HELLO
+HMI_1,192.0.2.22,9000,HELLO
+Drive_1,192.0.2.23,9000,HELLO

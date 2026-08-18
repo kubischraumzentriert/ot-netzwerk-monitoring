@@ -113,6 +113,8 @@ Fuer Nmap kannst du die Ziele in
 `configs/scan_targets.example.csv`
 anpassen und spaeter als `configs/scan_targets.csv`
 verwenden.
+Eine fachliche Einordnung der wichtigsten Nmap-Optionen fuer OT-Netze steht in
+[docs/10_nmap_optionen_ot.md](10_nmap_optionen_ot.md).
 
 ## Empfohlene Reihenfolge
 
@@ -184,6 +186,15 @@ Hier trägst du die drei Geraete ein:
 - `host`
 - `port`
 - optional `request`
+
+### `configs/targets.production.example.csv`
+
+Diese Datei ist die generische Vorlage fuer reale Zielgeraete, wenn du eine
+saubere Startbasis fuer eine Anlage anlegen willst.
+
+- dieselben Spalten wie `targets.csv`
+- nur Platzhalter-Adressen aus dem Dokumentationsnetz
+- gedacht zum Kopieren nach `configs/targets.csv` oder als Referenz fuer neue Projekte
 
 ### `configs/run.direct.csv` oder `configs/run.switch.csv`
 

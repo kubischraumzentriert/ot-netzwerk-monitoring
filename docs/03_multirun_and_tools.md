@@ -23,6 +23,9 @@ Der Nmap-Workflow ist in diesem Projekt bewusst konservativ:
 - langsamerer Scan mit wenigen Retries
 - Ausgabe pro Ziel als `-oA` Satz
 
+Die wichtigsten Nmap-Optionen fuer OT-Netze sind in
+[docs/10_nmap_optionen_ot.md](10_nmap_optionen_ot.md) beschrieben.
+
 ## Wireshark / tshark
 
 Fuer Mitschnitte nutzen wir `tshark`, weil es sich gut skripten laesst.
