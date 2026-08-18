@@ -36,6 +36,8 @@ Before starting substantive work in this repository:
   captures.
 - Review `.gitignore` before introducing new output folders or generated files.
 - Keep public repository content generic and reusable.
+- Ask for your explicit permission before creating a commit or pushing to the
+  remote repository.
 
 ## Conflict handling
 
