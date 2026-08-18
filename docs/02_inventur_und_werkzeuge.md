@@ -90,6 +90,31 @@ Merksatz:
 - Suricata beantwortet "gibt es sichtbare Ereignisse oder Muster?"
 - ZAP beantwortet "ist die Webschnittstelle sauber?"
 
+## Entscheidungsweg
+
+```mermaid
+flowchart TD
+  A["Start: Gibt es ein konkretes Kommunikationsproblem?"] --> B{"Willst du nur wissen, ob Port 9000 oder ein anderer bekannter Port erreichbar ist?"}
+  B -- Ja --> C["TCP-Test"]
+  B -- Nein --> D{"Willst du zusaetzlich offene Ports, Dienste oder OS-Hinweise sehen?"}
+  D -- Ja --> E["Nmap"]
+  D -- Nein --> F{"Willst du das Verhalten auf Paket-Ebene sehen?"}
+  F -- Ja --> G["Wireshark / tshark"]
+  F -- Nein --> H{"Willst du laenger passiv beobachten oder Events sammeln?"}
+  H -- Ja --> I["Suricata"]
+  H -- Nein --> J{"Ist eine Weboberflaeche oder API beteiligt?"}
+  J -- Ja --> K["ZAP"]
+  J -- Nein --> L["Erst Inventur, dann gezielter TCP-Test"]
+```
+
+Kurz gesagt:
+
+- erst den TCP-Test, wenn die Grundfrage nur die Erreichbarkeit ist
+- Nmap, wenn du mehr Struktur oder Zusatzhinweise brauchst
+- Wireshark, wenn du die Ursache auf Paketebene verstehen willst
+- Suricata, wenn du laenger passiv protokollieren willst
+- ZAP, wenn HTTP oder HTTPS im Spiel ist
+
 ### Nmap
 
 Sehr sinnvoll fuer:
