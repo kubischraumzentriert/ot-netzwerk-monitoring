@@ -70,7 +70,7 @@ Fuer einen kompakten reinen Trockenlauf sieh auch
 
 Arbeite aus dem Projektordner:
 
-`C:\Users\Andre\Documents\ChatGPT\NetzwerkAnalyse`
+`C:\Pfad\zum\ot-netzwerk-monitoring`
 
 ### 2. R-Pfad
 

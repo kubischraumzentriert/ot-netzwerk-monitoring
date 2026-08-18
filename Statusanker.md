@@ -1,7 +1,7 @@
 ---
 title: "Statusanker NetzwerkAnalyse"
-version: "2026-08-17"
-last_reviewed: "2026-08-17"
+version: "2026-08-18"
+last_reviewed: "2026-08-18"
 project: "NetzwerkAnalyse"
 branch: "main"
 status: "active"
@@ -24,11 +24,14 @@ Validierungen.
 ## Letzte verifizierte Bausteine
 
 - `powershell/inventory_collect.ps1`
+- `powershell/run_init_database.ps1`
 - `powershell/run_inventory_steckbrief.ps1`
 - `powershell/run_benchmark.ps1`
 - `powershell/run_benchmark_comparison.ps1`
 - `powershell/run_localhost_workflow.ps1`
+- `R/run_init_database.R`
 - `R/run_inventory_steckbrief.R`
+- `R/run_localhost_simulation.R`
 - `R/run_benchmark.R`
 - `R/run_benchmark_comparison.R`
 - `R/run_duckdb_analysis.R`

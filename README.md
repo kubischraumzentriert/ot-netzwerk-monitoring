@@ -80,15 +80,16 @@ Bevor du am Projekt arbeitest, lies bitte:
 
 ```mermaid
 flowchart TD
-  A["Vorbereitung: Configs, Ports, Targets"] --> B["powershell/run_init_database.ps1"]
-  B --> C["R/run_init_database.R"]
-  C --> D["DuckDB-Datei / Schema"]
-  D --> E["powershell/run_localhost_workflow.ps1 oder Vor-Ort-Lauf"]
-  E --> F["Inventur, Ping, TCP-Test, Auswertung"]
+  A["Vorbereitung: Configs, Ports, Targets"] --> B["powershell/run_localhost_workflow.ps1 oder Vor-Ort-Lauf"]
+  B --> C["powershell/run_init_database.ps1"]
+  C --> D["R/run_init_database.R"]
+  D --> E["DuckDB-Datei / Schema"]
+  B --> F["Inventur, Ping, TCP-Test, Auswertung"]
   F --> G["Reports / DuckDB / Steckbrief"]
 ```
 
-Der genaue Vor-Ort-Ablauf steht im [Betriebsmanual](docs/06_betriebsmanual_workflow.md).
+Der lokale Trockenlauf ruft die Datenbank-Initialisierung intern auf. Der
+genaue Vor-Ort-Ablauf steht im [Betriebsmanual](docs/06_betriebsmanual_workflow.md).
 
 ## Konfigurations-Spickzettel
 
@@ -98,7 +99,9 @@ Der genaue Vor-Ort-Ablauf steht im [Betriebsmanual](docs/06_betriebsmanual_workf
 | `configs/targets.private.csv` | lokale, ignorierte Zielkonfiguration | `label`, `host`, `port`, `request` |
 | `configs/targets.production.example.csv` | Vorlage fuer reale Anlagenziele | `label`, `host`, `port`, `request` |
 | `configs/run.direct.csv` | Direktlauf | `ping_count`, `tcp_count`, `tcp_port`, `session_tag`, `output_dir` |
+| `configs/run.direct.example.csv` | Vorlage fuer Direktlauf | `ping_count`, `tcp_count`, `tcp_port`, `session_tag`, `output_dir` |
 | `configs/run.switch.csv` | Switchlauf | `ping_count`, `tcp_count`, `tcp_port`, `session_tag`, `output_dir` |
+| `configs/run.switch.example.csv` | Vorlage fuer Switchlauf | `ping_count`, `tcp_count`, `tcp_port`, `session_tag`, `output_dir` |
 | `configs/run.localhost.csv` | Trockenlauf | `ping_count`, `tcp_count`, `tcp_port`, `session_tag`, `output_dir` |
 | `configs/scan_targets.csv` | Nmap-Ziele | `label`, `host`, `ports` |
 | `configs/duckdb_jdbc.example.csv` | optionale JDBC-Anbindung | `jar_path`, `db_path`, `driver_class` |
@@ -122,6 +125,7 @@ Der genaue Vor-Ort-Ablauf steht im [Betriebsmanual](docs/06_betriebsmanual_workf
 | `powershell/start_suricata_capture.ps1` | passives Logging | `data/raw/suricata/` | nein |
 | `R/run_init_database.R` | DuckDB-Initialisierung aus R | `data/processed/network_analysis.duckdb` | ja |
 | `R/run_inventory_steckbrief.R` | Markdown-Steckbrief | `reports/steckbrief_*.md` | nein |
+| `R/run_localhost_simulation.R` | lokaler Simulationslauf mit Benchmark, Multirun-Auswertung und DuckDB-Import | `reports/network_overview_localhost.md` | ja |
 | `R/run_benchmark.R` | Messlaeufe aus R | Roh-CSV-Dateien pro Lauf | ja |
 | `R/run_benchmark_comparison.R` | Direkt-vs-Switch-Vergleich | `reports/network_direct_vs_switch.md` | nein |
 | `R/run_multirun_analysis.R` | gemeinsame Analyse mehrerer Sessions | `reports/network_overview.md` und CSV-Aggregate | ja |
@@ -141,10 +145,10 @@ Der genaue Vor-Ort-Ablauf steht im [Betriebsmanual](docs/06_betriebsmanual_workf
 
 ## Start In 3 Schritten
 
-1. `powershell/run_init_database.ps1` ausfuehren
-2. `powershell/run_localhost_workflow.ps1` fuer den Trockenlauf oder
-   `powershell/inventory_collect.ps1` plus `powershell/run_benchmark.ps1` fuer
-   den echten Lauf starten
+1. `powershell/run_localhost_workflow.ps1` fuer den Trockenlauf ausfuehren
+   oder fuer den echten Lauf mit `powershell/run_init_database.ps1` starten
+2. vor Ort `powershell/inventory_collect.ps1` plus
+   `powershell/run_benchmark.ps1` fuer den echten Lauf ausfuehren
 3. die Reports in `reports/` und die DuckDB-Datei in
    `data/processed/network_analysis.duckdb` pruefen
 
