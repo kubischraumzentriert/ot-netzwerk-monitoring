@@ -1,4 +1,4 @@
-﻿---
+---
 title: "05 duckdb lokale auswertung"
 output: "html_document"
 ---

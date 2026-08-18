@@ -1,4 +1,4 @@
-﻿---
+---
 title: "inventory steckbrief"
 output: "html_document"
 ---

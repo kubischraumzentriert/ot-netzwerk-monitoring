@@ -1,4 +1,4 @@
-﻿---
+---
 title: "AGENTS"
 output: "html_document"
 ---
@@ -24,6 +24,7 @@ Before starting substantive work in this repository:
 - Update docs when a workflow or script changes in a user-visible way.
 - Use the existing R-first workflow unless the task clearly benefits from Python or PowerShell.
 - Avoid adding or committing raw data, scans, captures, logs, or generated reports.
+- Save Markdown files as UTF-8 without BOM; YAML front matter must begin at the first byte with `---` so GitHub renders it as metadata.
 
 ## Git and safety
 

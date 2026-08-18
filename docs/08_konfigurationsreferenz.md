@@ -1,4 +1,4 @@
-﻿---
+---
 title: "08 konfigurationsreferenz"
 output: "html_document"
 ---

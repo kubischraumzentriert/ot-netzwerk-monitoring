@@ -1,4 +1,4 @@
-﻿---
+---
 title: "09 konfigurations spickzettel"
 output: "html_document"
 ---

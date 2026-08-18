@@ -1,4 +1,4 @@
-﻿---
+---
 title: "10 nmap optionen ot"
 output: "html_document"
 ---
