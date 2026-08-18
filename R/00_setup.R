@@ -1,16 +1,21 @@
 user_r_lib <- Sys.getenv("R_LIBS_USER")
-if (!nzchar(user_r_lib)) {
-  user_r_lib <- file.path(
-    Sys.getenv("USERPROFILE"),
-    "AppData",
-    "Local",
-    "R",
-    "win-library",
-    paste0(R.version$major, ".", strsplit(R.version$minor, "\\.", fixed = FALSE)[[1]][1])
-  )
-}
-if (!(user_r_lib %in% .libPaths())) {
-  .libPaths(c(user_r_lib, .libPaths()))
+fallback_user_lib <- file.path(
+  Sys.getenv("USERPROFILE"),
+  "AppData",
+  "Local",
+  "R",
+  "win-library",
+  paste0(R.version$major, ".", strsplit(R.version$minor, "\\.", fixed = FALSE)[[1]][1])
+)
+
+candidate_libs <- unique(c(
+  if (nzchar(user_r_lib)) user_r_lib else character(),
+  fallback_user_lib
+))
+candidate_libs <- candidate_libs[nzchar(candidate_libs)]
+
+if (length(candidate_libs)) {
+  .libPaths(c(candidate_libs, .libPaths()))
 }
 
 project_root <- normalizePath(getwd(), winslash = "/", mustWork = TRUE)

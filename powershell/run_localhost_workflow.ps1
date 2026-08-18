@@ -14,6 +14,12 @@ if (-not (Test-Path -LiteralPath $inventoryScript)) { throw "Missing inventory s
 if (-not (Test-Path -LiteralPath $runnerScript)) { throw "Missing R runner: $runnerScript" }
 if (-not (Test-Path -LiteralPath $RScriptPath)) { throw "Missing Rscript: $RScriptPath" }
 
+if (-not $env:R_LIBS_USER -or -not (Test-Path -LiteralPath $env:R_LIBS_USER)) {
+    $env:R_LIBS_USER = Join-Path $env:USERPROFILE 'AppData\Local\R\win-library\4.5'
+}
+
+& (Join-Path $PSScriptRoot 'run_init_database.ps1') -ProjectRoot $ProjectRoot -RScriptPath $RScriptPath
+
 $server = Start-Process -FilePath powershell.exe -WindowStyle Hidden -PassThru -ArgumentList @(
     '-NoProfile',
     '-ExecutionPolicy', 'Bypass',

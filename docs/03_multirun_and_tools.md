@@ -12,7 +12,7 @@ output: "html"
 3. mehrere Sessions und Benchmarks gemeinsam auswerten
 4. Direkt-vs-Switch-Benchmarks getrennt vergleichen
 5. auffaellige Faelle mit Nmap, Wireshark und Suricata vertiefen
-6. Ergebnisse optional in DuckDB laden
+6. Datenbank initialisieren und Ergebnisse in DuckDB laden
 
 ## Nmap
 
@@ -50,9 +50,9 @@ DuckDB ist die gemeinsame lokale Analyse-Datei fuer:
 Der native Weg ist `duckdb` als R-Paket.
 Als Alternative kann das JDBC-JAR verwendet werden.
 
-Der Einstieg ist `R/run_duckdb_analysis.R`. Das Skript schreibt die Datenbank
-`data/processed/network_analysis.duckdb` und erzeugt dazu den Report
-`reports/network_overview_duckdb.md`.
+Der Einstieg ist `R/run_init_database.R`, danach `R/run_duckdb_analysis.R`.
+Zusammen erzeugen sie die Datenbank `data/processed/network_analysis.duckdb`
+und den Report `reports/network_overview_duckdb.md`.
 
 Einzelne Abfragen laufen ueber `R/run_duckdb_query.R`, zum Beispiel mit
 `sql/inventory_overview.sql`.

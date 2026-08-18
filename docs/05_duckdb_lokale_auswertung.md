@@ -19,6 +19,7 @@ und macht sie als SQL-basierten Analyse-Store nutzbar.
 
 - Datei: `data/processed/network_analysis.duckdb`
 - Report: `reports/network_overview_duckdb.md`
+- DDL: `sql/ddl/network_analysis_schema.sql`
 
 ## Was geladen wird
 
@@ -28,8 +29,17 @@ und macht sie als SQL-basierten Analyse-Store nutzbar.
 
 ## Start
 
+Die empfohlene Reihenfolge ist:
+
 ```powershell
+Rscript R/run_init_database.R
 Rscript R/run_duckdb_analysis.R
+```
+
+Oder aus PowerShell:
+
+```powershell
+powershell\run_init_database.ps1
 ```
 
 Das Skript versucht zunaechst den nativen DuckDB-Weg. Falls dieser in einer

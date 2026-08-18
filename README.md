@@ -26,6 +26,8 @@ Bevor du am Projekt arbeitest, lies bitte:
 3. [Statusanker.md](Statusanker.md)
 4. die Checkliste in [docs/07_vor_ort_checkliste_scan_auswerte_workflow.md](docs/07_vor_ort_checkliste_scan_auswerte_workflow.md)
 5. das Betriebsmanual in [docs/06_betriebsmanual_workflow.md](docs/06_betriebsmanual_workflow.md)
+6. die Konfigurationsreferenz in [docs/08_konfigurationsreferenz.md](docs/08_konfigurationsreferenz.md)
+7. den Konfigurations-Spickzettel in [docs/09_konfigurations_spickzettel.md](docs/09_konfigurations_spickzettel.md)
 
 ## Zielbild
 
@@ -70,8 +72,21 @@ Bevor du am Projekt arbeitest, lies bitte:
 - optional DuckDB als lokale Auswertungsbasis
 - spaeterer Vergleich mehrerer Anlagen und Messlaeufe
 
+## Konfigurations-Spickzettel
+
+| Datei | Zweck | Typische Schluessel |
+| --- | --- | --- |
+| `configs/targets.csv` | Ziele fuer echte Geraete | `label`, `host`, `port`, `request` |
+| `configs/run.direct.csv` | Direktlauf | `ping_count`, `tcp_count`, `tcp_port`, `session_tag`, `output_dir` |
+| `configs/run.switch.csv` | Switchlauf | `ping_count`, `tcp_count`, `tcp_port`, `session_tag`, `output_dir` |
+| `configs/run.localhost.csv` | Trockenlauf | `ping_count`, `tcp_count`, `tcp_port`, `session_tag`, `output_dir` |
+| `configs/scan_targets.csv` | Nmap-Ziele | `label`, `host`, `ports` |
+| `configs/duckdb_jdbc.example.csv` | optionale JDBC-Anbindung | `jar_path`, `db_path`, `driver_class` |
+| `sql/ddl/network_analysis_schema.sql` | DuckDB-DDL fuer die Basisstruktur | `schema_metadata`, `inventory_sessions`, `benchmark_rows`, `benchmark_summary` |
+
 ## Workflow Werkzeuge
 
+- `powershell/run_init_database.ps1` fuer den ersten Datenbank-Initialisierungsschritt
 - `powershell/inventory_collect.ps1` fuer die lokale Inventur
 - `powershell/run_inventory_steckbrief.ps1` fuer den Inventur-Steckbrief
 - `powershell/run_benchmark.ps1` fuer TCP-Port-Messungen, Standard ist 9000, je Zielhost kann ein eigener Port gesetzt werden
@@ -81,6 +96,7 @@ Bevor du am Projekt arbeitest, lies bitte:
 - `powershell/list_capture_interfaces.ps1` fuer `tshark -D`
 - `powershell/start_wireshark_capture.ps1` fuer paketbasierten Mitschnitt
 - `powershell/start_suricata_capture.ps1` fuer passives Logging
+- `R/run_init_database.R` fuer die lokale DuckDB-Initialisierung
 - `R/run_inventory_steckbrief.R` fuer den Markdown-Steckbrief
 - `R/run_benchmark.R` fuer die Messlaeufe
 - `R/run_benchmark_comparison.R` fuer den Direkt-vs-Switch-Vergleich
@@ -95,6 +111,8 @@ Bevor du am Projekt arbeitest, lies bitte:
   notwendigen Einstellungen
 - `docs/07_vor_ort_checkliste_scan_auswerte_workflow.md` fuer die kompakte
   Vor-Ort-Checkliste
+- `docs/08_konfigurationsreferenz.md` fuer die komplette Config-Referenz
+- `docs/09_konfigurations_spickzettel.md` fuer den schnellen Vor-Ort-Ueberblick
 
 ## GitHub Hinweis
 

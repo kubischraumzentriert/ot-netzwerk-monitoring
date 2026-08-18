@@ -21,11 +21,12 @@ Damit kannst du den Ablauf testen, ohne schon echte Geraete anzugreifen.
 
 ## Aufbau
 
-1. lokaler TCP-Echo-Server auf `127.0.0.1:9000`
-2. `inventory_collect.ps1`
-3. `R/run_localhost_simulation.R`
-4. `R/run_multirun_analysis.R`
-5. optional DuckDB-Ladung
+1. `R/run_init_database.R`
+2. lokaler TCP-Echo-Server auf `127.0.0.1:9000`
+3. `inventory_collect.ps1`
+4. `R/run_localhost_simulation.R`
+5. `R/run_multirun_analysis.R`
+6. DuckDB-Ladung und Report-Erzeugung
 
 ## Dateien
 
@@ -34,4 +35,3 @@ Damit kannst du den Ablauf testen, ohne schon echte Geraete anzugreifen.
 - `powershell/start_local_tcp_echo_server.ps1`
 - `powershell/run_localhost_workflow.ps1`
 - `R/run_localhost_simulation.R`
-

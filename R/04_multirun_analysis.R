@@ -120,13 +120,13 @@ build_multirun_bundle <- function(
   benchmark_files = list_benchmark_files()
 ) {
   inventory_sessions <- if (length(inventory_dirs)) {
-    bind_rows_union(lapply(inventory_dirs, inventory_session_summary))
+    do.call(bind_rows_union, lapply(inventory_dirs, inventory_session_summary))
   } else {
     data.frame()
   }
 
   benchmark_rows <- if (length(benchmark_files)) {
-    bind_rows_union(lapply(benchmark_files, benchmark_file_summary))
+    do.call(bind_rows_union, lapply(benchmark_files, benchmark_file_summary))
   } else {
     data.frame()
   }

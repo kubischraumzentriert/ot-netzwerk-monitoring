@@ -81,6 +81,11 @@ kopieren oder direkt die Beispiel-Dateien uebergeben.
 - `configs/run.direct.csv` oder `configs/run.direct.example.csv`, zum Beispiel `direct`
 - `configs/run.switch.csv` oder `configs/run.switch.example.csv`, zum Beispiel `switch`
 
+Die vollstaendige Beschreibung aller CSV-Spalten steht in
+[docs/08_konfigurationsreferenz.md](08_konfigurationsreferenz.md).
+Fuer einen schnellen Vor-Ort-Ueberblick nutze
+[docs/09_konfigurations_spickzettel.md](09_konfigurations_spickzettel.md).
+
 ### 5. Nmap-Konfiguration
 
 Fuer Nmap kannst du die Ziele in
@@ -214,6 +219,7 @@ powershell\start_suricata_capture.ps1
 ### DuckDB
 
 ```powershell
+Rscript R/run_init_database.R
 Rscript R/run_duckdb_analysis.R
 Rscript R/run_duckdb_query.R sql\inventory_overview.sql
 Rscript R/run_duckdb_overview_report.R

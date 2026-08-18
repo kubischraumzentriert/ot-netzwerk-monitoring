@@ -1,6 +1,7 @@
 source("R/04_multirun_analysis.R", local = TRUE)
 source("R/02_duckdb.R", local = TRUE)
 source("R/03_duckdb_jdbc.R", local = TRUE)
+source("R/06_duckdb_schema.R", local = TRUE)
 
 duckdb_native_available <- function() {
   requireNamespace("duckdb", quietly = TRUE) && requireNamespace("DBI", quietly = TRUE)
@@ -15,18 +16,13 @@ load_multirun_bundle_into_duckdb_native <- function(
     return(invisible(FALSE))
   }
 
+  duckdb_init_database(db_path = db_path)
   con <- open_duckdb(db_path)
   on.exit(DBI::dbDisconnect(con, shutdown = TRUE), add = TRUE)
 
-  write_table <- function(name, df) {
-    if (!is.data.frame(df) || !nrow(df)) return(invisible(NULL))
-    DBI::dbWriteTable(con, name, df, overwrite = TRUE)
-    invisible(TRUE)
-  }
-
-  write_table("inventory_sessions", bundle$inventory_sessions)
-  write_table("benchmark_rows", bundle$benchmark_rows)
-  write_table("benchmark_summary", bundle$benchmark_summary)
+  duckdb_write_or_replace_table(con, "inventory_sessions", bundle$inventory_sessions)
+  duckdb_write_or_replace_table(con, "benchmark_rows", bundle$benchmark_rows)
+  duckdb_write_or_replace_table(con, "benchmark_summary", bundle$benchmark_summary)
 
   message("Loaded multirun bundle into DuckDB: ", db_path)
   invisible(TRUE)
@@ -43,18 +39,13 @@ load_multirun_bundle_into_duckdb_jdbc <- function(
     return(invisible(FALSE))
   }
 
+  duckdb_init_database(db_path = db_path)
   con <- duckdb_jdbc_connect(db_path = db_path, jar_path = jar_path, driver_class = driver_class)
   on.exit(DBI::dbDisconnect(con), add = TRUE)
 
-  write_table <- function(name, df) {
-    if (!is.data.frame(df) || !nrow(df)) return(invisible(NULL))
-    DBI::dbWriteTable(con, name, df, overwrite = TRUE)
-    invisible(TRUE)
-  }
-
-  write_table("inventory_sessions", bundle$inventory_sessions)
-  write_table("benchmark_rows", bundle$benchmark_rows)
-  write_table("benchmark_summary", bundle$benchmark_summary)
+  duckdb_write_or_replace_table(con, "inventory_sessions", bundle$inventory_sessions)
+  duckdb_write_or_replace_table(con, "benchmark_rows", bundle$benchmark_rows)
+  duckdb_write_or_replace_table(con, "benchmark_summary", bundle$benchmark_summary)
 
   message("Loaded multirun bundle into DuckDB via JDBC: ", db_path)
   invisible(TRUE)
