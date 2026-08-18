@@ -19,6 +19,7 @@ Die kurze Referenz fuer den Vor-Ort-Einsatz.
 - `configs/scan_targets.csv`: Nmap-Ziele
 - `configs/duckdb_jdbc.example.csv`: optionale JDBC-Anbindung
 - `sql/ddl/network_analysis_schema.sql`: DuckDB-Basisstruktur
+- `docs/11_duckdb_datenmodell.md`: Tabellen, Views und Spalten im Detail
 
 ## Wichtige Felder
 
@@ -72,6 +73,16 @@ Die kurze Referenz fuer den Vor-Ort-Einsatz.
 - `inventory_sessions`: verdichtete Inventur
 - `benchmark_rows`: Rohmessungen
 - `benchmark_summary`: Kennzahlen pro Session
+
+### DuckDB-Datenmodell
+
+- `elapsed_ms`: Laufzeit der Probe selbst, also Prozesszeit
+- `metric_ms`: eigentliche Messgroesse, bei Ping die RTT
+- Views:
+  - `inventory_overview`
+  - `benchmark_overview`
+  - `benchmark_rows_ping`
+  - `benchmark_rows_tcp`
 
 ## Typische Werte
 

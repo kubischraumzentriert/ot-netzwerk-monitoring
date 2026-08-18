@@ -33,7 +33,7 @@ $targets = Import-Csv -LiteralPath $TargetsCsv
 
 foreach ($target in $targets) {
     $label = if ($target.label) { $target.label } else { $target.host }
-    $host = $target.host
+    $targetHost = $target.host
     $ports = if ($target.ports) { $target.ports } else { $DefaultPorts }
     $safeLabel = ($label -replace '[^A-Za-z0-9_-]', '_')
     $stamp = Get-Date -Format 'yyyyMMdd_HHmmss'
@@ -48,9 +48,9 @@ foreach ($target in $targets) {
         '--host-timeout', '45s',
         '-p', $ports,
         '-oA', $base,
-        $host
+        $targetHost
     )
 
-    Write-Host "Scanning $label ($host) ports $ports"
+    Write-Host "Scanning $label ($targetHost) ports $ports"
     & $NmapPath @args
 }

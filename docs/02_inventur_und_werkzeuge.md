@@ -156,6 +156,9 @@ Wichtig:
 
 - erst passiv einsetzen
 - in OT-Umgebungen nur mit Vorsicht und klarer Freigabe
+- fuer sichtbare Logs braucht Suricata in diesem Projekt eine echte Schnittstelle
+  und sinnvollerweise eine kleine Testregel; der Windows-Wrapper nutzt dafuer
+  den `--pcap`-Modus
 
 ### ZAP
 

@@ -8,6 +8,9 @@ output: "html_document"
 Diese Auswertung sammelt die vorhandenen Rohdaten in einer lokalen DuckDB-Datei
 und macht sie als SQL-basierten Analyse-Store nutzbar.
 
+Eine detaillierte Beschreibung der Tabellen, Views und Spalten steht in
+[docs/11_duckdb_datenmodell.md](11_duckdb_datenmodell.md).
+
 ## Zweck
 
 - Inventur-Sessions vergleichbar machen

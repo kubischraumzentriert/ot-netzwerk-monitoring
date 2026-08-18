@@ -30,6 +30,7 @@ Bevor du am Projekt arbeitest, lies bitte:
 5. das Betriebsmanual in [docs/06_betriebsmanual_workflow.md](docs/06_betriebsmanual_workflow.md)
 6. die Konfigurationsreferenz in [docs/08_konfigurationsreferenz.md](docs/08_konfigurationsreferenz.md)
 7. den Konfigurations-Spickzettel in [docs/09_konfigurations_spickzettel.md](docs/09_konfigurations_spickzettel.md)
+8. das DuckDB-Datenmodell in [docs/11_duckdb_datenmodell.md](docs/11_duckdb_datenmodell.md)
 
 ## Zielbild
 

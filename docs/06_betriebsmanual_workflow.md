@@ -36,6 +36,9 @@ Wichtig ist dabei:
 Wenn du den Test gegen die reale Anlage machst, wuerde ich ihn zuerst ohne Nmap
 und ohne Suricata starten und nur die Inventur plus TCP-Port-Benchmark auf mehreren Ports pro Zielhost laufen
 lassen. Die passiven Werkzeuge kannst du danach dazunehmen.
+Suricata nutzt in diesem Projekt den `--pcap`-Modus auf einem echten Adapter;
+fuer sichtbare Logs hilft eine kleine Testregel und ein Interface, das den
+Zielverkehr wirklich sieht.
 
 ## Ablaufdiagramm
 
@@ -317,6 +320,8 @@ so weiter schärfen:
 - einen kurzen Mitschnitt mit Wireshark waehrend der TCP-Probe
 - Nmap nur fuer die drei bekannten Ziele
 - Suricata nur passiv und nur im Testfenster
+- Suricata auf einem echten Adapter mit einer Testregel laufen lassen, wenn du
+  Alerts oder `eve.json` sehen willst
 
 ## Ergebnisdateien
 
