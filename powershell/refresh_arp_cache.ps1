@@ -54,7 +54,7 @@ function Convert-ArpTextToRows {
 
     $currentInterface = ''
     foreach ($line in $Lines) {
-        if ($line -match '^\s*Interface:\s+(.+?)\s+---\s+(.+?)\s*$') {
+        if ($line -match '^\s*(?:Interface|Schnittstelle):\s+(.+?)\s+---\s+(.+?)\s*$') {
             $currentInterface = $Matches[1]
             continue
         }

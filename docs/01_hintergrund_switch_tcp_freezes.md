@@ -43,7 +43,7 @@ Wenn Speed oder Duplex nicht sauber zusammenpassen, kann es zu massivem Fehlverh
 - Kollisionen oder Fehlzaehlungen
 - viele Retransmits
 - schlechte Performance trotz scheinbar "aktiver" Verbindung
-- HÃ¤nger, Zeitueberschreitungen oder sehr langsame Antwortzeiten
+- Haenger, Zeitueberschreitungen oder sehr langsame Antwortzeiten
 
 Deshalb ist es plausibel, dass ein falsch eingestellter Port oder ein falscher Aushandlungszustand in deinem Fall Probleme gemacht hat.
 
