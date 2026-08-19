@@ -42,8 +42,10 @@ Die aktuelle Version arbeitet bewusst leichtgewichtig und misst:
 - HTTP-Statuscode
 - Erfolg oder Fehler
 
-Die Messung ist als Erstversion fuer `http://`-Ziele ausgelegt und sendet
-standardmaessig `HEAD`, damit die Anwendung moeglichst wenig belastet wird.
+Die Messung ist als Erstversion fuer `http://`- und `https://`-Ziele
+ausgelegt. `http://` laeuft direkt per Socket, `https://` nutzt unter
+Windows einen PowerShell-Fallback. Standardmaessig wird `HEAD` gesendet,
+damit die Anwendung moeglichst wenig belastet wird.
 Die Rohdaten speichern Zeitstempel als portable ISO-Textform in `UTC`, damit
 der Lauf auch auf anderen Rechnern ohne Zeitzonen-Artefakte auswertbar bleibt.
 
@@ -122,6 +124,7 @@ powershell\run_webapp_timing.ps1 -TargetsConfig configs\webapp_targets.private.c
 - pruefe dann, ob der Server `HEAD` akzeptiert
 - wenn noetig, schalte pro Ziel auf `GET` um
 - ein `400 Bad Request` ist in der Regel eine echte HTTP-Antwort des Zielsystems und kein reiner Messfehler
+- bei `https://`-Zielen auf Windows wird der Request ueber PowerShell abgesetzt
 
 ## Einordnung
 

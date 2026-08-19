@@ -135,7 +135,7 @@ parse_http_url <- function(url) {
 
   default_port <- if (scheme == "http") 80L else if (scheme == "https") 443L else NA_integer_
   if (is.na(default_port)) {
-    stop("Unsupported URL scheme: ", scheme, ". This first version supports http:// URLs.")
+    stop("Unsupported URL scheme: ", scheme, ". Supported schemes are http:// and https://.")
   }
   port <- suppressWarnings(as.integer(port))
   if (is.na(port) || port <= 0L) port <- default_port
@@ -162,6 +162,96 @@ parse_http_status <- function(status_line) {
   list(code = NA_integer_, text = status_line)
 }
 
+escape_single_quotes <- function(x) {
+  gsub("'", "''", x, fixed = TRUE)
+}
+
+parse_key_value_line <- function(line) {
+  if (is.na(line) || !nzchar(line)) {
+    return(list())
+  }
+
+  out <- list()
+  parts <- strsplit(line, ";", fixed = TRUE)[[1]]
+  for (part in parts) {
+    if (!nzchar(part) || !grepl("=", part, fixed = TRUE)) next
+    kv <- strsplit(part, "=", fixed = TRUE)[[1]]
+    key <- trimws(kv[1])
+    value <- if (length(kv) >= 2) paste(kv[-1], collapse = "=") else ""
+    if (!nzchar(key)) next
+    out[[key]] <- tryCatch(URLdecode(value), error = function(e) value)
+  }
+  out
+}
+
+probe_webapp_https_windows <- function(parsed, url, method, timeout_sec) {
+  ps_url <- escape_single_quotes(url)
+  ps_method <- escape_single_quotes(method)
+  timeout_sec <- max(1L, as.integer(ceiling(timeout_sec)))
+  script <- paste0(
+    "$ErrorActionPreference='Stop';",
+    "$ProgressPreference='SilentlyContinue';",
+    "$uri='", ps_url, "';",
+    "$method='", ps_method, "';",
+    "$timeout=", timeout_sec, ";",
+    "$sw=[System.Diagnostics.Stopwatch]::StartNew();",
+    "try {",
+    "  $resp=Invoke-WebRequest -UseBasicParsing -Uri $uri -Method $method -TimeoutSec $timeout -MaximumRedirection 0 -Headers @{",
+    "    'User-Agent'='NetzwerkAnalyse-WebappTimer/1.0';",
+    "    'Accept'='*/*'",
+    "  };",
+    "  $sw.Stop();",
+    "  $code=[int]$resp.StatusCode;",
+    "  $text=[string]$resp.StatusDescription;",
+    "  $transport=1;",
+    "  $http=if ($code -ge 200 -and $code -lt 400) { 1 } else { 0 };",
+    "  $err='';",
+    "} catch {",
+    "  $sw.Stop();",
+    "  $transport=if ($_.Exception.Response -ne $null) { 1 } else { 0 };",
+    "  $code=if ($_.Exception.Response -ne $null) { [int]$_.Exception.Response.StatusCode } else { -1 };",
+    "  $text=if ($_.Exception.Response -ne $null) { [string]$_.Exception.Response.StatusDescription } else { 'ERROR' };",
+    "  $http=0;",
+    "  $err=[string]$_.Exception.Message;",
+    "};",
+    "$elapsed=[Math]::Round($sw.Elapsed.TotalMilliseconds,3);",
+    "Write-Output ('status_code=' + $code + ';status_text=' + [uri]::EscapeDataString($text) + ';elapsed_ms=' + $elapsed + ';transport_ok=' + $transport + ';http_ok=' + $http + ';error=' + [uri]::EscapeDataString($err));"
+  )
+
+  ps_cmd <- c(
+    "-NoProfile",
+    "-ExecutionPolicy", "Bypass",
+    "-Command", script
+  )
+
+  output <- suppressWarnings(system2("powershell.exe", args = ps_cmd, stdout = TRUE, stderr = TRUE))
+  if (!length(output)) {
+    return(list(
+      status_code = NA_integer_,
+      status_text = NA_character_,
+      transport_ok = FALSE,
+      http_ok = FALSE,
+      connect_ms = NA_real_,
+      first_byte_ms = NA_real_,
+      total_ms = NA_real_,
+      error = "Empty PowerShell response"
+    ))
+  }
+
+  parsed_line <- parse_key_value_line(tail(output, 1))
+  elapsed_ms <- suppressWarnings(as.numeric(parsed_line[["elapsed_ms"]]))
+  list(
+    status_code = suppressWarnings(as.integer(parsed_line[["status_code"]])),
+    status_text = if (!is.null(parsed_line[["status_text"]])) parsed_line[["status_text"]] else NA_character_,
+    transport_ok = identical(parsed_line[["transport_ok"]], "1") || identical(parsed_line[["transport_ok"]], "True"),
+    http_ok = identical(parsed_line[["http_ok"]], "1") || identical(parsed_line[["http_ok"]], "True"),
+    connect_ms = NA_real_,
+    first_byte_ms = NA_real_,
+    total_ms = elapsed_ms,
+    error = if (!is.null(parsed_line[["error"]]) && nzchar(parsed_line[["error"]])) parsed_line[["error"]] else NA_character_
+  )
+}
+
 webapp_probe_once <- function(label, url, method = "HEAD", timeout_sec = 5) {
   start <- Sys.time()
   parsed <- parse_http_url(url)
@@ -169,6 +259,31 @@ webapp_probe_once <- function(label, url, method = "HEAD", timeout_sec = 5) {
   if (!nzchar(method)) method <- "HEAD"
   if (!method %in% c("HEAD", "GET")) {
     method <- "HEAD"
+  }
+
+  if (identical(parsed$scheme, "https")) {
+    result <- probe_webapp_https_windows(parsed = parsed, url = url, method = method, timeout_sec = timeout_sec)
+    return(data.frame(
+      ts = timestamp_text(Sys.time()),
+      session_tag = NA_character_,
+      target_label = label,
+      url = url,
+      scheme = parsed$scheme,
+      host = parsed$host,
+      port = parsed$port,
+      path = parsed$path,
+      method = method,
+      success = isTRUE(result$http_ok),
+      transport_ok = isTRUE(result$transport_ok),
+      status_code = result$status_code,
+      status_text = result$status_text,
+      connect_ms = result$connect_ms,
+      first_byte_ms = result$first_byte_ms,
+      total_ms = result$total_ms,
+      timeout_sec = timeout_sec,
+      error = result$error,
+      stringsAsFactors = FALSE
+    ))
   }
 
   con <- NULL
