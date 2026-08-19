@@ -31,6 +31,7 @@ configs/targets.private.csv
 configs/*.private.csv
 configs/tools.csv
 configs/duckdb_jdbc.csv
+configs/scan_targets.csv
 
 # Daten und Exporte
 data/raw/*

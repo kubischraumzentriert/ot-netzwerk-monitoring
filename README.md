@@ -120,6 +120,7 @@ genaue Vor-Ort-Ablauf steht im [Betriebsmanual](docs/06_betriebsmanual_workflow.
 | `configs/targets.csv` | generische Zielvorlage | `label`, `host`, `port`, `request` |
 | `configs/targets.private.csv` | lokale, ignorierte Zielkonfiguration | `label`, `host`, `port`, `request` |
 | `configs/targets.production.example.csv` | Vorlage fuer reale Anlagenziele | `label`, `host`, `port`, `request` |
+| `configs/targets.localhost.csv` | Ziel fuer den lokalen Trockenlauf (`127.0.0.1`) | `label`, `host`, `port`, `request` |
 | `configs/run.csv` | Laufkonfiguration fuer einen Messlauf; `output_dir` und `session_tag` frei waehlbar, z. B. fuer Vorher/Nachher- oder Direkt/Switch-Vergleiche | `ping_count`, `tcp_count`, `tcp_port`, `session_tag`, `output_dir` |
 | `configs/run.example.csv` | Vorlage fuer `run.csv` | `ping_count`, `tcp_count`, `tcp_port`, `session_tag`, `output_dir` |
 | `configs/run.webapp.example.csv` | Vorlage fuer Webapp-Timing | `sample_count`, `interval_sec`, `timeout_sec`, `method`, `session_tag`, `output_dir` |
