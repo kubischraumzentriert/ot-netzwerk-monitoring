@@ -45,6 +45,28 @@ test_that("benchmark_target_overview returns NA median/p95 when raw benchmark_ro
   expect_true(is.na(out$metric_ms_p95))
 })
 
+test_that("benchmark_plot_group_key keeps different sessions of the same target/probe apart", {
+  bench <- data.frame(
+    target_label = c("Geraet1", "Geraet1", "Geraet1"),
+    probe = c("tcp", "tcp", "tcp"),
+    session_tag = c("direct", "switch", "switch"),
+    stringsAsFactors = FALSE
+  )
+  grp <- benchmark_plot_group_key(bench)
+
+  # Before the fix, target_label + probe alone would have merged "direct"
+  # and "switch" into a single boxplot group even though they are two
+  # different measurement runs.
+  expect_length(unique(grp), 2)
+  expect_setequal(levels(grp), c("Geraet1.tcp.direct", "Geraet1.tcp.switch"))
+})
+
+test_that("benchmark_plot_group_key tolerates a missing session_tag column", {
+  bench <- data.frame(target_label = "Geraet1", probe = "ping", stringsAsFactors = FALSE)
+  grp <- benchmark_plot_group_key(bench)
+  expect_equal(as.character(grp), "Geraet1.ping.n/a")
+})
+
 test_that("list_benchmark_files excludes inventory, webapp, scans, pcap and suricata folders", {
   root <- tempfile("raw_")
   dir.create(file.path(root, "direct"), recursive = TRUE)

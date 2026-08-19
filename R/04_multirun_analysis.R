@@ -462,6 +462,11 @@ plot_svg <- function(path, width = 10, height = 7, expr) {
   force(expr)
 }
 
+benchmark_plot_group_key <- function(bench) {
+  session_tag <- if ("session_tag" %in% names(bench)) bench$session_tag else "n/a"
+  interaction(bench$target_label, bench$probe, session_tag, drop = TRUE, lex.order = TRUE)
+}
+
 write_multirun_plots <- function(
   bundle = build_multirun_bundle(),
   output_dir = file.path(paths$reports, "figures")
@@ -482,7 +487,7 @@ write_multirun_plots <- function(
   if (nrow(sum_tbl)) {
     plot_file <- file.path(output_dir, "benchmark_success_rate.svg")
     plot_svg(plot_file, expr = {
-      labels <- paste(sum_tbl$target_label, sum_tbl$probe, sep = " / ")
+      labels <- paste(sum_tbl$target_label, sum_tbl$probe, sum_tbl$session_tag, sep = " / ")
       values <- suppressWarnings(as.numeric(sum_tbl$success_rate))
       barplot(
         height = values,
@@ -504,16 +509,15 @@ write_multirun_plots <- function(
     keep <- !is.na(values)
     if (!any(keep)) next
 
-    plot_file <- file.path(output_dir, paste0("benchmark_", col, "_boxplot.png"))
     plot_file <- file.path(output_dir, paste0("benchmark_", col, "_boxplot.svg"))
+    grp <- benchmark_plot_group_key(bench)
     plot_svg(plot_file, expr = {
-      grp <- interaction(bench$target_label, bench$probe, drop = TRUE, lex.order = TRUE)
       boxplot(
         values[keep] ~ grp[keep],
         las = 2,
         col = "#F18F01",
         ylab = paste(col, "ms"),
-        main = paste("Benchmark", col, "nach Ziel / Probe")
+        main = paste("Benchmark", col, "nach Ziel / Probe / Session")
       )
     })
     created <- c(created, plot_file)
