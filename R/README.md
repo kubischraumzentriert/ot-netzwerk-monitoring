@@ -12,12 +12,14 @@ output: "html_document"
 - `m01_ping_tcp_probe.R` fuehrt Ping- und TCP-Messungen durch
 - `run_multirun_analysis.R` fasst mehrere Inventur- und Benchmark-Laufe zusammen
 - `run_duckdb_analysis.R` laedt die Sammeldaten in DuckDB
+- `run_webapp_timing.R` misst in festen Abstaenden die Antwortzeit einer Webanwendung
 
 ## Verwendung
 
 1. `configs/targets.csv` aus `configs/targets.example.csv` ableiten
 2. `configs/run.csv` aus `configs/run.example.csv` ableiten
-3. `powershell/run_benchmark.ps1` ausfuehren
+3. fuer Webapps `configs/webapp_targets.private.csv` und `configs/run.webapp.private.csv` oder die `*.example.csv`-Vorlagen verwenden
+4. `powershell/run_benchmark.ps1` oder `powershell/run_webapp_timing.ps1` ausfuehren
 
 ## Hinweis
 

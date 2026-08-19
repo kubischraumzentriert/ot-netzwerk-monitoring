@@ -33,8 +33,10 @@ Beispiele:
 - `configs/run.csv` oder `configs/run.example.csv`
 - `configs/run.direct.csv` oder `configs/run.direct.example.csv`
 - `configs/run.switch.csv` oder `configs/run.switch.example.csv`
+- `configs/run.webapp.csv` oder `configs/run.webapp.example.csv`
 - `configs/run.localhost.csv`
 - `configs/scan_targets.csv` oder `configs/scan_targets.example.csv`
+- `configs/webapp_targets.example.csv`, optional lokal `configs/webapp_targets.private.csv`
 - `configs/tools.example.csv`, optional lokal `configs/tools.csv` oder
   `configs/tools.private.csv`
 - `configs/duckdb_jdbc.example.csv`
@@ -173,6 +175,26 @@ Diese Datei ist die Laufkonfiguration fuer den lokalen Trockenlauf.
 | `session_tag` | Laufname fuer den Trockenlauf | `localhost` | ja |
 | `output_dir` | Zielordner fuer Rohdaten | `data/raw/sim` | ja |
 
+## `configs/run.webapp.csv` und `configs/run.webapp.example.csv`
+
+Diese Datei ist die Laufkonfiguration fuer die Webapp-Zeitmessung.
+
+| Schluessel | Bedeutung | Beispiel | Pflicht |
+| --- | --- | --- | --- |
+| `sample_count` | Anzahl der Messungen pro Ziel | `60` | ja |
+| `interval_sec` | Pause zwischen zwei Webapp-Samples | `60` | ja |
+| `timeout_sec` | Socket-Timeout fuer den HTTP-Request | `5` | ja |
+| `method` | HTTP-Methode, standardmaessig `HEAD` | `HEAD` | nein |
+| `session_tag` | Laufname fuer Auswertung und Ordnerstruktur | `webapp` | ja |
+| `output_dir` | Zielordner fuer Rohdaten | `data/raw/webapp` | ja |
+
+Hinweise:
+
+- `interval_sec` ist die Standardpause fuer alle Ziele.
+- Ein Ziel kann `interval_sec` und `timeout_sec` auf Zeilenebene ueberschreiben.
+- Die erste Version arbeitet absichtlich leichtgewichtig und sendet nur einen
+  HTTP-Request pro Probe.
+
 ## `configs/scan_targets.csv`
 
 Diese Datei steuert die Nmap-Ziele.
@@ -206,6 +228,24 @@ Suchreihenfolge:
 2. `configs/tools.private.csv`, dann `configs/tools.csv`, dann `configs/tools.example.csv`
 3. `PATH` ueber `Get-Command`
 4. bekannte Windows-Installationspfade
+
+## `configs/webapp_targets.example.csv`
+
+Diese Datei beschreibt die Webapp-Ziele fuer die Zeitmessung.
+
+| Spalte | Bedeutung | Beispiel | Pflicht |
+| --- | --- | --- | --- |
+| `label` | Anzeigename fuer den Report | `WebApp` | ja |
+| `url` | komplette Ziel-URL | `http://127.0.0.1:8080/health` | ja |
+| `method` | HTTP-Methode, empfohlen `HEAD` | `HEAD` | nein |
+| `interval_sec` | optionaler Ziel-Override fuer das Intervall | `60` | nein |
+| `timeout_sec` | optionaler Ziel-Override fuer den Timeout | `5` | nein |
+
+Hinweise:
+
+- reale Ziel-URLs gehoeren in `configs/webapp_targets.private.csv`
+- die Messung ist fuer `http://`-Ziele ausgelegt
+- wenn du nur eine Webapp beobachten willst, reicht ein einzelner Eintrag
 
 ## `configs/duckdb_jdbc.example.csv`
 

@@ -15,8 +15,10 @@ Die kurze Referenz fuer den Vor-Ort-Einsatz.
 - `configs/targets.localhost.csv`: lokaler Trockenlauf auf `127.0.0.1`
 - `configs/run.direct.csv`: Direktlauf
 - `configs/run.switch.csv`: Switchlauf
+- `configs/run.webapp.csv`: Webapp-Zeitmessung
 - `configs/run.localhost.csv`: Trockenlauf
 - `configs/scan_targets.csv`: Nmap-Ziele
+- `configs/webapp_targets.example.csv`: Webapp-Zielvorlage
 - `configs/tools.example.csv`: Vorlage fuer lokale Tool-Pfade
 - `configs/duckdb_jdbc.example.csv`: optionale JDBC-Anbindung
 - `sql/ddl/network_analysis_schema.sql`: DuckDB-Basisstruktur
@@ -56,6 +58,23 @@ Hinweis:
 - `tcp_port`: Default-Port, wenn `targets.csv` oder `targets.private.csv` keinen gueltigen Port hat
 - `session_tag`: Laufname wie `direct`, `switch` oder `localhost`
 - `output_dir`: Zielordner fuer Rohdaten
+
+### `run.webapp.csv`
+
+- `sample_count`: Anzahl der Webapp-Samples
+- `interval_sec`: Sekunden zwischen den Samples
+- `timeout_sec`: HTTP-Timeout
+- `method`: `HEAD` oder `GET`
+- `session_tag`: Laufname wie `webapp`
+- `output_dir`: Zielordner fuer Rohdaten
+
+### `webapp_targets.example.csv`
+
+- `label`: Anzeigename
+- `url`: komplette Ziel-URL
+- `method`: HTTP-Methode, empfohlen `HEAD`
+- `interval_sec`: optionaler Ziel-Override fuer das Intervall
+- `timeout_sec`: optionaler Ziel-Override fuer den Timeout
 
 ### `scan_targets.csv`
 
@@ -101,6 +120,7 @@ Hinweis:
 - Direktlauf: `session_tag=direct`, `output_dir=data/raw/direct`
 - Switchlauf: `session_tag=switch`, `output_dir=data/raw/switch`
 - Trockenlauf: `session_tag=localhost`, `output_dir=data/raw/sim`
+- Webapp-Timing: `session_tag=webapp`, `output_dir=data/raw/webapp`
 - Standardport: `tcp_port=9000`
 - Schema-Start: `powershell\run_init_database.ps1`
 

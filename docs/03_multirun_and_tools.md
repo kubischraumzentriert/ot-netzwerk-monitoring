@@ -42,6 +42,19 @@ Suricata ist fuer passives Logging gedacht.
 - Logverzeichnis pro Lauf trennen
 - die Laufzeit begrenzen
 
+## Webapp-Timing
+
+Wenn du eine Webanwendung ueber laengere Zeit beobachten willst, ist ein
+kleines R-Skript fuer periodische Zeitmessungen meist besser als ZAP.
+
+- ein einzelner Request pro Intervall
+- typischerweise `HEAD` statt `GET`
+- konfigurierbares Intervall, zum Beispiel 60 Sekunden
+- Ausgabe als CSV plus Markdown-Report
+
+Die Konfiguration steht in
+[docs/13_webapp_timing.md](13_webapp_timing.md).
+
 ## DuckDB
 
 DuckDB ist die gemeinsame lokale Analyse-Datei fuer:

@@ -1,0 +1,7 @@
+key,value
+sample_count,60
+interval_sec,60
+timeout_sec,5
+method,HEAD
+session_tag,webapp
+output_dir,data/raw/webapp

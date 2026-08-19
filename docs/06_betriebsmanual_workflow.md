@@ -135,6 +135,30 @@ verwenden.
 Eine fachliche Einordnung der wichtigsten Nmap-Optionen fuer OT-Netze steht in
 [docs/10_nmap_optionen_ot.md](10_nmap_optionen_ot.md).
 
+### 6. Webapp-Timing, falls eine Webanwendung mitlaufen soll
+
+Wenn du zusaetzlich eine Webanwendung ueber laengere Zeit beobachten willst,
+nutze das leichte R-Skript fuer periodische Zeitmessungen.
+
+Die relevanten Dateien sind:
+
+- `configs/webapp_targets.example.csv`
+- `configs/webapp_targets.private.csv`
+- `configs/run.webapp.example.csv`
+- `configs/run.webapp.private.csv`
+- `powershell/run_webapp_timing.ps1`
+- `R/run_webapp_timing.R`
+
+Empfehlung fuer den Start:
+
+- `method = HEAD`
+- `interval_sec = 60`
+- `timeout_sec = 5`
+- nur einen Health- oder Status-Endpunkt messen
+
+Die fachliche Einordnung steht in
+[docs/13_webapp_timing.md](13_webapp_timing.md).
+
 ## Empfohlene Reihenfolge
 
 ### Phase A: Trockenlauf

@@ -32,6 +32,7 @@ Bevor du am Projekt arbeitest, lies bitte:
 7. den Konfigurations-Spickzettel in [docs/09_konfigurations_spickzettel.md](docs/09_konfigurations_spickzettel.md)
 8. das DuckDB-Datenmodell in [docs/11_duckdb_datenmodell.md](docs/11_duckdb_datenmodell.md)
 9. die Einordnung zu `netstat` und `Test-NetConnection` in [docs/12_netstat_vs_testnetconnection.md](docs/12_netstat_vs_testnetconnection.md)
+10. die Webapp-Zeitmessung in [docs/13_webapp_timing.md](docs/13_webapp_timing.md)
 
 ## Zielbild
 
@@ -68,6 +69,7 @@ Bevor du am Projekt arbeitest, lies bitte:
 - `scan` fuer Nmap-Workflows
 - `traffic` fuer Wireshark- oder PCAP-Auswertung
 - `alerts` fuer Auffaelligkeiten und Checks
+- `webapp` fuer periodische Antwortzeitmessungen einer Webanwendung
 
 ## Inventur und Auswertung
 
@@ -103,8 +105,10 @@ genaue Vor-Ort-Ablauf steht im [Betriebsmanual](docs/06_betriebsmanual_workflow.
 | `configs/run.direct.example.csv` | Vorlage fuer Direktlauf | `ping_count`, `tcp_count`, `tcp_port`, `session_tag`, `output_dir` |
 | `configs/run.switch.csv` | Switchlauf | `ping_count`, `tcp_count`, `tcp_port`, `session_tag`, `output_dir` |
 | `configs/run.switch.example.csv` | Vorlage fuer Switchlauf | `ping_count`, `tcp_count`, `tcp_port`, `session_tag`, `output_dir` |
+| `configs/run.webapp.example.csv` | Vorlage fuer Webapp-Timing | `sample_count`, `interval_sec`, `timeout_sec`, `method`, `session_tag`, `output_dir` |
 | `configs/run.localhost.csv` | Trockenlauf | `ping_count`, `tcp_count`, `tcp_port`, `session_tag`, `output_dir` |
 | `configs/scan_targets.csv` | Nmap-Ziele | `label`, `host`, `ports` |
+| `configs/webapp_targets.example.csv` | Vorlage fuer Webapp-Ziele | `label`, `url`, `method`, `interval_sec`, `timeout_sec` |
 | `configs/tools.example.csv` | Vorlage fuer lokale Tool-Pfade | `tool`, `path`, `note` |
 | `configs/duckdb_jdbc.example.csv` | optionale JDBC-Anbindung | `jar_path`, `db_path`, `driver_class` |
 | `sql/ddl/network_analysis_schema.sql` | DuckDB-DDL fuer die Basisstruktur mit internen Schluesseln und Views | `schema_metadata`, `inventory_sessions`, `benchmark_rows`, `benchmark_summary`, `inventory_overview`, `benchmark_overview`, `benchmark_rows_ping`, `benchmark_rows_tcp` |
@@ -119,6 +123,7 @@ genaue Vor-Ort-Ablauf steht im [Betriebsmanual](docs/06_betriebsmanual_workflow.
 | `powershell/run_inventory_steckbrief.ps1` | Inventur-Steckbrief erzeugen | `reports/steckbrief_*.md` | nein |
 | `powershell/run_benchmark.ps1` | TCP-Port-Messungen, Standard ist 9000 | `data/raw/direct/` oder `data/raw/switch/` oder `data/raw/sim/` | ja |
 | `powershell/run_benchmark_comparison.ps1` | Direkt-vs-Switch-Vergleich | `reports/network_direct_vs_switch.md` | nein |
+| `powershell/run_webapp_timing.ps1` | periodische Webapp-Zeitmessung | `data/raw/webapp/<session_tag>/` und `reports/webapp_timing_overview.md` | nein |
 | `powershell/run_r_script.ps1` | generischer R-Skript-Start mit zentraler Rscript-Suche | je nach R-Skript | je nach R-Skript |
 | `powershell/archive_data_backup.ps1` | Daten sichern und Arbeitsbestand resetten | `data/backups/YYYYMMdd_HHmmss_Databackup/` | nein |
 | `powershell/restore_data_backup.ps1` | Backup wiederherstellen | Rueckspielung von `data/raw/`, `data/processed/`, `reports/` | nein |
@@ -133,6 +138,7 @@ genaue Vor-Ort-Ablauf steht im [Betriebsmanual](docs/06_betriebsmanual_workflow.
 | `R/run_localhost_simulation.R` | lokaler Simulationslauf mit Benchmark, Multirun-Auswertung und DuckDB-Import | `reports/network_overview_localhost.md` | ja |
 | `R/run_benchmark.R` | Messlaeufe aus R | Roh-CSV-Dateien pro Lauf | ja |
 | `R/run_benchmark_comparison.R` | Direkt-vs-Switch-Vergleich, optional mit `--base=` und `--compare=` | `reports/network_direct_vs_switch.md` | nein |
+| `R/run_webapp_timing.R` | periodische Webapp-Zeitmessung | `data/raw/webapp/<session_tag>/` und `reports/webapp_timing_overview.md` | nein |
 | `R/run_multirun_analysis.R` | gemeinsame Analyse mehrerer Sessions | `reports/network_overview.md` und CSV-Aggregate | ja |
 | `R/run_duckdb_analysis.R` | laedt die lokalen Daten in DuckDB, erstellt Views und Report | `reports/network_overview_duckdb.md` | ja |
 | `R/run_duckdb_query.R` | einzelne SQL-Abfragen | Report oder CSV je nach Ausgabe | ja |
@@ -147,6 +153,7 @@ genaue Vor-Ort-Ablauf steht im [Betriebsmanual](docs/06_betriebsmanual_workflow.
 - `docs/08_konfigurationsreferenz.md` fuer die komplette Config-Referenz
 - `docs/09_konfigurations_spickzettel.md` fuer den schnellen Vor-Ort-Ueberblick
 - `docs/10_nmap_optionen_ot.md` fuer die Nmap-Einordnung in OT-Netzen
+- `docs/13_webapp_timing.md` fuer die periodische Webapp-Zeitmessung
 
 ## Start In 3 Schritten
 
