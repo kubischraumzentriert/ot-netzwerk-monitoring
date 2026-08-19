@@ -61,19 +61,31 @@ parse_ipconfig_blocks <- function(text) {
 parse_arp_entries <- function(text) {
   lines <- trimws(strsplit(text, "\n", fixed = TRUE)[[1]])
   lines <- lines[lines != ""]
-  lines <- lines[grepl("^[0-9]{1,3}(\\.[0-9]{1,3}){3}\\s+", lines)]
-  if (!length(lines)) return(data.frame())
-  rows <- lapply(lines, function(line) {
+
+  # `arp -a` lists a separate "Schnittstelle:"/"Interface:" header block per
+  # network adapter. Filtering IP lines without tracking the preceding
+  # header (as before) drops which interface each entry belongs to -- so
+  # entries that legitimately exist on more than one interface (e.g.
+  # multicast addresses) looked like accidental duplicates.
+  current_interface <- NA_character_
+  rows <- list()
+  for (line in lines) {
+    iface_match <- regmatches(line, regexec("^(?:Schnittstelle|Interface):\\s*(.+?)\\s*---", line, perl = TRUE))[[1]]
+    if (length(iface_match) >= 2) {
+      current_interface <- iface_match[2]
+      next
+    }
+    if (!grepl("^[0-9]{1,3}(\\.[0-9]{1,3}){3}\\s+", line)) next
     parts <- strsplit(line, "[[:space:]]+")[[1]]
-    if (length(parts) < 3) return(NULL)
-    data.frame(
+    if (length(parts) < 3) next
+    rows[[length(rows) + 1]] <- data.frame(
+      interface = current_interface,
       ip = parts[1],
       mac = parts[2],
       type = parts[3],
       stringsAsFactors = FALSE
     )
-  })
-  rows <- Filter(Negate(is.null), rows)
+  }
   if (!length(rows)) return(data.frame())
   do.call(rbind, rows)
 }
@@ -169,7 +181,7 @@ inventory_steckbrief <- function(
   }
 
   arp_preview <- if (arp_count) {
-    inv$arp_neighbors[, intersect(c("ip", "mac", "type"), names(inv$arp_neighbors)), drop = FALSE]
+    inv$arp_neighbors[, intersect(c("interface", "ip", "mac", "type"), names(inv$arp_neighbors)), drop = FALSE]
   } else {
     data.frame()
   }

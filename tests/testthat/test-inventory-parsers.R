@@ -19,12 +19,51 @@ test_that("parse_arp_entries parses standard arp -a output lines", {
   )
   out <- parse_arp_entries(text)
   expect_equal(nrow(out), 2)
+  expect_equal(out$interface, c("192.168.56.1", "192.168.56.1"))
   expect_equal(out$ip, c("192.168.56.254", "192.168.56.255"))
   expect_equal(out$type, c("dynamisch", "statisch"))
 })
 
+test_that("parse_arp_entries keeps entries from different interfaces apart instead of merging them", {
+  # Regression test: the same multicast address legitimately appears once
+  # per interface. Before tracking the interface header, these looked like
+  # accidental duplicate rows with no way to tell them apart.
+  text <- paste(
+    "Schnittstelle: 192.168.42.155 --- 0x6",
+    "  Internetadresse       Physische Adresse     Typ",
+    "  224.0.0.22            01-00-5e-00-00-16     statisch",
+    "",
+    "Schnittstelle: 192.168.56.1 --- 0x23",
+    "  Internetadresse       Physische Adresse     Typ",
+    "  224.0.0.22            01-00-5e-00-00-16     statisch",
+    sep = "\n"
+  )
+  out <- parse_arp_entries(text)
+  expect_equal(nrow(out), 2)
+  expect_setequal(out$interface, c("192.168.42.155", "192.168.56.1"))
+  expect_true(all(out$ip == "224.0.0.22"))
+})
+
+test_that("parse_arp_entries also understands the English 'Interface:' header", {
+  text <- paste(
+    "Interface: 192.0.2.1 --- 0x4",
+    "  Internet Address      Physical Address      Type",
+    "  192.0.2.254           aa-bb-cc-dd-ee-ff     dynamic",
+    sep = "\n"
+  )
+  out <- parse_arp_entries(text)
+  expect_equal(nrow(out), 1)
+  expect_equal(out$interface, "192.0.2.1")
+})
+
 test_that("parse_arp_entries returns an empty data frame when nothing matches", {
   expect_equal(nrow(parse_arp_entries("no relevant lines here")), 0)
+})
+
+test_that("parse_arp_entries tolerates IP lines with no preceding interface header", {
+  out <- parse_arp_entries("192.0.2.254           aa-bb-cc-dd-ee-ff     dynamisch")
+  expect_equal(nrow(out), 1)
+  expect_true(is.na(out$interface))
 })
 
 test_that("parse_netstat_entries parses TCP and UDP rows and skips headers", {
