@@ -81,7 +81,7 @@ bind_rows_union <- function(...) {
   all_names <- unique(unlist(lapply(dfs, names), use.names = FALSE))
   aligned <- lapply(dfs, function(df) {
     missing <- setdiff(all_names, names(df))
-    for (nm in missing) df[[nm]] <- NA
+    for (nm in missing) df[[nm]] <- rep(NA, nrow(df))
     df <- df[, all_names, drop = FALSE]
     rownames(df) <- NULL
     df

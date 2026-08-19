@@ -157,6 +157,17 @@ tcp_probe <- function(host, port = 9000, request = "HELLO", timeout_sec = 3) {
   )
 }
 
+combine_probe_rows <- function(rows_list, target_label, session_tag, timezone, target_host, target_port) {
+  if (!length(rows_list)) return(data.frame())
+  df <- do.call(rbind, rows_list)
+  df$target_label <- target_label
+  df$session_tag <- session_tag
+  df$timezone <- timezone
+  df$target_host <- target_host
+  df$target_port <- target_port
+  df
+}
+
 run_benchmark <- function(targets = read_targets(), run_cfg = read_run_config()) {
   ping_count <- as.integer(as_num(run_cfg[["ping_count"]], 20))
   ping_interval_sec <- as_num(run_cfg[["ping_interval_sec"]], 1)
@@ -207,16 +218,8 @@ run_benchmark <- function(targets = read_targets(), run_cfg = read_run_config())
         ".csv"
       )
     )
-    ping_df <- transform(do.call(rbind, ping_rows), target_label = target$label)
-    tcp_df <- transform(do.call(rbind, tcp_rows), target_label = target$label)
-    ping_df$session_tag <- session_tag
-    tcp_df$session_tag <- session_tag
-    ping_df$timezone <- run_timezone
-    tcp_df$timezone <- run_timezone
-    ping_df$target_host <- target$host
-    tcp_df$target_host <- target$host
-    ping_df$target_port <- NA_integer_
-    tcp_df$target_port <- port
+    ping_df <- combine_probe_rows(ping_rows, target$label, session_tag, run_timezone, target$host, NA_integer_)
+    tcp_df <- combine_probe_rows(tcp_rows, target$label, session_tag, run_timezone, target$host, port)
     combined <- bind_rows_union(ping_df, tcp_df)
     char_cols <- vapply(combined, is.character, logical(1))
     combined[char_cols] <- lapply(combined[char_cols], sanitize_text)

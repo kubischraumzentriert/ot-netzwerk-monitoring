@@ -1,3 +1,53 @@
+test_that("combine_probe_rows attaches the shared columns to non-empty rows", {
+  rows_list <- list(
+    data.frame(metric_ms = 1, stringsAsFactors = FALSE),
+    data.frame(metric_ms = 2, stringsAsFactors = FALSE)
+  )
+  df <- combine_probe_rows(rows_list, "Geraet1", "direct", "UTC", "192.0.2.11", 9000L)
+  expect_equal(nrow(df), 2)
+  expect_equal(df$target_label, c("Geraet1", "Geraet1"))
+  expect_equal(df$session_tag, c("direct", "direct"))
+  expect_equal(df$target_port, c(9000L, 9000L))
+})
+
+test_that("combine_probe_rows returns an empty data frame for zero probes instead of erroring", {
+  # Regression test: an empty rows_list previously reached
+  # transform(do.call(rbind, list()), ...), which errored because
+  # do.call(rbind, list()) is NULL, not a data frame.
+  df <- combine_probe_rows(list(), "Geraet1", "direct", "UTC", "192.0.2.11", 9000L)
+  expect_true(is.data.frame(df))
+  expect_equal(nrow(df), 0)
+})
+
+test_that("bind_rows_union combines a populated probe data frame with an empty one", {
+  # Regression test: combine_probe_rows(list(), ...) returns a truly empty
+  # (0-row, 0-col) data.frame(). Filling in the missing columns for that
+  # frame previously assigned a length-1 NA to a 0-row data frame, which
+  # errors ("replacement has 1 row, data has 0").
+  ping_df <- combine_probe_rows(
+    list(data.frame(probe = "ping", metric_ms = 5, stringsAsFactors = FALSE)),
+    "Geraet1", "direct", "UTC", "192.0.2.11", NA_integer_
+  )
+  tcp_df <- combine_probe_rows(list(), "Geraet1", "direct", "UTC", "192.0.2.11", 9000L)
+
+  combined <- bind_rows_union(ping_df, tcp_df)
+  expect_equal(nrow(combined), 1)
+  expect_equal(combined$probe, "ping")
+})
+
+test_that("run_benchmark tolerates ping_count=0 and tcp_count=0 without erroring", {
+  # Fully zero counts skip both probe loops entirely, so this does not
+  # depend on real network/ping availability and stays portable across CI.
+  targets <- data.frame(label = "Loopback", host = "127.0.0.1", port = 9000L, request = "HELLO", stringsAsFactors = FALSE)
+  run_cfg <- c(
+    ping_count = "0", ping_interval_sec = "0", tcp_count = "0", tcp_interval_sec = "0",
+    tcp_timeout_sec = "1", tcp_port = "9000", session_tag = "zero-both", output_dir = tempfile("bench_zero_")
+  )
+  res <- run_benchmark(targets = targets, run_cfg = run_cfg)
+  expect_true(is.data.frame(res[["Loopback"]]))
+  expect_equal(nrow(res[["Loopback"]]), 0)
+})
+
 test_that("resolve_port uses a valid target port and falls back otherwise", {
   expect_equal(resolve_port("8080", 9000), 8080L)
   expect_equal(resolve_port(NA, 9000), 9000L)
