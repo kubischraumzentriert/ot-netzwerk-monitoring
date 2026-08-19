@@ -10,7 +10,7 @@ output: "html_document"
 1. Inventur sammeln
 2. Inventur als Markdown zusammenfassen
 3. mehrere Sessions und Benchmarks gemeinsam auswerten
-4. Direkt-vs-Switch-Benchmarks getrennt vergleichen
+4. zwei Messlaeufe (z. B. Direktverbindung und Switch) getrennt vergleichen
 5. auffaellige Faelle mit Nmap, Wireshark und Suricata vertiefen
 6. Datenbank initialisieren und Ergebnisse in DuckDB laden
 
@@ -83,9 +83,10 @@ Einzelne Abfragen laufen ueber `R/run_duckdb_query.R`, zum Beispiel mit
 Der kombinierte Ueberblick fuer Inventur und Benchmark heisst
 `R/run_duckdb_overview_report.R`.
 
-Der Direkt-vs-Switch-Vergleich laeuft ueber `R/run_benchmark_comparison.R`.
-Die passenden Beispielkonfigurationen sind `configs/run.direct.example.csv`
-und `configs/run.switch.example.csv`.
+Der Vergleich zweier Messlaeufe laeuft ueber
+`R/run_benchmark_comparison.R --base=<tag1> --compare=<tag2>`. Beide
+Laeufe verwenden dieselbe `configs/run.example.csv` als Vorlage, jeweils mit
+eigenem `session_tag` und `output_dir`.
 
 Aktuell werden in DuckDB nur Inventur- und Benchmark-Daten geladen. Nmap-Scans,
 PCAP-Mitschnitte und Suricata-Logs bleiben als lokale Dateien unter `data/raw/`

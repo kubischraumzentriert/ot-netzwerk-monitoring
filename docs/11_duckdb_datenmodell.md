@@ -68,7 +68,7 @@ Rohdaten aller Messungen, also die einzelnen Ping- und TCP-Zeilen.
 | `reply` | Antwort des Zielsystems |
 | `error` | Fehlermeldung bei TCP-Fehlern |
 | `target_label` | Anzeigename des Ziels |
-| `session_tag` | Laufbezeichnung wie `localhost`, `direct`, `switch` |
+| `session_tag` | frei waehlbare Laufbezeichnung, z. B. `localhost`, `direct`, `switch` |
 | `target_host` | Ziel-IP oder Zielname aus der Konfiguration |
 | `target_port` | Zielport aus der Konfiguration |
 | `source_file` | Quell-CSV der Rohdaten |

@@ -108,10 +108,8 @@ genaue Vor-Ort-Ablauf steht im [Betriebsmanual](docs/06_betriebsmanual_workflow.
 | `configs/targets.csv` | generische Zielvorlage | `label`, `host`, `port`, `request` |
 | `configs/targets.private.csv` | lokale, ignorierte Zielkonfiguration | `label`, `host`, `port`, `request` |
 | `configs/targets.production.example.csv` | Vorlage fuer reale Anlagenziele | `label`, `host`, `port`, `request` |
-| `configs/run.direct.csv` | Direktlauf | `ping_count`, `tcp_count`, `tcp_port`, `session_tag`, `output_dir` |
-| `configs/run.direct.example.csv` | Vorlage fuer Direktlauf | `ping_count`, `tcp_count`, `tcp_port`, `session_tag`, `output_dir` |
-| `configs/run.switch.csv` | Switchlauf | `ping_count`, `tcp_count`, `tcp_port`, `session_tag`, `output_dir` |
-| `configs/run.switch.example.csv` | Vorlage fuer Switchlauf | `ping_count`, `tcp_count`, `tcp_port`, `session_tag`, `output_dir` |
+| `configs/run.csv` | Laufkonfiguration fuer einen Messlauf; `output_dir` und `session_tag` frei waehlbar, z. B. fuer Vorher/Nachher- oder Direkt/Switch-Vergleiche | `ping_count`, `tcp_count`, `tcp_port`, `session_tag`, `output_dir` |
+| `configs/run.example.csv` | Vorlage fuer `run.csv` | `ping_count`, `tcp_count`, `tcp_port`, `session_tag`, `output_dir` |
 | `configs/run.webapp.example.csv` | Vorlage fuer Webapp-Timing | `sample_count`, `interval_sec`, `timeout_sec`, `method`, `session_tag`, `output_dir` |
 | `configs/run.localhost.csv` | Trockenlauf | `ping_count`, `tcp_count`, `tcp_port`, `session_tag`, `output_dir` |
 | `configs/scan_targets.csv` | Nmap-Ziele | `label`, `host`, `ports` |
@@ -128,8 +126,8 @@ genaue Vor-Ort-Ablauf steht im [Betriebsmanual](docs/06_betriebsmanual_workflow.
 | `powershell/inventory_collect.ps1` | lokale Inventur | `data/raw/inventory/<timestamp>/` | optional |
 | `powershell/refresh_arp_cache.ps1` | ARP-Cache ueber vorsichtigen `/24`-Ping-Sweep aktualisieren | `data/raw/inventory/arp_refresh/` oder Inventur-Unterordner | nein |
 | `powershell/run_inventory_steckbrief.ps1` | Inventur-Steckbrief erzeugen | `reports/steckbrief_*.md` | nein |
-| `powershell/run_benchmark.ps1` | TCP-Port-Messungen, Standard ist 9000 | `data/raw/direct/` oder `data/raw/switch/` oder `data/raw/sim/` | ja |
-| `powershell/run_benchmark_comparison.ps1` | Direkt-vs-Switch-Vergleich | `reports/network_direct_vs_switch.md` | nein |
+| `powershell/run_benchmark.ps1` | TCP-Port-Messungen, Standard ist 9000 | `data/raw/<session_tag>/` je nach `run.csv` | ja |
+| `powershell/run_benchmark_comparison.ps1` | Vergleich zweier Sessions, `-BaseTag`/`-CompareTag` erforderlich | `reports/network_session_comparison.md` | nein |
 | `powershell/run_webapp_timing.ps1` | periodische Webapp-Zeitmessung | `data/raw/webapp/<session_tag>/` und `reports/webapp_timing_overview.md` | nein |
 | `powershell/run_r_script.ps1` | generischer R-Skript-Start mit zentraler Rscript-Suche | je nach R-Skript | je nach R-Skript |
 | `powershell/archive_data_backup.ps1` | Daten sichern und Arbeitsbestand resetten | `data/backups/YYYYMMdd_HHmmss_Databackup/` | nein |
@@ -144,7 +142,7 @@ genaue Vor-Ort-Ablauf steht im [Betriebsmanual](docs/06_betriebsmanual_workflow.
 | `R/run_inventory_steckbrief.R` | Markdown-Steckbrief | `reports/steckbrief_*.md` | nein |
 | `R/run_localhost_simulation.R` | lokaler Simulationslauf mit Benchmark, Multirun-Auswertung und DuckDB-Import | `reports/network_overview_localhost.md` | ja |
 | `R/run_benchmark.R` | Messlaeufe aus R | Roh-CSV-Dateien pro Lauf | ja |
-| `R/run_benchmark_comparison.R` | Direkt-vs-Switch-Vergleich, optional mit `--base=` und `--compare=` | `reports/network_direct_vs_switch.md` | nein |
+| `R/run_benchmark_comparison.R` | Vergleich zweier Sessions, `--base=` und `--compare=` erforderlich | `reports/network_session_comparison.md` | nein |
 | `R/run_webapp_timing.R` | periodische Webapp-Zeitmessung | `data/raw/webapp/<session_tag>/` und `reports/webapp_timing_overview.md` | nein |
 | `R/run_multirun_analysis.R` | gemeinsame Analyse mehrerer Sessions | `reports/network_overview.md` und CSV-Aggregate | ja |
 | `R/run_duckdb_analysis.R` | laedt die lokalen Daten in DuckDB, erstellt Views und Report | `reports/network_overview_duckdb.md` | ja |

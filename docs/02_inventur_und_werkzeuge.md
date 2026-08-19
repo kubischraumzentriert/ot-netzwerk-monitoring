@@ -75,9 +75,10 @@ Der Standard-Flow fuer das Projekt bleibt trotzdem: CSV sammeln, Markdown erzeug
 
 - `R/run_inventory_steckbrief.R` fuer den automatischen Inventur-Steckbrief
 - `powershell/run_inventory_steckbrief.ps1` fuer den Start aus PowerShell
-- `R/run_benchmark.R --run=configs/run.direct.example.csv --targets=configs/targets.csv`
-  fuer einen Direktlauf
-- `R/run_benchmark_comparison.R` fuer den Direkt-vs-Switch-Vergleich
+- `R/run_benchmark.R --run=configs/run.example.csv --targets=configs/targets.csv`
+  fuer einen Messlauf
+- `R/run_benchmark_comparison.R --base=<tag1> --compare=<tag2>` fuer den
+  Vergleich zweier Messlaeufe
 
 ## Wie du Wireshark, Nmap, ZAP und Suricata sinnvoll nutzt
 

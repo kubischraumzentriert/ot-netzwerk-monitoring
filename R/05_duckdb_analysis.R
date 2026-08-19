@@ -210,7 +210,7 @@ write_duckdb_report <- function(
     "",
     "## Naechste Schritte",
     "",
-    "- einen echten Direkt-vs-Switch-Lauf mit getrennten `session_tag`-Werten fahren",
+    "- zwei zu vergleichende Messlaeufe mit getrennten `session_tag`-Werten fahren",
     "- bei Bedarf weitere Rohdaten oder Varianten als Tabellen aufnehmen",
     "- gezielte SQL-Abfragen fuer eine tiefere Analyse anlegen",
     "- daraus spaeter Vergleiche pro Ziel, Probe und Session ableiten"

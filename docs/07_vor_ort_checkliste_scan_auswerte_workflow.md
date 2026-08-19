@@ -18,11 +18,12 @@ Diese Checkliste ist fuer den Scan-Auswerte-Workflow gedacht:
 ## Vor dem Anschluss
 
 - [ ] Freigabe fuer den Test liegt vor
-- [ ] Ziel ist klar: direkt, ueber Switch oder lokaler Trockenlauf
+- [ ] Ziel ist klar: welche zwei Messlaeufe verglichen werden sollen (z. B.
+  direkt vs. ueber Switch) oder lokaler Trockenlauf
 - [ ] Relevante IPs und Hostnamen sind dokumentiert
 - [ ] `configs/targets.csv` ist vorbereitet
-- [ ] falls gebraucht: `configs/run.direct.csv` und `configs/run.switch.csv`
-  sind angepasst
+- [ ] falls gebraucht: `configs/run.csv` ist fuer den jeweiligen Messlauf mit
+  eigenem `session_tag` und `output_dir` angepasst
 - [ ] unnoetige Netzwerkadapter sind identifiziert
 - [ ] VPN, Wi-Fi und sonstige Fremdverbindungen sind ausgeschaltet
 - [ ] nur der fuer den Test benoetigte Adapter ist aktiv
@@ -50,12 +51,15 @@ Diese Checkliste ist fuer den Scan-Auswerte-Workflow gedacht:
 
 ## TCP-Port-Benchmark
 
-- [ ] `powershell/run_benchmark.ps1` mit Direktlauf ausfuehren
-- [ ] nach dem Direktlauf Switchlauf mit derselben Konfiguration ausfuehren
+- [ ] `powershell/run_benchmark.ps1` fuer den ersten Messlauf ausfuehren
+- [ ] fuer den zweiten Messlauf `session_tag` und `output_dir` in
+  `configs/run.csv` aendern und erneut ausfuehren, sonst gleiche
+  Konfiguration
 - [ ] fuer jeden Zielhost auf Erfolg, Latenz und Ausreisser achten
-- [ ] die Session-Tags in `configs/run.localhost.csv`, `configs/run.direct.csv`
-  und `configs/run.switch.csv` sauber setzen
-- [ ] Ergebnisse unter `data/raw/direct/` und `data/raw/switch/` ablegen
+- [ ] die Session-Tags in `configs/run.localhost.csv` und `configs/run.csv`
+  sauber und je Lauf unterschiedlich setzen
+- [ ] Ergebnisse unter dem jeweiligen `output_dir`, z. B. `data/raw/direct/`
+  und `data/raw/switch/`, ablegen
 
 ## Optionaler Netzwerkscan
 
@@ -76,7 +80,8 @@ Diese Checkliste ist fuer den Scan-Auswerte-Workflow gedacht:
 
 - [ ] Rohdaten liegen an den erwarteten Stellen
 - [ ] Reports wurden geschrieben
-- [ ] `R/run_benchmark_comparison.R` ausfuehren
+- [ ] `R/run_benchmark_comparison.R --base=<tag1> --compare=<tag2>` mit den
+  beiden verwendeten Session-Tags ausfuehren
 - [ ] optional `R/run_duckdb_analysis.R` ausfuehren
 - [ ] optional `R/run_duckdb_overview_report.R` ausfuehren
 - [ ] Ergebnisse kurz gegen die Fragestellung pruefen
@@ -87,8 +92,8 @@ Diese Checkliste ist fuer den Scan-Auswerte-Workflow gedacht:
 
 1. Freigabe und Vorbereitung
 2. Verbindung und Inventur
-3. Direktlauf
-4. Switchlauf
+3. erster Messlauf
+4. zweiter Messlauf
 5. Vergleich
 6. optional Scans und Mitschnitt
 7. Auswertung und Ablage

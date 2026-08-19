@@ -298,13 +298,10 @@ build_multirun_bundle <- function(
 benchmark_session_compare <- function(benchmark_rows, base_tag = NULL, compare_tag = NULL) {
   if (!is.data.frame(benchmark_rows) || !nrow(benchmark_rows)) return(data.frame())
   if (!"session_tag" %in% names(benchmark_rows)) return(data.frame())
+  if (is.null(base_tag) || !nzchar(base_tag) || is.null(compare_tag) || !nzchar(compare_tag)) {
+    return(data.frame())
+  }
   tags <- sort(unique(benchmark_rows$session_tag[!is.na(benchmark_rows$session_tag) & nzchar(benchmark_rows$session_tag)]))
-  if (is.null(base_tag) || !nzchar(base_tag)) {
-    base_tag <- tags[1]
-  }
-  if (is.null(compare_tag) || !nzchar(compare_tag)) {
-    compare_tag <- tags[2]
-  }
   if (length(tags) < 2 || !(base_tag %in% tags) || !(compare_tag %in% tags)) return(data.frame())
 
   subset_cols <- intersect(
@@ -352,7 +349,7 @@ benchmark_session_compare <- function(benchmark_rows, base_tag = NULL, compare_t
 
 write_benchmark_comparison_report <- function(
   bundle = build_multirun_bundle(),
-  output_file = file.path(paths$reports, "network_direct_vs_switch.md"),
+  output_file = file.path(paths$reports, "network_session_comparison.md"),
   base_tag = NULL,
   compare_tag = NULL
 ) {
@@ -369,9 +366,15 @@ write_benchmark_comparison_report <- function(
     "Es wurden keine beschrifteten Benchmark-Daten gefunden."
   }
 
+  comparison_heading <- if (nrow(compare_tbl)) {
+    paste0("## Vergleich: `", base_tag, "` vs. `", compare_tag, "`")
+  } else {
+    "## Vergleich"
+  }
+
   md <- c(
-    markdown_yaml_header("Benchmark Vergleich"),
-    "# Benchmark Vergleich",
+    markdown_yaml_header("Session Vergleich"),
+    "# Session Vergleich",
     "",
     "## Session-Uebersicht",
     "",
@@ -381,7 +384,7 @@ write_benchmark_comparison_report <- function(
     "",
     fmt_md_table(sum_tbl, max_rows = 20),
     "",
-    "## Direkt vs. Switch",
+    comparison_heading,
     ""
   )
 
@@ -392,23 +395,20 @@ write_benchmark_comparison_report <- function(
       "",
       "## Hinweis",
       "",
-      if (is.null(base_tag) || is.null(compare_tag)) {
-        "- base_tag und compare_tag werden ohne explizite Auswahl aus den ersten beiden Session-Tags gebildet."
-      } else {
-        paste0("- Expliziter Vergleich: `", base_tag, "` gegen `", compare_tag, "`.")
-      },
-      "- Fuer einen echten Direkt-vs-Switch-Vergleich sollten die Laufnamen `direct` und `switch` enthalten.",
+      paste0("- Expliziter Vergleich: `", base_tag, "` gegen `", compare_tag, "`."),
       "- Die Kennzahlen sind Mittelwerte ueber die jeweiligen CSV-Rows."
     )
   } else {
+    example_base <- if (length(available_tags) >= 1) available_tags[1] else "vorher"
+    example_compare <- if (length(available_tags) >= 2) available_tags[2] else "nachher"
     md <- c(
       md,
-      "Keine zwei unterschiedlichen Benchmark-Sessions gefunden.",
+      "Kein Vergleich berechnet.",
       "",
       tag_hint,
       "",
-      "Tipp: setze `session_tag` in der Benchmark-Konfiguration, zum Beispiel `direct` und `switch`, oder gib `--base=` und `--compare=` an.",
-      "Der Vergleich braucht mindestens zwei unterschiedliche, nicht-leere Session-Tags."
+      paste0("Gib `--base=` und `--compare=` mit zwei unterschiedlichen, vorhandenen Session-Tags an, zum Beispiel `--base=", example_base, " --compare=", example_compare, "`."),
+      "Ohne beide Parameter wird kein Session-Tag-Paar automatisch geraten."
     )
   }
 
@@ -582,7 +582,7 @@ write_multirun_report <- function(bundle = build_multirun_bundle(), output_file 
     "",
     "## Naechste Auswertungsschritte",
     "",
-    "- Direkt vs. Switch als getrennte Sessions markieren",
+    "- zu vergleichende Messlaeufe als getrennte Sessions markieren",
     "- Port 9000 Messungen pro Geraet vergleichen",
     "- auffaellige Hosts mit Wireshark oder Suricata nachverfolgen",
     "- Ergebnisse bei Bedarf in DuckDB laden"

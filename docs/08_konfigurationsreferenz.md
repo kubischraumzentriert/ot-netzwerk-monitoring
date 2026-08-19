@@ -20,8 +20,6 @@ Arbeitsdateien gedacht:
 Beispiele:
 
 - `configs/targets.private.csv`
-- `configs/run.direct.private.csv`
-- `configs/run.switch.private.csv`
 - `configs/tools.private.csv`
 
 ## Uebersicht
@@ -31,8 +29,6 @@ Beispiele:
 - `configs/targets.production.example.csv`
 - `configs/targets.localhost.csv`
 - `configs/run.csv` oder `configs/run.example.csv`
-- `configs/run.direct.csv` oder `configs/run.direct.example.csv`
-- `configs/run.switch.csv` oder `configs/run.switch.example.csv`
 - `configs/run.webapp.csv` oder `configs/run.webapp.example.csv`
 - `configs/run.localhost.csv`
 - `configs/scan_targets.csv` oder `configs/scan_targets.example.csv`
@@ -130,36 +126,12 @@ Hinweise:
 - `output_dir` ist nur der Basisordner; der Lauf kann darunter noch einen
   `session_tag`-Unterordner anlegen.
 - `session_tag` ist fuer Vergleichslaeufe sehr hilfreich, aber nicht zwingend.
-
-## `configs/run.direct.csv`
-
-Diese Datei ist die Laufkonfiguration fuer den Direktlauf.
-
-| Schluessel | Bedeutung | Beispiel | Pflicht |
-| --- | --- | --- | --- |
-| `ping_count` | Anzahl der Ping-Proben | `20` | ja |
-| `ping_interval_sec` | Pause zwischen den Ping-Proben | `1` | ja |
-| `tcp_count` | Anzahl der TCP-Proben | `20` | ja |
-| `tcp_interval_sec` | Pause zwischen den TCP-Proben | `1` | ja |
-| `tcp_timeout_sec` | TCP-Timeout | `3` | ja |
-| `tcp_port` | Default-Port, wenn ein Ziel keinen eigenen Port hat | `9000` | ja |
-| `session_tag` | Laufname fuer Auswertung und Ordnerstruktur | `direct` | ja |
-| `output_dir` | Zielordner fuer Rohdaten | `data/raw/direct` | ja |
-
-## `configs/run.switch.csv`
-
-Diese Datei ist die Laufkonfiguration fuer den Switchlauf.
-
-| Schluessel | Bedeutung | Beispiel | Pflicht |
-| --- | --- | --- | --- |
-| `ping_count` | Anzahl der Ping-Proben | `20` | ja |
-| `ping_interval_sec` | Pause zwischen den Ping-Proben | `1` | ja |
-| `tcp_count` | Anzahl der TCP-Proben | `20` | ja |
-| `tcp_interval_sec` | Pause zwischen den TCP-Proben | `1` | ja |
-| `tcp_timeout_sec` | TCP-Timeout | `3` | ja |
-| `tcp_port` | Default-Port, wenn ein Ziel keinen eigenen Port hat | `9000` | ja |
-| `session_tag` | Laufname fuer Auswertung und Ordnerstruktur | `switch` | ja |
-| `output_dir` | Zielordner fuer Rohdaten | `data/raw/switch` | ja |
+- Fuer einen Vergleich zweier Messlaeufe (z. B. Direktverbindung gegen
+  Switch) fuehrst du `configs/run.csv` zweimal mit unterschiedlichem
+  `session_tag` und `output_dir` aus, zum Beispiel `session_tag=direct` /
+  `output_dir=data/raw/direct` und danach `session_tag=switch` /
+  `output_dir=data/raw/switch`. Es gibt keine dedizierten Config-Dateien pro
+  Szenario mehr, `configs/run.example.csv` ist die einzige Vorlage.
 
 ## `configs/run.localhost.csv`
 

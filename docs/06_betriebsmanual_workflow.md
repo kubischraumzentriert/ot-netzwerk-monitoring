@@ -3,7 +3,7 @@ title: "Betriebsmanual NetzwerkAnalyse Workflow"
 version: "1.0"
 date: "2026-08-17"
 project: "NetzwerkAnalyse"
-purpose: "Vor-Ort-Workflow fuer Inventur, konfigurierbare TCP-Port-Tests auf einem oder mehreren Ports pro Zielhost, Direkt-vs-Switch-Vergleich und Auswertung"
+purpose: "Vor-Ort-Workflow fuer Inventur, konfigurierbare TCP-Port-Tests auf einem oder mehreren Ports pro Zielhost, Vergleich zweier Messlaeufe und Auswertung"
 ---
 
 # Betriebsmanual Workflow
@@ -15,7 +15,7 @@ oder an drei vernetzten Geraeten. Ziel ist:
 
 - den Ist-Zustand der Kommunikation zu erfassen
 - einen konfigurierbaren TCP-Port gegen die Geraete zu messen, Standard ist 9000, wobei jeder Zielhost einen eigenen Port haben kann
-- einen Vergleich zwischen direkter Verbindung und Switch zu erzeugen
+- einen Vergleich zwischen zwei beliebigen Messlaeufen zu erzeugen, zum Beispiel direkte Verbindung gegen Switch, oder vorher gegen nachher
 - die Ergebnisse als Markdown und optional in DuckDB abzulegen
 
 Fuer die schnelle Abarbeitung vor Ort nutze zusaetzlich die
@@ -108,18 +108,21 @@ Die relevanten Dateien sind:
 - `configs/targets.csv`
 - `configs/targets.private.csv` fuer lokale reale Zieladressen, falls vorhanden
 - `configs/run.localhost.csv` fuer den Trockenlauf
-- `configs/run.direct.example.csv`
-- `configs/run.switch.example.csv`
+- `configs/run.example.csv`
 
-Fuer echte Tests kannst du die Beispieldateien nach
-`configs/run.direct.csv` und `configs/run.switch.csv`
-kopieren oder direkt die Beispiel-Dateien uebergeben.
+Fuer jeden Messlauf kopierst du `configs/run.example.csv` nach
+`configs/run.csv` (oder uebergibst per `--run=`/`-RunConfig` einen eigenen
+Pfad) und setzt `session_tag` und `output_dir` fuer diesen Lauf. Fuer einen
+Vergleich fuehrst du den Benchmark zweimal mit unterschiedlichem
+`session_tag` aus, zum Beispiel `direct`/`switch` oder `vorher`/`nachher` —
+der Name ist frei waehlbar, wichtig ist nur, dass er zwischen den beiden
+Laeufen unterschiedlich und konsistent ist.
 
-`session_tag` traegst du in der jeweiligen Run-Config ein:
+`session_tag` traegst du jeweils in der verwendeten Run-Config ein:
 
 - `configs/run.localhost.csv` fuer den Trockenlauf, zum Beispiel `localhost`
-- `configs/run.direct.csv` oder `configs/run.direct.example.csv`, zum Beispiel `direct`
-- `configs/run.switch.csv` oder `configs/run.switch.example.csv`, zum Beispiel `switch`
+- `configs/run.csv` fuer den jeweiligen Messlauf, zum Beispiel `direct` beim
+  ersten und `switch` beim zweiten Durchlauf
 
 Die vollstaendige Beschreibung aller CSV-Spalten steht in
 [docs/08_konfigurationsreferenz.md](08_konfigurationsreferenz.md).
@@ -165,11 +168,13 @@ Die fachliche Einordnung steht in
 
 1. `powershell/run_localhost_workflow.ps1`
 2. `R/run_duckdb_overview_report.R`
-3. `R/run_benchmark_comparison.R`
 
 Damit pruefst du, ob der komplette Werkzeugpfad lokal funktioniert. Der
 Workflow-Wrapper ruft dabei zuerst `powershell/run_init_database.ps1` auf, das
-seinerseits `R/run_init_database.R` startet.
+seinerseits `R/run_init_database.R` startet. Der Trockenlauf erzeugt nur
+einen Session-Tag (`localhost`), `R/run_benchmark_comparison.R` ist deshalb
+erst ab Phase E sinnvoll, wenn mindestens zwei unterschiedliche Session-Tags
+vorliegen.
 
 ### Phase B: Vor-Ort-Inventur
 
@@ -186,38 +191,48 @@ Ergebnis:
 - Rohdaten in `data/raw/inventory/<timestamp>/`
 - Markdown-Steckbrief in `reports/`
 
-### Phase C: Direktlauf ohne Switch
+### Phase C: Erster Messlauf
 
-1. Geraete direkt nacheinander mit dem Laptop verbinden
-2. `configs/run.direct.csv` oder `configs/run.direct.example.csv` verwenden
+1. Erstes Szenario aufbauen, z. B. Geraete direkt nacheinander mit dem
+   Laptop verbinden
+2. `configs/run.csv` (aus `configs/run.example.csv` kopiert) mit
+   `session_tag`, z. B. `direct`, und `output_dir`, z. B. `data/raw/direct`,
+   fuer dieses Szenario einstellen
 3. `powershell/run_benchmark.ps1`
 
 Ergebnis:
 
-- Ping- und TCP-Rohdaten in `data/raw/direct/<timestamp>_*.csv`
+- Ping- und TCP-Rohdaten in `<output_dir>/<timestamp>_*.csv`
 - spaeter auswertbar in R und DuckDB
 
-### Phase D: Lauf mit Switch
+### Phase D: Zweiter Messlauf
 
-1. Switch zwischenschalten
+1. zweites Szenario aufbauen, z. B. Switch zwischenschalten
 2. dieselben Zieladressen und bei Bedarf pro Zielhost unterschiedliche TCP-Ports verwenden
-3. `configs/run.switch.csv` oder `configs/run.switch.example.csv` verwenden
+3. `configs/run.csv` mit einem anderen `session_tag`, z. B. `switch`, und
+   `output_dir`, z. B. `data/raw/switch`, fuer dieses Szenario anpassen
 4. erneut `powershell/run_benchmark.ps1`
 
 Ergebnis:
 
-- Ping- und TCP-Rohdaten in `data/raw/switch/<timestamp>_*.csv`
+- Ping- und TCP-Rohdaten in `<output_dir>/<timestamp>_*.csv`
 
 ### Phase E: Vergleich
 
-1. `powershell/run_benchmark_comparison.ps1`
+1. `powershell/run_benchmark_comparison.ps1 -BaseTag <erster_session_tag> -CompareTag <zweiter_session_tag>`,
+   z. B. `-BaseTag direct -CompareTag switch`
 2. optional `R/run_multirun_analysis.R`
 3. optional `R/run_duckdb_analysis.R`
 4. optional `R/run_duckdb_overview_report.R`
 
+`-BaseTag`/`-CompareTag` (bzw. `--base=`/`--compare=` in R) sind
+erforderlich; ohne beide Angaben bricht der Vergleich mit einer Meldung ab,
+die die vorhandenen Session-Tags auflistet, statt lautlos ein Paar zu
+erraten.
+
 Ergebnis:
 
-- `reports/network_direct_vs_switch.md`
+- `reports/network_session_comparison.md`
 - `reports/network_overview.md`
 - `reports/network_overview_duckdb.md`
 - `reports/duckdb_analysis_overview.md`
@@ -251,9 +266,9 @@ saubere Startbasis fuer eine Anlage anlegen willst.
 - nur Platzhalter-Adressen aus dem Dokumentationsnetz
 - gedacht zum Kopieren nach `configs/targets.csv` oder als Referenz fuer neue Projekte
 
-### `configs/run.direct.csv` oder `configs/run.switch.csv`
+### `configs/run.csv`
 
-Hier stellst du die Messlaenge ein:
+Hier stellst du die Messlaenge fuer den jeweiligen Messlauf ein:
 
 - `ping_count`
 - `tcp_count`
@@ -269,7 +284,9 @@ Empfehlung fuer den Start:
 - `ping_count = 20`
 - `tcp_count = 20`
 - `tcp_port = 9000` als Standardwert, aber jeder freigegebene Port pro Zielhost ist moeglich
-- `session_tag = direct`, `switch` oder `localhost`
+- `session_tag` frei waehlbar, z. B. `direct`, `switch` oder `localhost` —
+  fuer einen Vergleich zwischen zwei Laeufen einfach vor dem zweiten Lauf
+  `session_tag` und `output_dir` in `configs/run.csv` aendern
 
 ### `configs/scan_targets.csv`
 
@@ -328,8 +345,8 @@ wichtigsten Basisabfragen:
 in die DuckDB, `R/run_duckdb_overview_report.R` liest nur noch aus der
 vorhandenen Datenbank und schreibt den Uebersichtsreport.
 
-Bei mehreren Messpaaren kannst du den Direkt-vs-Switch-Vergleich explizit
-auswaehlen:
+Bei mehreren Messlaeufen waehlst du die zu vergleichenden Sessions explizit
+aus, `-BaseTag`/`-CompareTag` sind erforderlich:
 
 ```powershell
 powershell\run_benchmark_comparison.ps1 -BaseTag direct -CompareTag switch
@@ -354,8 +371,8 @@ Wenn du nur wenig Zeit hast, dann wuerde ich so vorgehen:
 
 1. Inventur sammeln
 2. Steckbrief schreiben
-3. Direktlauf messen
-4. Switch-Lauf messen
+3. ersten Messlauf durchfuehren
+4. zweiten Messlauf durchfuehren
 5. Vergleichsreport erzeugen
 6. erst danach Nmap oder Mitschnitt aktivieren
 
@@ -376,11 +393,10 @@ so weiter schärfen:
 Typische Ausgaben sind:
 
 - `data/raw/inventory/<timestamp>/`
-- `data/raw/direct/<timestamp>_*.csv`
-- `data/raw/switch/<timestamp>_*.csv`
+- `data/raw/<session_tag>/<timestamp>_*.csv` je Messlauf, z. B. `data/raw/direct/` und `data/raw/switch/`
 - `reports/steckbrief_*.md`
 - `reports/network_overview.md`
-- `reports/network_direct_vs_switch.md`
+- `reports/network_session_comparison.md`
 - `reports/network_overview_duckdb.md`
 - `reports/duckdb_analysis_overview.md`
 
@@ -392,6 +408,6 @@ Der empfohlene Start ist:
 
 1. Inventur
 2. Steckbrief
-3. Direktlauf
-4. Switchlauf
+3. erster Messlauf
+4. zweiter Messlauf
 5. Vergleich

@@ -13,8 +13,7 @@ Die kurze Referenz fuer den Vor-Ort-Einsatz.
 - `configs/targets.private.csv`: lokale, ignorierte Zieladressen
 - `configs/targets.production.example.csv`: Vorlage fuer reale Zielgeraete
 - `configs/targets.localhost.csv`: lokaler Trockenlauf auf `127.0.0.1`
-- `configs/run.direct.csv`: Direktlauf
-- `configs/run.switch.csv`: Switchlauf
+- `configs/run.csv`: Laufkonfiguration fuer den jeweiligen Messlauf (`session_tag`/`output_dir` je Lauf anpassen)
 - `configs/run.webapp.csv`: Webapp-Zeitmessung
 - `configs/run.localhost.csv`: Trockenlauf
 - `configs/scan_targets.csv`: Nmap-Ziele
@@ -119,8 +118,8 @@ Hinweis:
 
 ## Typische Werte
 
-- Direktlauf: `session_tag=direct`, `output_dir=data/raw/direct`
-- Switchlauf: `session_tag=switch`, `output_dir=data/raw/switch`
+- Messlauf (Beispiel): `session_tag=direct`, `output_dir=data/raw/direct`
+- Vergleichslauf (Beispiel): `session_tag=switch`, `output_dir=data/raw/switch`
 - Trockenlauf: `session_tag=localhost`, `output_dir=data/raw/sim`
 - Webapp-Timing: `session_tag=webapp`, `output_dir=data/raw/webapp`
 - Standardport: `tcp_port=9000`
