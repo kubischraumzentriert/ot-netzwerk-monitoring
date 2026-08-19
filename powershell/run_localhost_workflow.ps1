@@ -33,6 +33,9 @@ if (-not (Test-Path -LiteralPath $runnerScript)) { throw "Missing R runner: $run
 if (-not $env:R_LIBS_USER -or -not (Test-Path -LiteralPath $env:R_LIBS_USER)) {
     $env:R_LIBS_USER = Join-Path $env:USERPROFILE 'AppData\Local\R\win-library\4.5'
 }
+if (-not $env:TZ -or -not $env:TZ.Trim()) {
+    $env:TZ = 'UTC'
+}
 
 if ($DbPath) {
     $env:NETWORK_ANALYSIS_DUCKDB_PATH = $DbPath

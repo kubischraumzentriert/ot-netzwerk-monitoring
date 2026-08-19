@@ -44,6 +44,8 @@ Die aktuelle Version arbeitet bewusst leichtgewichtig und misst:
 
 Die Messung ist als Erstversion fuer `http://`-Ziele ausgelegt und sendet
 standardmaessig `HEAD`, damit die Anwendung moeglichst wenig belastet wird.
+Die Rohdaten speichern Zeitstempel als portable ISO-Textform in `UTC`, damit
+der Lauf auch auf anderen Rechnern ohne Zeitzonen-Artefakte auswertbar bleibt.
 
 ## Konfiguration
 
@@ -73,6 +75,7 @@ Die `*.private.csv`-Dateien sind fuer reale Werte gedacht und bleiben lokal.
 - `interval_sec`: Sekunden zwischen den Samples
 - `timeout_sec`: Socket-Timeout in Sekunden
 - `method`: Standard-Methode, wenn das Ziel nichts ueberschreibt
+- `timezone`: optionale Zeitzone fuer Lauf und Rohdaten, empfohlen `UTC`
 - `session_tag`: Laufbezeichnung
 - `output_dir`: Basisordner fuer die Rohdaten
 
@@ -113,9 +116,15 @@ powershell\run_webapp_timing.ps1 -TargetsConfig configs\webapp_targets.private.c
 4. Timeout eher kurz halten, zum Beispiel 5 Sekunden
 5. erst danach bei Bedarf auf `GET` oder kuerzere Intervalle gehen
 
+## Wenn `Bad Request` auftaucht
+
+- pruefe zuerst die genaue URL und den Pfad
+- pruefe dann, ob der Server `HEAD` akzeptiert
+- wenn noetig, schalte pro Ziel auf `GET` um
+- ein `400 Bad Request` ist in der Regel eine echte HTTP-Antwort des Zielsystems und kein reiner Messfehler
+
 ## Einordnung
 
 - fuer reine Latenz- und Timeoutmessung: R-Skript
 - fuer Web-Security oder Interception: ZAP
 - fuer tiefe Paket-Analyse: Wireshark/tshark
-

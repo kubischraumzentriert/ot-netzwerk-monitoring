@@ -56,6 +56,7 @@ Hinweis:
 - `tcp_interval_sec`: Pause zwischen TCP-Proben
 - `tcp_timeout_sec`: TCP-Timeout
 - `tcp_port`: Default-Port, wenn `targets.csv` oder `targets.private.csv` keinen gueltigen Port hat
+- `timezone`: optionale Zeitzone fuer Lauf und Rohdaten, empfohlen `UTC`
 - `session_tag`: Laufname wie `direct`, `switch` oder `localhost`
 - `output_dir`: Zielordner fuer Rohdaten
 
@@ -65,6 +66,7 @@ Hinweis:
 - `interval_sec`: Sekunden zwischen den Samples
 - `timeout_sec`: HTTP-Timeout
 - `method`: `HEAD` oder `GET`
+- `timezone`: optionale Zeitzone, empfohlen `UTC`
 - `session_tag`: Laufname wie `webapp`
 - `output_dir`: Zielordner fuer Rohdaten
 

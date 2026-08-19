@@ -230,7 +230,7 @@ webapp_probe_once <- function(label, url, method = "HEAD", timeout_sec = 5) {
   total_ms <- as.numeric(difftime(Sys.time(), start, units = "secs")) * 1000
 
   data.frame(
-    ts = Sys.time(),
+    ts = timestamp_text(Sys.time()),
     session_tag = NA_character_,
     target_label = label,
     url = url,
@@ -309,6 +309,7 @@ write_webapp_timing_report <- function(rows, run_cfg, targets, output_file) {
     paste0("- sample_count: `", if ("sample_count" %in% names(run_cfg)) run_cfg[["sample_count"]] else "n/a", "`"),
     paste0("- interval_sec: `", if ("interval_sec" %in% names(run_cfg)) run_cfg[["interval_sec"]] else "n/a", "`"),
     paste0("- timeout_sec: `", if ("timeout_sec" %in% names(run_cfg)) run_cfg[["timeout_sec"]] else "n/a", "`"),
+    paste0("- timezone: `", if ("timezone" %in% names(run_cfg)) run_cfg[["timezone"]] else "UTC", "`"),
     paste0("- output_dir: `", if ("output_dir" %in% names(run_cfg)) run_cfg[["output_dir"]] else "n/a", "`"),
     "",
     "## Zielsysteme",
@@ -327,6 +328,7 @@ write_webapp_timing_report <- function(rows, run_cfg, targets, output_file) {
     "",
     "- Die Messung ist bewusst leichtgewichtig und sendet pro Probe nur einen einzelnen HTTP-Request.",
     "- Standard ist `HEAD`; wenn die Anwendung das nicht sauber kann, kannst du auf `GET` umstellen.",
+    "- Wenn der Zielserver `400 Bad Request` liefert, liegt das meistens an einem ungeeigneten Pfad, einer nicht unterstuetzten HTTP-Methode oder an einem Health-Endpunkt, der anders erwartet wird.",
     "- Fuer HTTPS koennen wir spaeter eine erweiterte Variante auf Basis von `curl` oder `httr2` ergänzen."
   )
 
@@ -359,6 +361,7 @@ run_webapp_timing <- function(targets = read_webapp_targets(), run_cfg = read_we
   interval_sec <- as_num(run_cfg[["interval_sec"]], 60)
   default_timeout_sec <- as_num(run_cfg[["timeout_sec"]], 5)
   default_method <- if ("method" %in% names(run_cfg)) run_cfg[["method"]] else "HEAD"
+  run_timezone <- normalize_timezone(if ("timezone" %in% names(run_cfg)) run_cfg[["timezone"]] else "UTC")
   session_tag <- resolve_webapp_session_tag(run_cfg)
   output_dir <- resolve_webapp_output_dir(run_cfg)
   dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
@@ -403,7 +406,7 @@ run_webapp_timing <- function(targets = read_webapp_targets(), run_cfg = read_we
     out_file <- file.path(
       output_dir,
       paste0(
-        format(Sys.time(), "%Y%m%d_%H%M%S"),
+        compact_timestamp(Sys.time(), tz = run_timezone),
         "_",
         safe_component(session_tag, fallback = "webapp"),
         "_",
@@ -421,8 +424,9 @@ run_webapp_timing <- function(targets = read_webapp_targets(), run_cfg = read_we
     stop("No webapp timing rows were written.")
   }
 
-  combined$run_started_at <- as.character(run_started_at)
-  combined$run_finished_at <- as.character(Sys.time())
+  combined$run_started_at <- timestamp_text(run_started_at, tz = run_timezone)
+  combined$run_finished_at <- timestamp_text(Sys.time(), tz = run_timezone)
+  combined$timezone <- run_timezone
   write_webapp_timing_report(
     rows = combined,
     run_cfg = run_cfg,
@@ -431,7 +435,7 @@ run_webapp_timing <- function(targets = read_webapp_targets(), run_cfg = read_we
   )
   write.csv(
     combined,
-    file.path(output_dir, paste0(format(run_started_at, "%Y%m%d_%H%M%S"), "_", safe_component(session_tag, fallback = "webapp"), "_combined.csv")),
+    file.path(output_dir, paste0(compact_timestamp(run_started_at, tz = run_timezone), "_", safe_component(session_tag, fallback = "webapp"), "_combined.csv")),
     row.names = FALSE,
     fileEncoding = "UTF-8"
   )

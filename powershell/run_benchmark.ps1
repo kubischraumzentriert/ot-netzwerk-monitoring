@@ -17,6 +17,9 @@ if (-not $TargetsConfig -or -not $TargetsConfig.Trim()) {
 if (-not $RunConfig -or -not $RunConfig.Trim()) {
     $RunConfig = Join-Path $ProjectRoot 'configs\run.csv'
 }
+if (-not $env:TZ -or -not $env:TZ.Trim()) {
+    $env:TZ = 'UTC'
+}
 
 . (Join-Path $ScriptRootPath 'resolve_tool_path.ps1')
 $rscript = Resolve-ProjectTool `

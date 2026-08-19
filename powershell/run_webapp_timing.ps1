@@ -20,6 +20,9 @@ if (-not $RunConfig -or -not $RunConfig.Trim()) {
     $privateRun = Join-Path $ProjectRoot 'configs\run.webapp.private.csv'
     $RunConfig = if (Test-Path -LiteralPath $privateRun) { $privateRun } else { Join-Path $ProjectRoot 'configs\run.webapp.example.csv' }
 }
+if (-not $env:TZ -or -not $env:TZ.Trim()) {
+    $env:TZ = 'UTC'
+}
 
 . (Join-Path $ScriptRootPath 'resolve_tool_path.ps1')
 $RScriptPath = Resolve-ProjectTool `

@@ -5,4 +5,5 @@ tcp_count,20
 tcp_interval_sec,1
 tcp_timeout_sec,3
 tcp_port,9000
+timezone,UTC
 output_dir,data/raw

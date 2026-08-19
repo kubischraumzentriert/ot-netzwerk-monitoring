@@ -106,7 +106,7 @@ ping_once <- function(host, timeout_sec = 1) {
   rtt_ms <- extract_ping_rtt_ms(res)
 
   data.frame(
-    ts = Sys.time(),
+    ts = timestamp_text(Sys.time()),
     host = host,
     port = NA_integer_,
     probe = "ping",
@@ -154,7 +154,7 @@ tcp_probe <- function(host, port = 9000, request = "HELLO", timeout_sec = 3) {
   total_ms <- as.numeric(difftime(Sys.time(), start, units = "secs")) * 1000
 
   data.frame(
-    ts = Sys.time(),
+    ts = timestamp_text(Sys.time()),
     host = host,
     port = port,
     probe = "tcp",
@@ -175,6 +175,7 @@ run_benchmark <- function(targets = read_targets(), run_cfg = read_run_config())
   tcp_interval_sec <- as_num(run_cfg[["tcp_interval_sec"]], 1)
   tcp_timeout_sec <- as_num(run_cfg[["tcp_timeout_sec"]], 3)
   tcp_default_port <- as.integer(as_num(run_cfg[["tcp_port"]], 9000))
+  run_timezone <- normalize_timezone(if ("timezone" %in% names(run_cfg)) run_cfg[["timezone"]] else "UTC")
   output_dir <- run_cfg[["output_dir"]]
   if (is.na(output_dir) || !nzchar(output_dir)) output_dir <- file.path(paths$root, "data", "raw")
   session_tag <- resolve_session_tag(run_cfg, output_dir, fallback = "session")
@@ -211,7 +212,7 @@ run_benchmark <- function(targets = read_targets(), run_cfg = read_run_config())
     out <- file.path(
       output_dir,
       paste0(
-        format(Sys.time(), "%Y%m%d_%H%M%S"),
+        compact_timestamp(Sys.time(), tz = run_timezone),
         "_",
         gsub("[^A-Za-z0-9_-]", "_", target$label),
         ".csv"
@@ -221,6 +222,8 @@ run_benchmark <- function(targets = read_targets(), run_cfg = read_run_config())
     tcp_df <- transform(do.call(rbind, tcp_rows), target_label = target$label)
     ping_df$session_tag <- session_tag
     tcp_df$session_tag <- session_tag
+    ping_df$timezone <- run_timezone
+    tcp_df$timezone <- run_timezone
     ping_df$target_host <- target$host
     tcp_df$target_host <- target$host
     ping_df$target_port <- NA_integer_

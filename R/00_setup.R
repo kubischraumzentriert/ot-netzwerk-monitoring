@@ -84,6 +84,31 @@ safe_component <- function(x, fallback = "default") {
   gsub("[^A-Za-z0-9_-]", "_", x)
 }
 
+normalize_timezone <- function(tz, fallback = "UTC") {
+  tz <- as.character(tz)
+  tz <- tz[!is.na(tz) & nzchar(trimws(tz))]
+  if (!length(tz)) {
+    return(fallback)
+  }
+
+  tz <- trimws(tz[[1]])
+  if (tz %in% OlsonNames()) {
+    tz
+  } else {
+    fallback
+  }
+}
+
+timestamp_text <- function(time = Sys.time(), tz = "UTC") {
+  tz <- normalize_timezone(tz, fallback = "UTC")
+  format(time, "%Y-%m-%dT%H:%M:%OS6%z", tz = tz)
+}
+
+compact_timestamp <- function(time = Sys.time(), tz = "UTC") {
+  tz <- normalize_timezone(tz, fallback = "UTC")
+  format(time, "%Y%m%d_%H%M%S", tz = tz)
+}
+
 read_csv_safe <- function(path) {
   if (!file.exists(path)) return(data.frame())
   read.csv(path, stringsAsFactors = FALSE, check.names = FALSE, fileEncoding = "UTF-8-BOM")

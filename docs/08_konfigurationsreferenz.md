@@ -120,6 +120,7 @@ Sie wird verwendet, wenn kein anderer Run-Pfad uebergeben wird.
 | `tcp_interval_sec` | Pause zwischen zwei TCP-Proben | `1` | ja |
 | `tcp_timeout_sec` | Socket-Timeout fuer den TCP-Test | `3` | ja |
 | `tcp_port` | Default-Port fuer Ziele ohne gueltige `port`-Angabe | `9000` | ja |
+| `timezone` | optionale Zeitzone fuer Lauf und Rohdaten; empfohlen `UTC` | `UTC` | nein |
 | `output_dir` | Basisordner fuer Rohdaten | `data/raw` | ja |
 | `session_tag` | Laufbezeichnung; optional, wird bei Bedarf aus dem Ausgabeordner oder als `session` abgeleitet | `direct` | nein |
 
@@ -185,6 +186,7 @@ Diese Datei ist die Laufkonfiguration fuer die Webapp-Zeitmessung.
 | `interval_sec` | Pause zwischen zwei Webapp-Samples | `60` | ja |
 | `timeout_sec` | Socket-Timeout fuer den HTTP-Request | `5` | ja |
 | `method` | HTTP-Methode, standardmaessig `HEAD` | `HEAD` | nein |
+| `timezone` | optionale Zeitzone fuer Lauf und Rohdaten; empfohlen `UTC` | `UTC` | nein |
 | `session_tag` | Laufname fuer Auswertung und Ordnerstruktur | `webapp` | ja |
 | `output_dir` | Zielordner fuer Rohdaten | `data/raw/webapp` | ja |
 
