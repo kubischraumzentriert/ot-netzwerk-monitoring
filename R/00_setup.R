@@ -74,6 +74,21 @@ default_targets_path <- function() {
   }
 }
 
+bind_rows_union <- function(...) {
+  dfs <- list(...)
+  dfs <- Filter(function(x) is.data.frame(x) && nrow(x) >= 0, dfs)
+  if (!length(dfs)) return(data.frame())
+  all_names <- unique(unlist(lapply(dfs, names), use.names = FALSE))
+  aligned <- lapply(dfs, function(df) {
+    missing <- setdiff(all_names, names(df))
+    for (nm in missing) df[[nm]] <- NA
+    df <- df[, all_names, drop = FALSE]
+    rownames(df) <- NULL
+    df
+  })
+  do.call(rbind, aligned)
+}
+
 as_num <- function(x, default = NA_real_) {
   if (length(x) == 0 || is.na(x) || !nzchar(x)) return(default)
   suppressWarnings(as.numeric(x))

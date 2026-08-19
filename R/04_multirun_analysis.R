@@ -1,21 +1,6 @@
 source("R/00_setup.R", local = TRUE)
 source("R/01_inventory_report.R", local = TRUE)
 
-bind_rows_union <- function(...) {
-  dfs <- list(...)
-  dfs <- Filter(function(x) is.data.frame(x) && nrow(x) >= 0, dfs)
-  if (!length(dfs)) return(data.frame())
-  all_names <- unique(unlist(lapply(dfs, names), use.names = FALSE))
-  aligned <- lapply(dfs, function(df) {
-    missing <- setdiff(all_names, names(df))
-    for (nm in missing) df[[nm]] <- NA
-    df <- df[, all_names, drop = FALSE]
-    rownames(df) <- NULL
-    df
-  })
-  do.call(rbind, aligned)
-}
-
 list_inventory_sessions <- function(root = paths$inventory) {
   if (!dir.exists(root)) return(character())
   dirs <- list.dirs(root, full.names = TRUE, recursive = FALSE)

@@ -29,21 +29,6 @@ resolve_session_tag <- function(run_cfg, output_dir, fallback = "session") {
   safe_component(tag, fallback = fallback)
 }
 
-bind_rows_union <- function(...) {
-  dfs <- list(...)
-  dfs <- Filter(function(x) is.data.frame(x) && nrow(x) >= 0, dfs)
-  if (!length(dfs)) return(data.frame())
-  all_names <- unique(unlist(lapply(dfs, names), use.names = FALSE))
-  aligned <- lapply(dfs, function(df) {
-    missing <- setdiff(all_names, names(df))
-    for (nm in missing) df[[nm]] <- NA
-    df <- df[, all_names, drop = FALSE]
-    rownames(df) <- NULL
-    df
-  })
-  do.call(rbind, aligned)
-}
-
 sanitize_text <- function(x) {
   x <- as.character(x)
   x <- vapply(x, function(value) {
@@ -54,7 +39,7 @@ sanitize_text <- function(x) {
     if (is.na(value) || !nzchar(value)) {
       value <- ""
     }
-    value <- gsub("\r\n|\r|\n", " \\n ", value, perl = TRUE)
+    value <- gsub("\r\n|\r|\n", " \\\\n ", value, perl = TRUE)
     value <- gsub("[[:cntrl:]]", " ", value, perl = TRUE)
     trimws(value)
   }, character(1), USE.NAMES = FALSE)

@@ -33,6 +33,15 @@ test_that("sanitize_text strips control characters and collapses onto one line",
   expect_equal(length(strsplit(x, "\n", fixed = TRUE)[[1]]), 1)
 })
 
+test_that("sanitize_text marks removed newlines with a literal '\\n' placeholder", {
+  # Regression test: the gsub() replacement previously used an
+  # under-escaped "\\n" that perl=TRUE interpreted as a real newline
+  # escape instead of the literal two-character placeholder, which the
+  # following control-character cleanup then silently swallowed again.
+  x <- sanitize_text("line1\r\nline2")
+  expect_equal(x, "line1 \\n line2")
+})
+
 test_that("sanitize_text turns NA/empty input into an empty string", {
   expect_equal(sanitize_text(NA), "")
 })
