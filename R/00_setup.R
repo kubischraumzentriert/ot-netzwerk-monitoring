@@ -15,7 +15,7 @@ candidate_libs <- unique(c(
 candidate_libs <- candidate_libs[nzchar(candidate_libs)]
 
 if (length(candidate_libs)) {
-  .libPaths(c(candidate_libs, .libPaths()))
+  .libPaths(c(.libPaths(), candidate_libs))
 }
 
 project_root <- normalizePath(getwd(), winslash = "/", mustWork = TRUE)

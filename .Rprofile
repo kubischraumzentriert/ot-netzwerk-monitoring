@@ -13,6 +13,6 @@ if (!nzchar(user_lib)) {
 }
 
 if (dir.exists(user_lib)) {
-  .libPaths(c(user_lib, .libPaths()))
+  .libPaths(c(.libPaths(), user_lib))
 }
 

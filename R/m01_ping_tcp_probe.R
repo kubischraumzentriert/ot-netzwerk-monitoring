@@ -121,7 +121,8 @@ ping_once <- function(host, timeout_sec = 1) {
 tcp_probe <- function(host, port = 9000, request = "HELLO", timeout_sec = 3) {
   start <- Sys.time()
   con <- NULL
-  ok <- FALSE
+  transport_ok <- FALSE
+  reply_ok <- FALSE
   reply <- NA_character_
   connect_ms <- NA_real_
   total_ms <- NA_real_
@@ -138,13 +139,14 @@ tcp_probe <- function(host, port = 9000, request = "HELLO", timeout_sec = 3) {
     connect_ms <- as.numeric(difftime(Sys.time(), start, units = "secs")) * 1000
     writeBin(charToRaw(paste0(request, "\n")), con)
     flush(con)
+    transport_ok <- TRUE
     reply <- tryCatch({
       raw <- readBin(con, what = "raw", n = 4096)
       if (length(raw) > 0) rawToChar(raw) else ""
     }, error = function(e) {
       NA_character_
     })
-    ok <- TRUE
+    reply_ok <- !is.na(reply) && nzchar(reply)
   }, error = function(e) {
     err <<- conditionMessage(e)
   }, finally = {
@@ -158,7 +160,9 @@ tcp_probe <- function(host, port = 9000, request = "HELLO", timeout_sec = 3) {
     host = host,
     port = port,
     probe = "tcp",
-    success = ok,
+    success = transport_ok && reply_ok,
+    transport_ok = transport_ok,
+    reply_ok = reply_ok,
     connect_ms = connect_ms,
     total_ms = total_ms,
     request = request,

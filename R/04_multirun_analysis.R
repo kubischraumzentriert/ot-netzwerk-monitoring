@@ -22,10 +22,13 @@ list_inventory_sessions <- function(root = paths$inventory) {
   dirs[dir.exists(dirs)]
 }
 
+non_benchmark_raw_dirs <- c("inventory", "webapp", "scans", "pcap", "suricata")
+
 list_benchmark_files <- function(root = paths$data_raw) {
   if (!dir.exists(root)) return(character())
   files <- list.files(root, pattern = "\\.csv$", full.names = TRUE, recursive = TRUE)
-  files[!grepl("[\\\\/]inventory[\\\\/]", files, ignore.case = TRUE)]
+  exclude_pattern <- paste0("[\\\\/](", paste(non_benchmark_raw_dirs, collapse = "|"), ")[\\\\/]")
+  files[!grepl(exclude_pattern, files, ignore.case = TRUE)]
 }
 
 safe_mean <- function(x) {
