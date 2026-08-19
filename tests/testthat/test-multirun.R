@@ -7,6 +7,44 @@ test_that("safe_mean/safe_median/safe_p95 ignore NA and handle empty input", {
   expect_true(is.na(safe_p95(numeric(0))))
 })
 
+test_that("benchmark_target_overview recomputes median/p95 from raw rows instead of weighted-averaging group medians", {
+  rows <- data.frame(
+    session_tag = c(rep("s1", 5), "s2"),
+    target_label = "T1",
+    probe = "ping",
+    metric_ms = c(1, 1, 1, 1, 1, 100),
+    success = TRUE,
+    stringsAsFactors = FALSE
+  )
+  summary_tbl <- benchmark_run_summary(rows)
+  out <- benchmark_target_overview(summary_tbl, rows)
+
+  true_median <- safe_median(rows$metric_ms)
+  expect_equal(out$metric_ms_median[out$target_label == "T1"], true_median)
+
+  # A weighted mean of the two group medians is a very different (wrong)
+  # number here -- this pins down that the fix actually changed behavior,
+  # not just that it returns *some* number.
+  naive_weighted_mean_of_medians <- weighted.mean(summary_tbl$metric_ms_median, w = summary_tbl$rows)
+  expect_gt(abs(naive_weighted_mean_of_medians - true_median), 10)
+})
+
+test_that("benchmark_target_overview returns NA median/p95 when raw benchmark_rows are not supplied", {
+  rows <- data.frame(
+    session_tag = c("s1", "s2"),
+    target_label = "T1",
+    probe = "ping",
+    metric_ms = c(1, 100),
+    success = TRUE,
+    stringsAsFactors = FALSE
+  )
+  summary_tbl <- benchmark_run_summary(rows)
+  out <- benchmark_target_overview(summary_tbl)
+
+  expect_true(is.na(out$metric_ms_median))
+  expect_true(is.na(out$metric_ms_p95))
+})
+
 test_that("list_benchmark_files excludes inventory, webapp, scans, pcap and suricata folders", {
   root <- tempfile("raw_")
   dir.create(file.path(root, "direct"), recursive = TRUE)

@@ -171,14 +171,31 @@ benchmark_probe_overview <- function(benchmark_rows) {
   do.call(rbind, rows)
 }
 
-benchmark_target_overview <- function(summary_tbl) {
+benchmark_target_overview <- function(summary_tbl, benchmark_rows = data.frame()) {
   if (!is.data.frame(summary_tbl) || !nrow(summary_tbl) || !"target_label" %in% names(summary_tbl)) {
     return(data.frame())
   }
 
+  has_raw_metric <- is.data.frame(benchmark_rows) && nrow(benchmark_rows) &&
+    all(c("target_label", "metric_ms") %in% names(benchmark_rows))
+
   targets <- sort(unique(summary_tbl$target_label[!is.na(summary_tbl$target_label) & nzchar(summary_tbl$target_label)]))
   rows <- lapply(targets, function(target_name) {
     subset_tbl <- summary_tbl[summary_tbl$target_label == target_name, , drop = FALSE]
+
+    # Mean and success rate are weighted averages of per-group means/rates,
+    # which are mathematically identical to computing them on the pooled
+    # rows. Median and p95 are NOT: a weighted average of per-group medians
+    # or p95 values is not the median/p95 of the pooled data, so those two
+    # are recomputed from the raw metric_ms values for this target instead.
+    metric_ms_median <- NA_real_
+    metric_ms_p95 <- NA_real_
+    if (has_raw_metric) {
+      raw_metric <- benchmark_rows$metric_ms[benchmark_rows$target_label == target_name]
+      metric_ms_median <- safe_median(raw_metric)
+      metric_ms_p95 <- safe_p95(raw_metric)
+    }
+
     data.frame(
       target_label = target_name,
       rows = sum(as.integer(subset_tbl$rows), na.rm = TRUE),
@@ -186,8 +203,8 @@ benchmark_target_overview <- function(summary_tbl) {
       probes = if ("probe" %in% names(subset_tbl)) paste(sort(unique(subset_tbl$probe[!is.na(subset_tbl$probe) & nzchar(subset_tbl$probe)])), collapse = ", ") else "n/a",
       success_rate = if ("success_rate" %in% names(subset_tbl)) weighted.mean(subset_tbl$success_rate, w = as.integer(subset_tbl$rows), na.rm = TRUE) else NA_real_,
       metric_ms_mean = if ("metric_ms_mean" %in% names(subset_tbl)) weighted.mean(subset_tbl$metric_ms_mean, w = as.integer(subset_tbl$rows), na.rm = TRUE) else NA_real_,
-      metric_ms_median = if ("metric_ms_median" %in% names(subset_tbl)) weighted.mean(subset_tbl$metric_ms_median, w = as.integer(subset_tbl$rows), na.rm = TRUE) else NA_real_,
-      metric_ms_p95 = if ("metric_ms_p95" %in% names(subset_tbl)) weighted.mean(subset_tbl$metric_ms_p95, w = as.integer(subset_tbl$rows), na.rm = TRUE) else NA_real_,
+      metric_ms_median = metric_ms_median,
+      metric_ms_p95 = metric_ms_p95,
       stringsAsFactors = FALSE
     )
   })

@@ -126,7 +126,7 @@ write_duckdb_report <- function(
   benchmark_files <- benchmark_file_overview()
   probe_overview <- benchmark_probe_overview(benchmark_rows)
   session_overview <- benchmark_session_overview(benchmark_summary)
-  target_overview <- benchmark_target_overview(benchmark_summary)
+  target_overview <- benchmark_target_overview(benchmark_summary, benchmark_rows)
 
   counts <- counts[order(counts$table_name), , drop = FALSE]
   total_rows <- sum(counts$rows, na.rm = TRUE)
