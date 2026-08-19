@@ -25,6 +25,12 @@ output: "html_document"
 
 Die TCP-Messung ist generisch. Wenn dein Dienst auf Port 9000 ein bestimmtes Protokoll erwartet, muessen wir das Request-Format ggf. noch anpassen.
 
+Wenn du das Repo auf einem neuen Rechner startest, ist der Standardweg:
+
+```r
+renv::restore()
+```
+
 ## Port-Konfiguration
 
 - `configs/run.csv` enthaelt den Default-Port unter `tcp_port`

@@ -20,6 +20,8 @@ env/
 .Rproj.user/
 Rplots.pdf
 .local_r_lib/
+renv/cache/
+renv/library/
 
 # PowerShell / Windows
 *.ps1~*

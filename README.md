@@ -33,6 +33,7 @@ Bevor du am Projekt arbeitest, lies bitte:
 8. das DuckDB-Datenmodell in [docs/11_duckdb_datenmodell.md](docs/11_duckdb_datenmodell.md)
 9. die Einordnung zu `netstat` und `Test-NetConnection` in [docs/12_netstat_vs_testnetconnection.md](docs/12_netstat_vs_testnetconnection.md)
 10. die Webapp-Zeitmessung in [docs/13_webapp_timing.md](docs/13_webapp_timing.md)
+11. `renv` und die R-Abhaengigkeiten in [docs/14_renv_und_abhaengigkeiten.md](docs/14_renv_und_abhaengigkeiten.md)
 
 ## Zielbild
 
@@ -47,6 +48,12 @@ Bevor du am Projekt arbeitest, lies bitte:
 1. R
 2. Python
 3. PowerShell
+
+## R-Umgebung
+
+Die R-Abhaengigkeiten werden im Projekt mit `renv` versioniert.
+Das Lockfile heisst [renv.lock](renv.lock). Auf einem neuen Rechner solltest du
+vor dem ersten Lauf `renv::restore()` ausfuehren.
 
 ## Erste Struktur
 

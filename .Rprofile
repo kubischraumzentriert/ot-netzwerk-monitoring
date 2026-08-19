@@ -1,3 +1,5 @@
+Sys.setenv(RENV_PATHS_CACHE = file.path(getwd(), "renv", "cache"))
+source("renv/activate.R")
 user_lib <- Sys.getenv("R_LIBS_USER")
 if (!nzchar(user_lib)) {
   user_lib <- file.path(
