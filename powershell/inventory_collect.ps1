@@ -8,6 +8,21 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
+# ipconfig/netsh/arp/netstat/route are legacy console tools that write their
+# output in the system's OEM codepage (Control Panel > Region > "Language
+# for non-Unicode programs"), not in PowerShell's default encoding. Without
+# this, PowerShell decodes the captured bytes incorrectly and replaces
+# non-ASCII characters (e.g. German umlauts) with U+FFFD before the text
+# ever reaches Out-File -Encoding utf8 -- by then the original bytes are
+# already lost. Reading the true OEM codepage from the registry keeps this
+# correct for any locale, not just German.
+try {
+    $oemCodePage = (Get-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Nls\CodePage').OEMCP
+    [Console]::OutputEncoding = [System.Text.Encoding]::GetEncoding([int]$oemCodePage)
+} catch {
+    Write-Warning "Could not set console output encoding to the system OEM codepage: $($_.Exception.Message)"
+}
+
 $ScriptRootPath = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Path }
 
 if (-not $ProjectRoot -or -not $ProjectRoot.Trim()) {

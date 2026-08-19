@@ -10,6 +10,17 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
+# See inventory_collect.ps1 for why this is needed: arp.exe/ping.exe write
+# console output in the system OEM codepage, not UTF-8, and PowerShell must
+# be told the real codepage before capturing it or non-ASCII characters get
+# replaced with U+FFFD.
+try {
+    $oemCodePage = (Get-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Nls\CodePage').OEMCP
+    [Console]::OutputEncoding = [System.Text.Encoding]::GetEncoding([int]$oemCodePage)
+} catch {
+    Write-Warning "Could not set console output encoding to the system OEM codepage: $($_.Exception.Message)"
+}
+
 $ScriptRootPath = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Path }
 
 if (-not $ProjectRoot -or -not $ProjectRoot.Trim()) {
