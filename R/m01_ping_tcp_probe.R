@@ -73,17 +73,36 @@ extract_ping_rtt_ms <- function(lines) {
   min(candidates, na.rm = TRUE)
 }
 
-ping_once <- function(host, timeout_sec = 1) {
+windows_oem_encoding <- function() {
+  cp <- tryCatch(
+    utils::readRegistry(r"(SYSTEM\CurrentControlSet\Control\Nls\CodePage)", hive = "HLM")$OEMCP,
+    error = function(e) NA_character_
+  )
+  if (is.null(cp) || is.na(cp) || !nzchar(cp)) return("CP850")
+  paste0("CP", cp)
+}
+
+run_ping_command <- function(host, timeout_sec) {
   if (.Platform$OS.type != "windows") {
-    cmd <- "ping"
     args <- c("-c", "1", "-W", as.character(timeout_sec), host)
-  } else {
-    cmd <- "ping"
-    args <- c("-n", "1", "-w", as.character(timeout_sec * 1000), host)
+    return(suppressWarnings(system2("ping", args = args, stdout = TRUE, stderr = TRUE)))
   }
 
+  # ping.exe (a legacy console tool) writes its output in the system's OEM
+  # codepage (Control Panel > Region > "Language for non-Unicode programs"),
+  # not in R's native/UTF-8 encoding and not affected by chcp. On German
+  # Windows that OEM codepage is 850, which produces mojibake and "invalid
+  # UTF-8"/"unable to translate" warnings when captured as-is. The OEM
+  # codepage is read from the registry so this works for any locale, not
+  # just German.
+  args <- c("-n", "1", "-w", as.character(timeout_sec * 1000), host)
+  res <- suppressWarnings(system2("ping", args = args, stdout = TRUE, stderr = TRUE))
+  iconv(res, from = windows_oem_encoding(), to = "UTF-8", sub = "byte")
+}
+
+ping_once <- function(host, timeout_sec = 1) {
   start <- Sys.time()
-  res <- suppressWarnings(system2(cmd, args = args, stdout = TRUE, stderr = TRUE))
+  res <- run_ping_command(host, timeout_sec)
   elapsed_ms <- as.numeric(difftime(Sys.time(), start, units = "secs")) * 1000
 
   text <- paste(res, collapse = "\n")

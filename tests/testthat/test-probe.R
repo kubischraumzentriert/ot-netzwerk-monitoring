@@ -1,3 +1,21 @@
+test_that("windows_oem_encoding returns a codepage label with a safe fallback", {
+  # On non-Windows this exercises the fallback path (readRegistry is not
+  # available), on Windows it should reflect the real OEM codepage.
+  enc <- windows_oem_encoding()
+  expect_type(enc, "character")
+  expect_true(grepl("^CP[0-9]+$", enc))
+})
+
+test_that("run_ping_command decodes ping.exe's OEM-codepage output as valid UTF-8", {
+  # Regression test: ping.exe writes console output in the OEM codepage
+  # (e.g. CP850 on German Windows), not UTF-8. Capturing it as-is produced
+  # mojibake and "invalid UTF-8" warnings from grepl()/regexec() downstream.
+  skip_on_os(c("mac", "linux", "solaris"))
+  res <- run_ping_command("127.0.0.1", timeout_sec = 1)
+  expect_true(all(validUTF8(res)))
+  expect_true(any(grepl("TTL=", res, ignore.case = TRUE)))
+})
+
 test_that("combine_probe_rows attaches the shared columns to non-empty rows", {
   rows_list <- list(
     data.frame(metric_ms = 1, stringsAsFactors = FALSE),
