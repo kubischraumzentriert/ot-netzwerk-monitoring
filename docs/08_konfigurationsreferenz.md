@@ -8,6 +8,22 @@ output: "html_document"
 Diese Seite beschreibt die CSV-Dateien unter `configs/` und die Bedeutung
 aller verwendeten Spalten und Schluessel.
 
+## Grundregel fuer private Dateien
+
+Dateien mit dem Suffix `*.private.csv` sind in diesem Projekt als lokale
+Arbeitsdateien gedacht:
+
+- sie enthalten reale Anlagenadressen oder lokale Tool-Pfade
+- sie bleiben ueber `.gitignore` lokal
+- sie werden nicht ins GitHub-Repo gepusht
+
+Beispiele:
+
+- `configs/targets.private.csv`
+- `configs/run.direct.private.csv`
+- `configs/run.switch.private.csv`
+- `configs/tools.private.csv`
+
 ## Uebersicht
 
 - `configs/targets.csv` oder `configs/targets.example.csv`

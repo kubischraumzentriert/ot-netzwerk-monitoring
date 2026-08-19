@@ -22,6 +22,11 @@ Die kurze Referenz fuer den Vor-Ort-Einsatz.
 - `sql/ddl/network_analysis_schema.sql`: DuckDB-Basisstruktur
 - `docs/11_duckdb_datenmodell.md`: Tabellen, Views und Spalten im Detail
 
+Hinweis:
+
+- `*.private.csv` bleibt lokal und wird durch `.gitignore` nicht versioniert
+- `*.example.csv` bleibt im Repo und dient als Vorlage
+
 ## Wichtige Felder
 
 ### `targets.csv`
