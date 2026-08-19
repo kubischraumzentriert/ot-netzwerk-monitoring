@@ -55,6 +55,18 @@ Die R-Abhaengigkeiten werden im Projekt mit `renv` versioniert.
 Das Lockfile heisst [renv.lock](renv.lock). Auf einem neuen Rechner solltest du
 vor dem ersten Lauf `renv::restore()` ausfuehren.
 
+## Tests
+
+```bash
+Rscript tests/run_tests.R
+```
+
+Eine `testthat`-Suite deckt Config-Parser, Inventur-Parser,
+Ping/TCP-Probe-Hilfsfunktionen und den Session-Vergleich ab. Details stehen in
+[docs/14_renv_und_abhaengigkeiten.md](docs/14_renv_und_abhaengigkeiten.md).
+Ein GitHub-Actions-Workflow ([.github/workflows/r-tests.yml](.github/workflows/r-tests.yml))
+fuehrt die Suite bei jedem Push und Pull Request auf `main` aus.
+
 ## Erste Struktur
 
 - `R/` fuer Auswertungen, Reports und Visualisierungen

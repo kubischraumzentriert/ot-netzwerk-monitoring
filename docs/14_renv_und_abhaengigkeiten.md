@@ -55,6 +55,7 @@ unter anderem:
 - `readr`
 - `rJava`
 - `RJDBC`
+- `testthat`
 
 Fuer die neue Webapp-Zeitmessung sind aktuell keine zusaetzlichen R-Pakete
 noetig, weil sie auf Basis-R-Funktionen aufsetzt.
@@ -72,6 +73,24 @@ renv::restore()
 ```r
 renv::snapshot(prompt = FALSE)
 ```
+
+## Tests
+
+Der Kern der Parser- und Auswertungsfunktionen (Config-Parser,
+Inventur-Parser, Ping/TCP-Probe-Hilfsfunktionen, Session-Vergleich) hat eine
+`testthat`-Testsuite unter `tests/testthat/`.
+
+```r
+Rscript tests/run_tests.R
+```
+
+Die Tests brauchen nur `testthat`, nicht die volle `renv`-Lockfile-Umgebung
+(kein `duckdb`/`rJava` noetig). In GitHub Actions
+([.github/workflows/r-tests.yml](../.github/workflows/r-tests.yml)) laeuft
+deshalb bewusst kein `renv::restore()`, sondern nur eine gezielte
+Installation von `testthat`, um CI schnell und unabhaengig von einer
+Java-Installation zu halten. Fuer den lokalen `renv`-Workflow ist `testthat`
+trotzdem regulaer im Lockfile erfasst.
 
 ## Praktische Hinweise
 
